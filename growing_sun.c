@@ -41,6 +41,10 @@ int main(int argc, char *argv[]) {
 
 	// Create output directory
 	mkdir(OUTPUT_PATH, 0777);
+	char player_script[100];
+	sprintf(player_script, "%s/play_movie.sh", OUTPUT_PATH);
+	FILE *fp = fopen(player_script, "w");
+	fprintf(fp, "movie_player %d %d", screen_width, screen_height);
 
 	//Draw frames
 	for (int i = 0; i < num_frames; i++) {
@@ -51,10 +55,14 @@ int main(int argc, char *argv[]) {
 		// Save image
 		sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, i);
 		G_save_image_to_file(file_name);
+		fprintf(fp, " \\\n\t%s", file_name);
 
 		// Update frame details
 		radius += delta_radius;
 		shade += delta_shade;
 
 	}
+
+	fprintf(fp, "\n");
+	fclose(fp);
 }
