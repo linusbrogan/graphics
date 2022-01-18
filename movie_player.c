@@ -2,20 +2,19 @@
 
 int main(int argc, char *argv[]) {
 	// Check arguments
-	if (argc < 3) {
-		printf("usage: pgm_name movie_prefix num_frames\n");
+	if (argc < 4) {
+		printf("usage: pgm_name width height frame1 [frame2 [...]]\n");
 		exit(0);
 	}
 
 	// Initialize graphics
-	G_init_graphics(1000, 1000);
+	int width = atoi(argv[1]);
+	int height = atoi(argv[2]);
+	G_init_graphics(width, height);
 
-	// Contruct file names and render frames
-	int num_frames = atoi(argv[2]);
-	char file_name[100];
-	for (int i = 0; i < num_frames; i++) {
-		sprintf(file_name, "%s%04d.xwd", argv[1], i);
-		G_get_image_from_file(file_name, 0, 0) ;
+	// Display frames
+	for (int i = 3; i < argc; i++) {
+		G_get_image_from_file(argv[i], 0, 0) ;
 		G_wait_key();
 	}
 }
