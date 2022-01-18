@@ -1,4 +1,8 @@
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "FPToolkit.c"
+
+const char* OUTPUT_PATH = "Growing_Sun";
 
 /**
  * Draws a frame of the growing sun, centered at (x, y) with the given radius.
@@ -35,6 +39,9 @@ int main(int argc, char *argv[]) {
 	double delta_shade = 1.0 / num_frames;
 	char file_name[100];
 
+	// Create output directory
+	mkdir(OUTPUT_PATH, 0777);
+
 	//Draw frames
 	for (int i = 0; i < num_frames; i++) {
 		// Render
@@ -42,7 +49,7 @@ int main(int argc, char *argv[]) {
 		G_wait_key();
 
 		// Save image
-		sprintf(file_name, "growing_sun.frame_%04d.xwd", i);
+		sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, i);
 		G_save_image_to_file(file_name);
 
 		// Update frame details
