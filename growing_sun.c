@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	char file_name[100];
 
 	// Create output directory
-	mkdir(OUTPUT_PATH, 0777);
+	mkdir(OUTPUT_PATH, 0750);
 	char player_script[100];
 	sprintf(player_script, "%s/play_movie.sh", OUTPUT_PATH);
 	FILE *fp = fopen(player_script, "w");
@@ -64,5 +64,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	fprintf(fp, "\n");
+	chmod(player_script, 0750);
 	fclose(fp);
 }
