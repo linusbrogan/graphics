@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < num_frames; i++) {
 		// Render
 		draw_frame(x, y, radius, shade);
-		G_display_image();
+		G_wait_key();
 
 		// Save image
 		sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, i);
