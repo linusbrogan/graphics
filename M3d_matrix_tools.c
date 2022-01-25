@@ -317,36 +317,20 @@ int fill_action_matrix(double result[4][4], int action_type, double parameter) {
 int fill_action_matrix_inverse(double result[4][4], int action_type, double parameter) {
 	switch (action_type) {
 		case SX:
-		return M3d_make_scaling(result, 1 / parameter, 1, 1);
 		case SY:
-		return M3d_make_scaling(result, 1, 1 / parameter, 1);
 		case SZ:
-		return M3d_make_scaling(result, 1, 1, 1 / parameter);
+		parameter = 1 / parameter;
+		break;
 
 		case RX:
-		return M3d_make_x_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
 		case RY:
-		return M3d_make_y_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
 		case RZ:
-		return M3d_make_z_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
-
 		case TX:
-		return M3d_make_translation(result, -parameter, 0, 0);
 		case TY:
-		return M3d_make_translation(result, 0, -parameter, 0);
 		case TZ:
-		return M3d_make_translation(result, 0, 0, -parameter);
-
-		case NX:
-		return M3d_make_scaling(result, -1, 1, 1);
-		case NY:
-		return M3d_make_scaling(result, 1, -1, 1);
-		case NZ:
-		return M3d_make_scaling(result, 1, 1, -1);
-
-		default:
-		return 0;
+		parameter = -parameter;
 	}
+	return fill_action_matrix(result, action_type, parameter);
 }
 
 int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, int mtype[], double mparam[]) {
