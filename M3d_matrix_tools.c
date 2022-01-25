@@ -275,4 +275,102 @@ int M3d_x_product (double res[3], double a[3], double b[3])
 #define NZ 11
 
 
-  
+//////////////
+
+#define DEGREES (M_PI / 180)
+
+int fill_action_matrix(double result[4][4], int action_type, double parameter) {
+	switch (action_type) {
+		case SX:
+		return M3d_make_scaling(result, parameter, 1, 1);
+		case SY:
+		return M3d_make_scaling(result, 1, parameter, 1);
+		case SZ:
+		return M3d_make_scaling(result, 1, 1, parameter);
+
+		case RX:
+		return M3d_make_x_rotation_cs(result, cos(parameter * DEGREES), sin(parameter * DEGREES));
+		case RY:
+		return M3d_make_y_rotation_cs(result, cos(parameter * DEGREES), sin(parameter * DEGREES));
+		case RZ:
+		return M3d_make_z_rotation_cs(result, cos(parameter * DEGREES), sin(parameter * DEGREES));
+
+		case TX:
+		return M3d_make_translation(result, parameter, 0, 0);
+		case TY:
+		return M3d_make_translation(result, 0, parameter, 0);
+		case TZ:
+		return M3d_make_translation(result, 0, 0, parameter);
+
+		case NX:
+		return M3d_make_scaling(result, -1, 1, 1);
+		case NY:
+		return M3d_make_scaling(result, 1, -1, 1);
+		case NZ:
+		return M3d_make_scaling(result, 1, 1, -1);
+
+		default:
+		return 0;
+	}
+}
+
+int fill_action_matrix_inverse(double result[4][4], int action_type, double parameter) {
+	switch (action_type) {
+		case SX:
+		return M3d_make_scaling(result, 1 / parameter, 1, 1);
+		case SY:
+		return M3d_make_scaling(result, 1, 1 / parameter, 1);
+		case SZ:
+		return M3d_make_scaling(result, 1, 1, 1 / parameter);
+
+		case RX:
+		return M3d_make_x_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
+		case RY:
+		return M3d_make_y_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
+		case RZ:
+		return M3d_make_z_rotation_cs(result, cos(-parameter * DEGREES), sin(-parameter * DEGREES));
+
+		case TX:
+		return M3d_make_translation(result, -parameter, 0, 0);
+		case TY:
+		return M3d_make_translation(result, 0, -parameter, 0);
+		case TZ:
+		return M3d_make_translation(result, 0, 0, -parameter);
+
+		case NX:
+		return M3d_make_scaling(result, -1, 1, 1);
+		case NY:
+		return M3d_make_scaling(result, 1, -1, 1);
+		case NZ:
+		return M3d_make_scaling(result, 1, 1, -1);
+
+		default:
+		return 0;
+	}
+}
+
+int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, int mtype[], double mparam[]) {
+	double A[4][4];
+	M3d_make_identity(A);
+	double B[4][4];
+	M3d_make_identity(B);
+
+	for (int i = 0; i < n; i++) {
+		double temp[4][4];
+		fill_action_matrix(temp, mtype[i], mparam[i]);
+		M3d_mat_mult(A, temp, A);
+		fill_action_matrix_inverse(temp, mtype[i], mparam[i]);
+		M3d_mat_mult(B, B, temp);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			v[i][j] = A[i][j];
+			vi[i][j] = B[i][j];
+		}
+	}
+
+	return 1;
+}
+
+
