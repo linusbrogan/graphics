@@ -66,6 +66,13 @@ int main(int argc, char **argv)
 
  // now make the movie the rotates and shrinks about the center :
 //spin + direction, shrinking until very small, then red circle
+	G_rgb(0, 0, 0);
+	G_clear();
+
+	G_rgb(0.25, 0.5, 1);
+	G_fill_polygon(x, y, 13);
+	G_wait_key();
+
 	int i = 0;
 	while (i < 50) {
 		G_rgb(0, 0, 0);
@@ -74,7 +81,11 @@ int main(int argc, char **argv)
 		G_rgb(0.25, 0.5, 1);
 		G_fill_polygon(x, y, 13);
 
-		G_wait_key();
+		G_display_image();
+		usleep(u);
+		char keypress = G_no_wait_key();
+		if (keypress == 'q') exit(0);
+
 		M3d_mat_mult_points(x, y, z, fall, x, y, z, 13);
 		i++;
 	}
@@ -82,7 +93,9 @@ int main(int argc, char **argv)
 	G_clear();
 	G_rgb(1, 0, 0);
 	G_fill_circle(center, center, center / 6);
-	while (1) G_wait_key();
+	while (1)
+		if (G_wait_key() == 'q')
+			break;
  // .....
 
 }
