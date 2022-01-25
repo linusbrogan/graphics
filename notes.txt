@@ -1,0 +1,3 @@
+Homogeneous coordinates
+	x, y, z, and dummy 1
+	Makes translation a matrix multiplication problem
