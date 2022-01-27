@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	int n = 0;
 	mtype[n] = TX;	mparam[n] = -200;	n++;
 	mtype[n] = TY;	mparam[n] = -200;	n++;
-	double scale = winsize / 200;
+	double scale = winsize / 400;
 	mtype[n] = SX;	mparam[n] = scale;	n++;
 	mtype[n] = SY;	mparam[n] = scale;	n++;
 	double center = winsize / 2;
