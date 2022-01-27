@@ -277,7 +277,7 @@ int M3d_x_product (double res[3], double a[3], double b[3])
 
 //////////////
 
-#define DEGREES (M_PI / 180)
+#define DEGREES (((M_PI) / (180)))
 
 int fill_action_matrix(double result[4][4], int action_type, double parameter) {
 	switch (action_type) {
@@ -358,3 +358,51 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 }
 
 
+/////////////////////
+
+int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3]) {
+	// Initialize movement sequence
+	int mtype[100];
+	double mparam[100];
+	int n = 0;
+
+	// Copy inputs
+	double eye[3];
+	double coi[3];
+	double coi0[3];
+	double up[3];
+	for (int i = 0; i < 3; i++) {
+		eye[i] = eyeA[i];
+		coi[i] = coiA[i];
+		coi0[i] = coiA[i];
+		up[i] = upA[i];
+	}
+
+	// Create temporary movement sequence matrix
+	double t[4][4];
+	double t_i[4][4];
+
+	// Translate camera by negative of its location
+	mtype[n] = TX;	mparam[n] = -eye[0];	n++;
+	mtype[n] = TY;	mparam[n] = -eye[1];	n++;
+	mtype[n] = TZ;	mparam[n] = -eye[2];	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi, t, coi);
+
+	// Rotate about y-axis to bring CoI onto y-z plane
+	double theta = atan2(coi[0], coi[2]) / DEGREES;
+	mtype[n] = RY;	mparam[n] = -theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi0, t, coi0);
+
+	// Rotate about x-axis to bring CoI onto z-axis
+	theta = atan2(coi0[1], coi0[2]) / DEGREES;
+	mtype[n] = RX;	mparam[n] = theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(up, t, up);
+
+	//Roatete about z-axis to bring Up onto  y-z plane
+	theta = atan2(up[0], up[1]) / DEGREES;
+	mtype[n] = RZ;	mparam[n] = theta;	n++;
+	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
+}

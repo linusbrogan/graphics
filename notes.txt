@@ -1,3 +1,20 @@
 Homogeneous coordinates
 	x, y, z, and dummy 1
 	Makes translation a matrix multiplication problem
+
+In CS-367, we assumed the viewer was at the origin, looking at the +z-axis, with the +y-axis up.
+Now we want an arbitrary perspective.
+If the camera was moved to (2, 5, 1), for example, then we could equivalently move the world -(2, 5, 1) to get the same view.
+
+Objects are built in "object space."
+Each object gets some transformation to end up in the right place in the "world space."
+We can also put a light and camera somewhere in world space.
+To orient the camera, it also gets a "Center of Interest" and an "Up Point."
+
+To bring the camera back to its default location:
+- Translate the camera by the negative of its location.
+- Rotate about the y-axis to bring the CoI onto the y-z plane.
+- Rotate about the x-axis to bring the CoI onto the z-axis.
+- Rotate about the z-axis to bring the Up Point onto the y-z plane.
+The transformation matrix for this sequence is the "View Matrix".
+Apply the view matrix to all objects to get the right picture from the default camera.
