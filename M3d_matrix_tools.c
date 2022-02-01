@@ -401,7 +401,7 @@ int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], d
 	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
 	M3d_mat_mult_pt(up, t, up);
 
-	//Roatete about z-axis to bring Up onto  y-z plane
+	//Rotate about z-axis to bring Up onto  y-z plane
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
