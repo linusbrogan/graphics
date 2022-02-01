@@ -18,3 +18,40 @@ To bring the camera back to its default location:
 - Rotate about the z-axis to bring the Up Point onto the y-z plane.
 The transformation matrix for this sequence is the "View Matrix".
 Apply the view matrix to all objects to get the right picture from the default camera.
+
+2022-02-01
+View Matrix Computation, as Jeff suggests
+
+Translate by -eye
+Rotate CoI
+	a = coi0 - eye0
+	b = coi1 - eye1
+	c = coi2 - eye2
+	p = sqrt(a^2 + c^2)
+	
+	Rotate around z-axis
+	C = cos = c / p
+	S = sin = -a / p (negative angle)
+
+	[ C 0 S 0 ] (a)   (0)
+	[ 0 1 0 0 ] (b) = (b)
+	[-S 0 C 0 ] (c)   (p)
+	[ 0 0 0 1 ] (1)   (1)
+
+	Rotate around x-axis
+	Go from (0, b, p) to (0, 0, r)
+	r = sqrt(b^2 + p^2)
+	C = cos = p / r
+	S = sin = b / r (positive angle)
+
+	[ 1 0  0 0 ] (0)   (0)
+	[ 0 C -S 0 ] (b) = (0)
+	[ 0 S  C 0 ] (p)   (r)
+	[ 0 0  0 1 ] (1)   (1)
+
+	Send Up point through these transformations to get Up-bar
+	Rotate around z-axis
+	Up-bar = (x, y, z)
+	h = sqrt(x^2 + y^2)
+	C = cos = y / H
+	S = sin = x / H (positive angle)
