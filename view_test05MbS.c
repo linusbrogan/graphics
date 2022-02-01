@@ -489,6 +489,37 @@ int main ()
     up[2]  = eye[2] ; 
 
     // put your code here!!!!!!!!!!!!
+	M3d_view(V, Vi, eye, coi, up);
+	for (onum = 0; onum < numobjects; onum++) {
+		M3d_mat_mult_points(
+			x[onum],
+			y[onum],
+			z[onum],
+			V,
+			x[onum],
+			y[onum],
+			z[onum],
+			numpoints[onum]
+		);
+	}
+	G_rgb(0,0,0);
+	G_clear();
+	draw_all_objects() ;
+	for (onum = 0; onum < numobjects; onum++) {
+		M3d_mat_mult_points(
+			x[onum],
+			y[onum],
+			z[onum],
+			Vi,
+			x[onum],
+			y[onum],
+			z[onum],
+			numpoints[onum]
+		);
+	}
+	q = G_wait_key();
+	if (q == 'q')
+		exit(0);
 
 
     fnum++ ;
