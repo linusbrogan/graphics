@@ -55,3 +55,16 @@ Rotate CoI
 	h = sqrt(x^2 + y^2)
 	C = cos = y / H
 	S = sin = x / H (positive angle)
+
+Parametrizing Shapes
+Explicit form (y = f(x))
+	Line: y = x
+	Parabola: y = x^2
+Implicit form (an equation, often with one side equalling 0 or 1)
+	Circle: x^2 + y^2 = 1 or x^2 + y^2 - 1 = 0
+	Hyperbola: x^2 - y^2 = 1
+Parametric form (a function of another parameter)
+	Circle: x(t) = cos(t), y(t) = sin(t)
+	Line through (1, 2) and (5, 4):
+		(x, y) = (1, 2) + t * [(5, 4) - (1, 2)]
+	Hyperbola: (x, y) = (cosh(t), sin(t)) = (1 / 2) * (e^t + e^(-t), e^t - e^(-t))
