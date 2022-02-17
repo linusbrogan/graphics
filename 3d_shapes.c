@@ -10,13 +10,15 @@
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
 #define OUTPUT_PATH "Graph_3D"
+#define HITHER (1e-3)
+#define YON (1e50)
 
 double Z_BUFFER[WINDOW_SIZE][WINDOW_SIZE];
 
 void initialize_z_buffer(int size) {
 	for (int x = 0; x < size; x++) {
 		for (int y = 0; y < size; y++) {
-			Z_BUFFER[x][y] = 1e50;
+			Z_BUFFER[x][y] = YON;
 		}
 	}
 }
@@ -51,7 +53,7 @@ void graph_3d(
 			int x = project(point[0], z);
 			int y = project(point[1], z);
 			if (x >= 0 && x < WINDOW_SIZE && y >= 0 && y < WINDOW_SIZE) {
-				if (z > 0 && z < Z_BUFFER[x][y]) {
+				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
 					G_point(x, y);
 				}
