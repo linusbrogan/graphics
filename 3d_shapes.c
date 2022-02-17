@@ -1,7 +1,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "FPToolkit.c"
-#include "M3d_matrix_tools.c"
+#include "light_model.c"
 #include "2d_shape_functions.c"
 #include "3d_shape_functions.c"
 
@@ -29,6 +28,55 @@ int project(double x, double z) {
 	return round(x_prime);
 }
 
+void set_color(
+	double (*f_x)(double, double),
+	double (*f_y)(double, double),
+	double (*f_z)(double, double),
+	double u,
+	double du,
+	double v,
+	double dv,
+	double T[4][4],
+	double inherent_rgb[3]
+) {
+	double P[3] = {
+		f_x(u, v),
+		f_y(u, v),
+		f_z(u, v)
+	};
+	double u2 = u + du;
+	double Q[3] = {
+		f_x(u2, v),
+		f_y(u2, v),
+		f_z(u2, v)
+	};
+	double v2 = v + dv;
+	double R[3] = {
+		f_x(u, v2),
+		f_y(u, v2),
+		f_z(u, v2)
+	};
+
+	M3d_mat_mult_pt(P, T, P);
+	M3d_mat_mult_pt(Q, T, Q);
+	M3d_mat_mult_pt(R, T, R);
+
+	double A[3];
+	double B[3];
+	for (int i = 0; i < 3; i++) {
+		A[i] = Q[i] - P[i];
+		B[i] = R[i] - P[i];
+	}
+
+	double n[3];
+	M3d_x_product(n, A, B);
+
+	double eye[3] = {0, 0, 0};
+	double rgb[3];
+	Light_Model(inherent_rgb, eye, P, n, rgb);
+	G_rgb(rgb[0], rgb[1], rgb[2]);
+}
+
 void graph_3d(
 	double (*f_x)(double, double),
 	double (*f_y)(double, double),
@@ -37,7 +85,8 @@ void graph_3d(
 	double u_end,
 	double v_start,
 	double v_end,
-	double T[4][4]
+	double T[4][4],
+	double rgb[3]
 ) {
 	double du = (u_end - u_start) / NUM_PTS;
 	double dv = (v_end - v_start) / NUM_PTS;
@@ -55,6 +104,7 @@ void graph_3d(
 			if (x >= 0 && x < WINDOW_SIZE && y >= 0 && y < WINDOW_SIZE) {
 				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
+					set_color(f_x, f_y, f_z, u, du, v, dv, T, rgb);
 					G_point(x, y);
 				}
 			}
@@ -97,7 +147,7 @@ int main() {
 		double _i[4][4];
 	///////////
 		// Build an origin point
-		G_rgb(1, 0.8, 0);
+		double origin_rgb[3] = {1, 0.8, 0};
 		double M0[4][4];
 		double N0[4][4];
 		T_n = 0;
@@ -106,10 +156,10 @@ int main() {
 		T_type[T_n] = SZ;	T_param[T_n] = 0.25;	T_n++;
 		M3d_make_movement_sequence_matrix(M0, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N0, view, M0);
-		graph_3d(sphere_x, sphere_y, sphere_z, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, N0);
+		graph_3d(sphere_x, sphere_y, sphere_z, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, N0, origin_rgb);
 
 		// Build a +x-axis
-		G_rgb(1, 0.2, 0.2);
+		double x_rgb[3] = {1, 0.2, 0.2};
 		double M1[4][4];
 		double N1[4][4];
 		T_n = 0;
@@ -118,10 +168,10 @@ int main() {
 		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
 		M3d_make_movement_sequence_matrix(M1, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N1, view, M1);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N1);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N1, x_rgb);
 
 		// Build a +y-axis
-		G_rgb(1, 1, 1);
+		double y_rgb[3] = {1, 1, 1};
 		double M2[4][4];
 		double N2[4][4];
 		T_n = 0;
@@ -130,10 +180,10 @@ int main() {
 		T_type[T_n] = RX;	T_param[T_n] = -90;	T_n++;
 		M3d_make_movement_sequence_matrix(M2, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N2, view, M2);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N2);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N2, y_rgb);
 
 		// Build a +z-axis
-		G_rgb(0.3, 0.2, 1);
+		double z_rgb[3] = {0.3, 0.2, 1};
 		double M3[4][4];
 		double N3[4][4];
 		T_n = 0;
@@ -141,11 +191,11 @@ int main() {
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
 		M3d_make_movement_sequence_matrix(M3, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N3, view, M3);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N3);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N3, z_rgb);
 
 		// Build a x-y link
 		double half_length = 2 * sqrt(2);
-		G_rgb(0, 0.5, 0.5);
+		double diagonal_rgb[3] = {0, 0.5, 0.5};
 		double M4[4][4];
 		double N4[4][4];
 		T_n = 0;
@@ -157,10 +207,9 @@ int main() {
 		T_type[T_n] = TY;	T_param[T_n] = 2;	T_n++;
 		M3d_make_movement_sequence_matrix(M4, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N4, view, M4);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N4);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N4, diagonal_rgb);
 
 		// Build a x-z link
-		G_rgb(0, 0.5, 0.5);
 		double M5[4][4];
 		double N5[4][4];
 		T_n = 0;
@@ -171,10 +220,9 @@ int main() {
 		T_type[T_n] = TZ;	T_param[T_n] = 2;	T_n++;
 		M3d_make_movement_sequence_matrix(M5, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N5, view, M5);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N5);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N5, diagonal_rgb);
 
 		// Build a y-z link
-		G_rgb(0, 0.5, 0.5);
 		double M6[4][4];
 		double N6[4][4];
 		T_n = 0;
@@ -185,7 +233,7 @@ int main() {
 		T_type[T_n] = TZ;	T_param[T_n] = 2;	T_n++;
 		M3d_make_movement_sequence_matrix(M6, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N6, view, M6);
-		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N6);
+		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N6, diagonal_rgb);
 
 		if (G_no_wait_key() == 'q' || frame >= 100)
 			return 0;
