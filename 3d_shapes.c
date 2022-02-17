@@ -3,6 +3,7 @@
 #include "light_model.c"
 #include "2d_shape_functions.c"
 #include "3d_shape_functions.c"
+#include "shape_colors.c"
 
 #define NUM_PTS 500
 #define WINDOW_SIZE 800
@@ -37,7 +38,7 @@ void set_color(
 	double v,
 	double dv,
 	double T[4][4],
-	double inherent_rgb[3]
+	void (*inherent_rgb)(double, double, double *)
 ) {
 	double P[3] = {
 		f_x(u, v),
@@ -72,8 +73,10 @@ void set_color(
 	M3d_x_product(n, A, B);
 
 	double eye[3] = {0, 0, 0};
+	double irgb[3];
+	inherent_rgb(u, v, irgb);
 	double rgb[3];
-	Light_Model(inherent_rgb, eye, P, n, rgb);
+	Light_Model(irgb, eye, P, n, rgb);
 	G_rgb(rgb[0], rgb[1], rgb[2]);
 }
 
@@ -86,7 +89,7 @@ void graph_3d(
 	double v_start,
 	double v_end,
 	double T[4][4],
-	double rgb[3]
+	void (*rgb)(double, double, double *)
 ) {
 	double du = (u_end - u_start) / NUM_PTS;
 	double dv = (v_end - v_start) / NUM_PTS;
@@ -145,9 +148,8 @@ int main() {
 
 
 		double _i[4][4];
-	///////////
+
 		// Build an origin point
-		double origin_rgb[3] = {1, 0.8, 0};
 		double M0[4][4];
 		double N0[4][4];
 		T_n = 0;
@@ -159,7 +161,6 @@ int main() {
 		graph_3d(sphere_x, sphere_y, sphere_z, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, N0, origin_rgb);
 
 		// Build a +x-axis
-		double x_rgb[3] = {1, 0.2, 0.2};
 		double M1[4][4];
 		double N1[4][4];
 		T_n = 0;
@@ -171,7 +172,6 @@ int main() {
 		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N1, x_rgb);
 
 		// Build a +y-axis
-		double y_rgb[3] = {1, 1, 1};
 		double M2[4][4];
 		double N2[4][4];
 		T_n = 0;
@@ -183,7 +183,6 @@ int main() {
 		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, 0, 4, N2, y_rgb);
 
 		// Build a +z-axis
-		double z_rgb[3] = {0.3, 0.2, 1};
 		double M3[4][4];
 		double N3[4][4];
 		T_n = 0;
@@ -195,7 +194,6 @@ int main() {
 
 		// Build a x-y link
 		double half_length = 2 * sqrt(2);
-		double diagonal_rgb[3] = {0, 0.5, 0.5};
 		double M4[4][4];
 		double N4[4][4];
 		T_n = 0;
