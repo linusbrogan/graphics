@@ -96,3 +96,36 @@ Transform onto computer screen
 	For visible points (x', y' in [-H, H]), shift by (H, H) to have origin at bottom left.
 	Scale by window size / (2 * H).
 	Round to nearest pixel value, in [0, window size).
+
+Light Model
+We put a light somewhere and color points based on the angles between the light, eye, and object.
+There are 4 important (unit) vectors from the point:
+	Lu, to the light;
+	Ru, the reflection of the light;
+	Eu, to the eye; and
+	Nu, the normal.
+Intensity = Ambient + Diffuse + Specular
+	between 0 and 1
+Ambient is a constant, representing background radiation, perhaps 0.2.
+Maximum Diffuse is another constant, perhaps 0.5.
+Diffuse represents how directly overhead the light is.
+	Its formula is Maximum Diffuse * <Nu, Lu>, where <,> represents a dot product, and for unit vectors is the cosine of angle between them.
+	If the light is on the other side of the object from the eye, this should instead be 0.
+Maximum Non-Specular is Ambient + Maximum Diffuse.
+Maximum Specular is 1 - Maximum Non-Specular.
+Specular Power is how focused a hot spot, perhaps 50.
+Specular is Maximum Specular * <Eu, Ru> ** Specular Power, varying with on the observer's position.
+Objects have inherent color, a point in the 3D RGB color space.
+When Intensity equals Maximum Non-Specular, the actual color will be the inherent color.
+When the Intensity is less than Maximum Non-Specular, the color point should be pulled toward black (0, 0, 0) proportionally to the Intensity relative to that threshold.
+When the Intensity is greater than Maximum Non-Specular, the color point should be pulled toward white (1, 1, 1) proportionally to the Intensity relative to the appropriate threshold.
+
+Normal vector at a point
+Let P = point(u, v), in object space.
+Let Q = point(u + du, v).
+Let R = point(u, v + dv).
+Map P, Q, and R through the transformations to world space and then eye space, yielding P', Q', and R' respectively.
+Find the vectors A = Q' - P' and B = R' - P'.
+These vectors span the (approximate) tangent plane at point.
+Their cross product will then be normal to the surface.
+While this may not be exact, it is Good Enough for Government Work (TM).
