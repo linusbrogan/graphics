@@ -68,3 +68,31 @@ Parametric form (a function of another parameter)
 	Line through (1, 2) and (5, 4):
 		(x, y) = (1, 2) + t * [(5, 4) - (1, 2)]
 	Hyperbola: (x, y) = (cosh(t), sin(t)) = (1 / 2) * (e^t + e^(-t), e^t - e^(-t))
+3D Shapes
+	Unit sphere:
+		x^2 + y^2 + z^2 = 1
+		Cylindrical coordinates
+			(x, y, z) = (r * cos(u), v, r * sin(u)), r = sqrt(1 - v^2)), u in [0, tau), v in [-1,1] or similar
+		Spherical coordinates
+			(x, y, z) = r * (cos(t) * sin(p), sin(t) * sin(p), cos(p)), t in [0, tau), p in [0,pi]
+			(x, y, z) = (cos(u) * cos(v), sin(v), sin(u) * cos(v)), u in [0,tau), v in [-pi / 2, pi / 2]
+	Cylinder:
+		(x, y, z) = (cos(u), v, sin(u))
+
+Plotting 3D shapes
+	Repeatedly pick random point in range and plot, a poor strategy.
+	Plotting sphere with cylindrical coordinates should look more uniform than spherical.
+Rendering
+	Construct a point in object space, map through transformation matrix into world space and then view space, and then project onto the screen at z = 1.
+	Sorting all points would take too much space and tiem, so do not save them.
+	Save the z-value at every rendered pixel in a Z-buffer as big as the window.
+	Render in reverse order of z, only re-rendering a pixel if the new z-value is closer than what is saved in the Z-buffer.
+
+Projection
+	Half angle: h
+	Half screen height: H = tan(h)
+	(x', y') = (x, y) / z
+Transform onto computer screen
+	For visible points (x', y' in [-H, H]), shift by (H, H) to have origin at bottom left.
+	Scale by window size / (2 * H).
+	Round to nearest pixel value, in [0, window size).
