@@ -3,6 +3,7 @@
 #include "light_model.c"
 #include "2d_shape_functions.c"
 #include "3d_shape_functions.c"
+#include "XWD_TOOLS_03/xwd_tools_03.c"
 #include "shape_colors.c"
 
 #define NUM_PTS 500
@@ -116,6 +117,8 @@ void graph_3d(
 }
 
 int main() {
+	initialize_texture_maps();
+
 	// Initialize screen
 	G_init_graphics(WINDOW_SIZE, WINDOW_SIZE);
 
