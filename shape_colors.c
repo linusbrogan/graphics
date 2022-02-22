@@ -21,10 +21,10 @@ void initialize_texture_maps() {
 }
 
 void clock_map(double u, double v, double *rgb) {
-	double u_start = 0;
-	double u_end = 2 * M_PI;
-	double v_start = - M_PI / 2;
-	double v_end = M_PI / 2;
+	double u_start = 0-1;
+	double u_end = 1;// * M_PI;
+	double v_start = -1;//- M_PI / 2;
+	double v_end = 1;//M_PI / 2;
 	int d[2];
 	int error = get_xwd_map_dimensions(TEXTURE_IDS[TM_CLOCK], d);
 	if (error == -1) return;
