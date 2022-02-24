@@ -7,7 +7,12 @@
 #include "shape_colors.c"
 
 #define NUM_PTS 5000
-#define WINDOW_SIZE 800
+#define WINDOW_WIDTH 1080
+#define WINDOW_HEIGHT 720
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define WINDOW_SIZE (MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
+#define DX (-((WINDOW_SIZE) - (WINDOW_WIDTH)) / 2)
+#define DY (-((WINDOW_SIZE) - (WINDOW_HEIGHT)) / 2)
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
 #define OUTPUT_PATH "Graph_3D"
@@ -68,9 +73,9 @@ double cap_z(double u, double v) {
 	return sgn(v);
 }
 
-void initialize_z_buffer(int size) {
-	for (int x = 0; x < size; x++) {
-		for (int y = 0; y < size; y++) {
+void initialize_z_buffer() {
+	for (int x = 0; x < WINDOW_SIZE; x++) {
+		for (int y = 0; y < WINDOW_SIZE; y++) {
 			Z_BUFFER[x][y] = YON;
 		}
 	}
@@ -161,7 +166,7 @@ void graph_3d(
 				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
 					set_color(f_x, f_y, f_z, u, du, v, dv, T, rgb);
-					G_point(x, y);
+					G_point(x + DX, y + DY);
 				}
 			}
 		}
@@ -172,7 +177,7 @@ int main() {
 	initialize_texture_maps();
 
 	// Initialize screen
-	G_init_graphics(WINDOW_SIZE, WINDOW_SIZE);
+	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -186,7 +191,7 @@ int main() {
 	double t = 0;
 	while (1) {
 		// Reset frame
-		initialize_z_buffer(WINDOW_SIZE);
+		initialize_z_buffer();
 		G_rgb(0, 0, 0);
 		G_clear();
 
@@ -218,56 +223,62 @@ int main() {
 		M3d_mat_mult(N0, view, M0);
 		graph_3d(sphere_x, sphere_y, sphere_z, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, N0, clock_map);
 
+		// Build the torus pair
 		double M1[4][4];
 		double N1[4][4];
 		T_n = 0;
 		T_type[T_n] = RX;	T_param[T_n] = 20;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -45;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M1, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N1, view, M1);
 		graph_3d(torus_x, torus_y, torus_z, 0, 2 * M_PI, 0, 4 * M_PI, N1, space_station_color);
 
+		// Build one cross-axis pair
 		double M2[4][4];
 		double N2[4][4];
 		T_n = 0;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
 		T_type[T_n] = RX;	T_param[T_n] = 20;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -45;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M2, _i, T_n, T_type, T_param);
 		M3d_make_movement_sequence_matrix(M2, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N2, view, M2);
 		graph_3d(cyl_x, cyl_y, cyl_z, -1, 1, 0, 4 * M_PI, N2, space_station_color);
 
+		// Build another cross-axis pair
 		double M3[4][4];
 		double N3[4][4];
 		T_n = 0;
-		T_type[T_n] = RZ;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = -45;	T_n++;
 		T_type[T_n] = RX;	T_param[T_n] = 20;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -45;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M3, _i, T_n, T_type, T_param);
 		M3d_make_movement_sequence_matrix(M3, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N3, view, M3);
 		graph_3d(cyl_x, cyl_y, cyl_z, -1, 1, 0, 4 * M_PI, N3, space_station_color);
 
+		// Build the center connection
 		double M4[4][4];
 		double N4[4][4];
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = RX;	T_param[T_n] = 20;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -45;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M4, _i, T_n, T_type, T_param);
 		M3d_make_movement_sequence_matrix(M4, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N4, view, M4);
 		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -0.7, 0.7, N4, space_station_color);
 
+		// Build the center connection end cap
 		double M5[4][4];
 		double N5[4][4];
 		T_n = 0;
@@ -275,9 +286,9 @@ int main() {
 		T_type[T_n] = SY;	T_param[T_n] = 0.2;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = 0.7;	T_n++;
 		T_type[T_n] = RX;	T_param[T_n] = 20;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -45;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M5, _i, T_n, T_type, T_param);
 		M3d_make_movement_sequence_matrix(M5, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N5, view, M5);
