@@ -1,0 +1,8 @@
+space station movie:
+space station and planet ; observer looking at it
+spin observer around (rotate coi)
+
+parametric equation of square
+lift
+rotate aroudn x axis with matrix
+return 0 from F_xyz to supress point

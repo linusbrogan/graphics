@@ -6,7 +6,7 @@
 #include "XWD_TOOLS_03/xwd_tools_03.c"
 #include "shape_colors.c"
 
-#define NUM_PTS 5000
+#define NUM_PTS 1000
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 720
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -15,7 +15,7 @@
 #define DY (-((WINDOW_SIZE) - (WINDOW_HEIGHT)) / 2)
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
-#define OUTPUT_PATH "Graph_3D"
+#define OUTPUT_PATH "Space_Station"
 #define HITHER (1e-3)
 #define YON (1e50)
 
@@ -198,7 +198,7 @@ int main() {
 		// Configure frame
 		t = 0.01 * frame;
 		double eye[3] = {0, 0, 0};
-		double coi[3] = {0, 0, 1};
+		double coi[3] = {sin(t), 0, cos(t)};
 		double up[3] = {eye[0], eye[1] + 1, eye[2]};
 
 		// Make view matrix
@@ -209,13 +209,25 @@ int main() {
 
 		double _i[4][4];
 
+		// Build the stars
+		double M0X[4][4];
+		double N0X[4][4];
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 10;	T_n++;
+		M3d_make_movement_sequence_matrix(M0X, _i, T_n, T_type, T_param);
+		M3d_mat_mult(N0X, view, M0X);
+		//graph_3d(sphere_x, sphere_y, sphere_z, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, N0X, star_map);
+
+
 		// Build the planet
 		double M0[4][4];
 		double N0[4][4];
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 10000;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10000;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 1000;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 10000;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = 10000;	T_n++;
 		T_type[T_n] = TY;	T_param[T_n] = 6000;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = 10000;	T_n++;
@@ -233,7 +245,7 @@ int main() {
 		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
 		M3d_make_movement_sequence_matrix(M1, _i, T_n, T_type, T_param);
 		M3d_mat_mult(N1, view, M1);
-		graph_3d(torus_x, torus_y, torus_z, 0, 2 * M_PI, 0, 4 * M_PI, N1, space_station_color);
+		graph_3d(snorus_x, snorus_y, snorus_z, 0, 2 * M_PI, 0, 4 * M_PI, N1, space_station_color);
 
 		// Build one cross-axis pair
 		double M2[4][4];
@@ -295,8 +307,7 @@ int main() {
 		graph_3d(cap_x, cap_y, cap_z, 0, 2 * M_PI, -1, 1, N5, space_station_color);
 
 
-		G_wait_key();
-		if (G_no_wait_key() == 'q' || frame >= 100)
+		if (G_no_wait_key() == 'q' || frame >= 1000)
 			return 0;
 
 		char file_name[100];
