@@ -30,9 +30,15 @@ int project(double x, double z) {
 	return round(x_prime);
 }
 
-double x(double u, double v) {return u;}
-double y(double u, double v) {return v;}
-double z(double u, double v) {return 0;}
+double x(double u, double v) {
+	return u;
+}
+double y(double u, double v) {
+	return v;
+}
+double z(double u, double v) {
+	return 0;
+}
 
 void set_color(
 	double (*f_x)(double, double),
