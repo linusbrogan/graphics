@@ -19,20 +19,29 @@
 #define HITHER (1e-3)
 #define YON (1e50)
 
-double Z_BUFFER[WINDOW_SIZE][WINDOW_SIZE];
+enum coordinate {
+	_X = 0,
+	_Y,
+	_Z
+};
+
+double Z_BUFFER[WINDOW_WIDTH][WINDOW_HEIGHT];
 
 void initialize_z_buffer() {
-	for (int x = 0; x < WINDOW_SIZE; x++) {
-		for (int y = 0; y < WINDOW_SIZE; y++) {
+	for (int x = 0; x < WINDOW_WIDTH; x++) {
+		for (int y = 0; y < WINDOW_HEIGHT; y++) {
 			Z_BUFFER[x][y] = YON;
 		}
 	}
 }
 
-int project(double x, double z) {
-	double x_bar = x / z;
-	double x_prime = (x_bar / H + 1) * WINDOW_SIZE / 2;
-	return round(x_prime);
+int project(double w, double z, enum coordinate sign) {
+	double w_bar = w / z;
+	double w_prime = (w_bar / H + 1) * WINDOW_SIZE / 2;
+	int w_px = round(w_prime);
+	if (sign == _X) w_px += DX;
+	if (sign == _Y) w_px += DY;
+	return w_px;
 }
 
 void set_color(
@@ -108,13 +117,13 @@ void graph_3d(
 			};
 			M3d_mat_mult_pt(point, T, point);
 			double z = point[2];
-			int x = project(point[0], z);
-			int y = project(point[1], z);
-			if (x >= 0 && x < WINDOW_SIZE && y >= 0 && y < WINDOW_SIZE) {
+			int x = project(point[0], z, _X);
+			int y = project(point[1], z, _Y);
+			if (x >= 0 && x < WINDOW_WIDTH && y >= 0 && y < WINDOW_HEIGHT) {
 				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
 					set_color(f_x, f_y, f_z, u, du, v, dv, T, rgb);
-					G_point(x + DX, y + DY);
+					G_point(x, y);
 				}
 			}
 		}
