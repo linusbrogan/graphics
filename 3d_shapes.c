@@ -6,8 +6,13 @@
 #include "XWD_TOOLS_03/xwd_tools_03.c"
 #include "shape_colors.c"
 
-#define NUM_PTS 500
-#define WINDOW_SIZE 800
+#define RESOLUTION 500
+#define WINDOW_WIDTH 1080
+#define WINDOW_HEIGHT 720
+#define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define WINDOW_SIZE (WS_MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
+#define DX (-((WINDOW_SIZE) - (WINDOW_WIDTH)) / 2)
+#define DY (-((WINDOW_SIZE) - (WINDOW_HEIGHT)) / 2)
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
 #define OUTPUT_PATH "Graph_3D"
@@ -16,9 +21,9 @@
 
 double Z_BUFFER[WINDOW_SIZE][WINDOW_SIZE];
 
-void initialize_z_buffer(int size) {
-	for (int x = 0; x < size; x++) {
-		for (int y = 0; y < size; y++) {
+void initialize_z_buffer() {
+	for (int x = 0; x < WINDOW_SIZE; x++) {
+		for (int y = 0; y < WINDOW_SIZE; y++) {
 			Z_BUFFER[x][y] = YON;
 		}
 	}
@@ -92,8 +97,8 @@ void graph_3d(
 	double T[4][4],
 	void (*rgb)(double, double, double *)
 ) {
-	double du = (u_end - u_start) / NUM_PTS;
-	double dv = (v_end - v_start) / NUM_PTS;
+	double du = (u_end - u_start) / RESOLUTION;
+	double dv = (v_end - v_start) / RESOLUTION;
 	for (double u = u_start; u <= u_end; u += du) {
 		for (double v = v_start; v <= v_end; v += dv) {
 			double point[3] = {
@@ -109,7 +114,7 @@ void graph_3d(
 				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
 					set_color(f_x, f_y, f_z, u, du, v, dv, T, rgb);
-					G_point(x, y);
+					G_point(x + DX, y + DY);
 				}
 			}
 		}
@@ -120,7 +125,7 @@ int main() {
 	initialize_texture_maps();
 
 	// Initialize screen
-	G_init_graphics(WINDOW_SIZE, WINDOW_SIZE);
+	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -134,7 +139,7 @@ int main() {
 	double t = 0;
 	while (1) {
 		// Reset frame
-		initialize_z_buffer(WINDOW_SIZE);
+		initialize_z_buffer();
 		G_rgb(0, 0, 0);
 		G_clear();
 
