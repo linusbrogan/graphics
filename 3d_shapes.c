@@ -27,6 +27,31 @@ enum coordinate {
 
 double Z_BUFFER[WINDOW_WIDTH][WINDOW_HEIGHT];
 
+// Graphics shims
+void LG_init_graphics(int width, int height) {
+	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
+}
+void LG_rgb(double r, double g, double b) {
+	G_rgb(r, g, b);
+}
+void LG_point(int x, int y) {
+	G_point(x, y);
+}
+void LG_clear() {
+	G_clear();
+}
+int LG_no_wait_key() {
+	return G_no_wait_key();
+}
+void LG_display_image() {
+	G_display_image();
+}
+void LG_save_image_to_file(char *file_name) {
+	G_save_image_to_file(file_name);
+}
+
+
+
 void initialize_z_buffer() {
 	for (int x = 0; x < WINDOW_WIDTH; x++) {
 		for (int y = 0; y < WINDOW_HEIGHT; y++) {
@@ -38,7 +63,7 @@ void initialize_z_buffer() {
 void initialize() {
 	initialize_texture_maps();
 	initialize_z_buffer();
-	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LG_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -101,7 +126,7 @@ void set_color(
 	inherent_rgb(u, v, irgb);
 	double rgb[3];
 	Light_Model(irgb, eye, P, n, rgb);
-	G_rgb(rgb[0], rgb[1], rgb[2]);
+	LG_rgb(rgb[0], rgb[1], rgb[2]);
 }
 
 void graph_3d(
@@ -132,7 +157,7 @@ void graph_3d(
 				if (z > HITHER && z < Z_BUFFER[x][y]) {
 					Z_BUFFER[x][y] = z;
 					set_color(f_x, f_y, f_z, u, du, v, dv, T, rgb);
-					G_point(x, y);
+					LG_point(x, y);
 				}
 			}
 		}
@@ -152,8 +177,8 @@ int main() {
 	while (1) {
 		// Reset frame
 		initialize_z_buffer();
-		G_rgb(0, 0, 0);
-		G_clear();
+		LG_rgb(0, 0, 0);
+		LG_clear();
 
 		// Configure frame
 		t = 0.01 * frame;
@@ -253,13 +278,13 @@ int main() {
 		M3d_mat_mult(N6, view, M6);
 		graph_3d(cylinder_x, cylinder_y, cylinder_z, 0, 2 * M_PI, -half_length, half_length , N6, diagonal_rgb);
 
-		if (G_no_wait_key() == 'q' || frame >= 100)
+		if (LG_no_wait_key() == 'q' || frame >= 100)
 			return 0;
 
 		char file_name[100];
-		G_display_image();
+		LG_display_image();
 		sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, frame);
-		G_save_image_to_file(file_name);
+		LG_save_image_to_file(file_name);
 
 		frame++;
 	}
