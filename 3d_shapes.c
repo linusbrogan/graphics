@@ -35,6 +35,15 @@ void initialize_z_buffer() {
 	}
 }
 
+void initialize() {
+	initialize_texture_maps();
+	initialize_z_buffer();
+	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	// Create frame directory
+	mkdir(OUTPUT_PATH, 0777);
+}
+
 int project(double w, double z, enum coordinate sign) {
 	double w_bar = w / z;
 	double w_prime = (w_bar / H + 1) * WINDOW_SIZE / 2;
@@ -131,13 +140,7 @@ void graph_3d(
 }
 
 int main() {
-	initialize_texture_maps();
-
-	// Initialize screen
-	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	// Create frame directory
-	mkdir(OUTPUT_PATH, 0777);
+	initialize();
 
 	// Create movement sequence
 	int T_n = 0;
