@@ -1,23 +1,19 @@
-double sphere_x(double u, double v) {
-	return cos(u) * cos(v);
+enum coordinate {
+	_X = 0,
+	_Y,
+	_Z
+};
+
+int sphere_xyz(double u, double v, double xyz[3]) {
+	xyz[_X] = cos(u) * cos(v);
+	xyz[_Y] = sin(u) * cos(v);
+	xyz[_Z] = sin(v);
+	return 1;
 }
 
-double sphere_y(double u, double v) {
-	return sin(u) * cos(v);
-}
-
-double sphere_z(double u, double v) {
-	return sin(v);
-}
-
-double cylinder_x(double u, double v) {
-	return cos(u);
-}
-
-double cylinder_y(double u, double v) {
-	return sin(u);
-}
-
-double cylinder_z(double u, double v) {
-	return v;
+int cylinder_xyz(double u, double v, double xyz[3]) {
+	xyz[_X] = cos(u);
+	xyz[_Y] = sin(u);
+	xyz[_Z] = v;
+	return 1;
 }
