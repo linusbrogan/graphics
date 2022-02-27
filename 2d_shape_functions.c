@@ -1,3 +1,5 @@
+#include <math.h>
+
 double identity(double x) {
 	return x;
 }

@@ -1,8 +1,5 @@
-enum coordinate {
-	_X = 0,
-	_Y,
-	_Z
-};
+#include <math.h>
+#include "graphics.h"
 
 int sphere_xyz(double u, double v, double xyz[3]) {
 	xyz[_X] = cos(u) * cos(v);

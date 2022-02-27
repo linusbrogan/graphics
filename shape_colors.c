@@ -1,3 +1,6 @@
+#include <math.h>
+#include "lg.c"
+
 enum texture_map_id {
 	TM_CHECKERBOARD = 0,
 	TM_CLOCK,

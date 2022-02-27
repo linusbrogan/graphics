@@ -1,4 +1,3 @@
-#include "FPToolkit.c"
 #include "M3d_matrix_tools.c"
 
 // To support the light model :
