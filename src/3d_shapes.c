@@ -16,6 +16,13 @@ void initialize() {
 	mkdir(OUTPUT_PATH, 0777);
 }
 
+void save_image(int frame) {
+	char file_name[100];
+	sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, frame);
+	LG_display_image();
+	LG_save_image_to_file(file_name);
+}
+
 int main() {
 	initialize();
 
@@ -133,10 +140,7 @@ int main() {
 		if (LG_no_wait_key() == 'q' || frame >= 100)
 			return 0;
 
-		char file_name[100];
-		LG_display_image();
-		sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, frame);
-		LG_save_image_to_file(file_name);
+		save_image(frame);
 
 		frame++;
 	}
