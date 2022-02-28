@@ -11,7 +11,9 @@ SRC_FILES = \
 	sprint \
 	stickfigureS \
 	view_test04Mb \
-	view_test05MbS
+	view_test05MbS \
+	xwd_blend_example \
+	xwd_no_graphics_window_example
 
 LIB_FILES = \
 	2d_shape_functions \
@@ -19,7 +21,8 @@ LIB_FILES = \
 	g3d \
 	lg \
 	light_model \
-	shape_colors
+	shape_colors \
+	xwd_tools_03
 
 SRC_TARGETS = $(addprefix build/,$(SRC_FILES))
 LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
@@ -62,6 +65,10 @@ test: $(SRC_TARGETS)
 	./build/shapes
 	display out/2dshapes02.xwd
 	./tool/play_xwd_movieC.exec ./out/ViewMatrixMovie/pimage 0 90
+	echo asset/clock.xwd asset/mandelbrot_set.xwd | ./build/xwd_blend_example
+	./build/xwd_no_graphics_window_example
+	display out/taller.xwd
+	display out/wider.xwd
 
 clean:
 	-rm -r build
@@ -71,3 +78,4 @@ clean:
 	-rm out/M3d_test_sequence.out
 	-rm out/M3d_test_view.out
 	-rm out/view_test04Mb0000.xwd
+	-rm out/taller.xwd out/wider.xwd
