@@ -14,12 +14,6 @@
 #define HITHER (1e-3)
 #define YON (1e50)
 
-enum color {
-	_R = 0,
-	_G,
-	_B
-};
-
 double Z_BUFFER[WINDOW_WIDTH][WINDOW_HEIGHT];
 
 void initialize_z_buffer() {

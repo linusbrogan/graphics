@@ -1,11 +1,12 @@
 // Graphics library shims for FPT or XWD Tools
-#define LG_USE_FPT
+#undef LG_USE_FPT
 
 #ifdef LG_USE_FPT
 #include <fpt.h>
 #endif
 
 #include <xwd.h>
+#include <graphics.h>
 
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 720
