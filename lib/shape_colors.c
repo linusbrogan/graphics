@@ -82,3 +82,9 @@ void diagonal_rgb(double u, double v, double *rgb) {
 	rgb[1] = 0.5;
 	rgb[2] = 0.5;
 }
+
+void space_grey(double u, double v, double *rgb) {
+	rgb[0] = 0.5;
+	rgb[1] = 0.5;
+	rgb[2] = 0.75;
+}

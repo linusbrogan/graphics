@@ -37,6 +37,7 @@ default: main
 
 main: clean build/space_station build/movie_player
 	time ./build/space_station
+	display out/Space_Station/frame_0000.xwd
 	./build/movie_player 1080 720 out/Space_Station/frame_ 0 99 0 40000
 
 all: $(SRC_TARGETS) $(LIB_TARGETS)

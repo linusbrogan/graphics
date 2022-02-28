@@ -37,6 +37,9 @@ int main() {
 	int frame = 0;
 	double t = 0;
 	while (1) {
+		if (LG_no_wait_key() == 'q' || frame >= FRAMES)
+			return 0;
+
 		printf("Rendering frame %04d\n", frame);
 
 		// Reset frame
@@ -55,18 +58,111 @@ int main() {
 		double view_i[4][4];
 		M3d_view(view, view_i, eye, coi, up);
 
-		// Build a demo sphere
+		// Build the planet
+		double planet_radius = 10000;
 		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = 0.25;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 0.25;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 0.25;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 2;	T_n++;
+		T_type[T_n] = SX;	T_param[T_n] = planet_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = planet_radius;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = planet_radius;	T_n++;
+		T_type[T_n] = TX;	T_param[T_n] = 12000;	T_n++;
+		T_type[T_n] = TY;	T_param[T_n] = 6500;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 12000;	T_n++;
 		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
 		M3d_mat_mult(M, view, M);
 		graph_3d(sphere_xyz, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, M, unit_checkerboard_map);
 
-		if (LG_no_wait_key() == 'q' || frame >= FRAMES)
-			return 0;
+		// Build the space station
+		double half_height = 0.5;
+		// Make the space station transformation sequence
+		double S[4][4];
+		T_n = 0;
+		T_type[T_n] = RX;	T_param[T_n] = 15;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = -35;	T_n++;
+		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 5;	T_n++;
+		M3d_make_movement_sequence_matrix(S, _i, T_n, T_type, T_param);
+		M3d_mat_mult(S, view, S);
+
+		// Build the upper ring
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(torus_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, unit_checkerboard_map);
+
+		// Build the lower ring
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(torus_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, unit_checkerboard_map);
+
+		double beam_radius = 0.1;
+		// Build the upper cross-bar 1
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(cylinder_xyz, 0, 2 * M_PI, -1, 1, M, unit_checkerboard_map);
+
+		// Build the upper cross-bar 2
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(cylinder_xyz, 0, 2 * M_PI, -1, 1, M, unit_checkerboard_map);
+
+		// Build the lower cross-bar 1
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(cylinder_xyz, 0, 2 * M_PI, -1, 1, M, unit_checkerboard_map);
+
+		// Build the lower cross-bar 2
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(cylinder_xyz, 0, 2 * M_PI, -1, 1, M, unit_checkerboard_map);
+
+		// Build the central axis
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 0.15;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 0.15;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(space_station_central_axis_xyz, 0, 2 * M_PI, -0.7, 0.7, M, unit_checkerboard_map);
+
+		// Build the central axis upper cap
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = 0.7 ;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(disk_xyz, 0, 0.2, 0, 2 * M_PI, M, unit_checkerboard_map);
+
+		// Build the central axis lower cap
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = -0.7 ;	T_n++;
+		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
+		M3d_mat_mult(M, S, M);
+		graph_3d(disk_xyz, 0, 0.3, 0, 2 * M_PI, M, unit_checkerboard_map);
 
 		save_image(frame);
 		frame++;
