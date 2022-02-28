@@ -35,8 +35,9 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: main
 
-main: build/space_station
-	./build/space_station
+main: clean build/space_station build/movie_player
+	time ./build/space_station
+	./build/movie_player 1080 720 out/Space_Station/frame_ 0 99 0 40000
 
 all: $(SRC_TARGETS) $(LIB_TARGETS)
 
@@ -80,5 +81,6 @@ clean:
 	-rm -r out/Growing_Sun
 	-rm out/M3d_test_sequence.out
 	-rm out/M3d_test_view.out
+	-rm -r out/Space_Station
 	-rm out/view_test04Mb0000.xwd
 	-rm out/taller.xwd out/wider.xwd
