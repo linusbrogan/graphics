@@ -34,8 +34,7 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: main
 
-main: build/3d_shapes
-	./build/3d_shapes
+main:
 
 all: $(SRC_TARGETS) $(LIB_TARGETS)
 
@@ -48,6 +47,8 @@ $(LIB_TARGETS):
 	cc -c -o $@ lib/$(basename $(notdir $@)).c $(INCLUDES)
 
 test: $(SRC_TARGETS)
+	-timeout 10 ./build/3d_shapes
+	./build/movie_player 1080 720 out/Graph_3D/frame_ 0 $$(($$(ls out/Graph_3D | wc -l) - 1)) 1 40000
 	./build/FPToolkitDemoB
 	./build/functional
 	echo "700 650 asset/a.xwd" | ./build/get_image_from_file
