@@ -8,6 +8,7 @@ SRC_FILES = \
 	M3d_test_view \
 	movie_player \
 	shapes \
+	space_station \
 	sprint \
 	stickfigureS \
 	view_test04Mb \
@@ -34,7 +35,8 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: main
 
-main:
+main: build/space_station
+	./build/space_station
 
 all: $(SRC_TARGETS) $(LIB_TARGETS)
 
