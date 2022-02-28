@@ -1,14 +1,11 @@
-#ifndef LG_H
-#define LG_H
-
 // Graphics library shims for FPT or XWD Tools
 #define LG_USE_FPT
 
 #ifdef LG_USE_FPT
-#include "FPToolkit.c"
+#include <fpt.h>
 #endif
 
-#include "XWD_TOOLS_03/xwd_tools_03.c"
+#include <xwd.h>
 
 #define WINDOW_WIDTH 1080
 #define WINDOW_HEIGHT 720
@@ -84,5 +81,3 @@ void LG_save_image_to_file(char *file_name) {
 	xwd_map_to_named_xwd_file(LG_WINDOW_ID, file_name) ;
 #endif
 }
-
-#endif

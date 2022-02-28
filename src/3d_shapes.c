@@ -1,10 +1,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "3d_shape_functions.c"
-#include "shape_colors.c"
-#include "g3d.c"
+#include <shape_3d.h>
+#include <shape_color.h>
+#include <g3d.h>
+#include <lg.h>
 
-#define OUTPUT_PATH "Graph_3D"
+#define OUTPUT_PATH "out/Graph_3D"
 
 void initialize() {
 	initialize_texture_maps();

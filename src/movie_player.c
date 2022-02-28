@@ -1,4 +1,4 @@
-#include "FPToolkit.c"
+#include <fpt.h>
 
 int main(int argc, char *argv[]) {
 	// Check arguments

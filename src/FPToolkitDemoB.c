@@ -52,7 +52,7 @@ note : the 'X' in -X11 is capitalized
 */
 
 
-#include  "FPToolkit.c"
+#include  <fpt.h>
 
 
 int main()
@@ -145,7 +145,7 @@ int main()
    key =  G_wait_key() ; // pause so user can see results
 
    //   G_save_image_to_file("demo.xwd") ;
-   G_save_to_bmp_file("demo.bmp") ;
+   G_save_to_bmp_file("out/demo.bmp") ;
 }
 
 

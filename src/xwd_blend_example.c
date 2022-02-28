@@ -1,5 +1,5 @@
-#include "FPToolkit.c"
-#include "xwd_tools_03.c"
+#include <fpt.h>
+#include <xwd.h>
 
 
 int main()

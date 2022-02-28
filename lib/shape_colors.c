@@ -1,5 +1,6 @@
 #include <math.h>
-#include "lg.c"
+#include <stdio.h>
+#include <lg.h>
 
 enum texture_map_id {
 	TM_CHECKERBOARD = 0,
@@ -7,9 +8,9 @@ enum texture_map_id {
 	TM_MANDELBROT_SET
 };
 char *TEXTURE_MAP_FILES[] = {
-	"checkerboard.xwd",
-	"XWD_TOOLS_03/clock.xwd",
-	"XWD_TOOLS_03/mandelbrot_set.xwd"
+	"asset/checkerboard.xwd",
+	"asset/clock.xwd",
+	"asset/mandelbrot_set.xwd"
 };
 int TEXTURE_MAPS = 3;
 int TEXTURE_IDS[100];

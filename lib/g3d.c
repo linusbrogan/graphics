@@ -1,8 +1,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "graphics.h"
-#include "light_model.c"
-#include "lg.c"
+#include <graphics.h>
+#include <light_model.h>
+#include <lg.h>
 
 #define RESOLUTION 500
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))

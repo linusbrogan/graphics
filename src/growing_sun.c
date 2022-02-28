@@ -1,8 +1,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "FPToolkit.c"
+#include <fpt.h>
 
-const char* OUTPUT_PATH = "Growing_Sun";
+const char* OUTPUT_PATH = "out/Growing_Sun";
 
 /**
  * Draws a frame of the growing sun, centered at (x, y) with the given radius.

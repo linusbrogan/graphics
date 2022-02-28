@@ -1,8 +1,8 @@
 
 // read the data from multiple xyz files and display all of the objects
 
-#include "FPToolkit.c"
-#include "M3d_matrix_tools.c"
+#include <fpt.h>
+#include <m3d.h>
 
 
 int window_width, window_height, window_square_size ;
@@ -376,8 +376,8 @@ int main ()
 
 
   // Build an origin point out of the sphere file.
-  f = fopen("sphere.xyz","r") ;
-  if (f == NULL) { printf("Can't open file %s\n", "sphere.xyz") ;  exit(0) ;  }
+  f = fopen("asset/sphere.xyz","r") ;
+  if (f == NULL) { printf("Can't open file %s\n", "asset/sphere.xyz") ;  exit(0) ;  }
   inherent_rgb[onum][0] = 1.0 ;
   inherent_rgb[onum][1] = 0.8 ;
   inherent_rgb[onum][2] = 0.0 ;
@@ -397,8 +397,8 @@ int main ()
 
 
   // Build a +x axis with the cylinder file.
-  f = fopen("cylinder.xyz","r") ;
-  if (f == NULL) { printf("Can't open file %s\n", "cylinder.xyz") ;  exit(0) ;  }
+  f = fopen("asset/cylinder.xyz","r") ;
+  if (f == NULL) { printf("Can't open file %s\n", "asset/cylinder.xyz") ;  exit(0) ;  }
   inherent_rgb[onum][0] = 1.0 ;
   inherent_rgb[onum][1] = 0.2 ;
   inherent_rgb[onum][2] = 0.2 ;
@@ -417,8 +417,8 @@ int main ()
 
 
   // Build a +y axis with the cylinder file.
-  f = fopen("cylinder.xyz","r") ;
-  if (f == NULL) { printf("Can't open file %s\n", "cylinder.xyz") ;  exit(0) ;  }
+  f = fopen("asset/cylinder.xyz","r") ;
+  if (f == NULL) { printf("Can't open file %s\n", "asset/cylinder.xyz") ;  exit(0) ;  }
   inherent_rgb[onum][0] = 1.0 ;
   inherent_rgb[onum][1] = 1.0 ;
   inherent_rgb[onum][2] = 1.0 ;
@@ -438,8 +438,8 @@ int main ()
 
 
   // Build a +z axis with a cylinder.
-  f = fopen("cylinder.xyz","r") ;
-  if (f == NULL) { printf("Can't open file %s\n", "cylinder.xyz") ;  exit(0) ;  }
+  f = fopen("asset/cylinder.xyz","r") ;
+  if (f == NULL) { printf("Can't open file %s\n", "asset/cylinder.xyz") ;  exit(0) ;  }
   inherent_rgb[onum][0] = 0.3 ;
   inherent_rgb[onum][1] = 0.2 ;
   inherent_rgb[onum][2] = 1.0 ;
@@ -479,7 +479,7 @@ int main ()
   G_rgb(0,0,0) ; 
   G_clear() ;
   draw_all_objects() ;
-  G_save_image_to_file("view_test04Mb0000.xwd") ;
+  G_save_image_to_file("out/view_test04Mb0000.xwd") ;
 
   q = G_wait_key() ;
 

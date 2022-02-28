@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include "M3d_matrix_tools.c"
+#include <m3d.h>
 
 
 int main()

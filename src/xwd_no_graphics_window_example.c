@@ -1,4 +1,4 @@
-#include "xwd_tools_03.c"
+#include <xwd.h>
 
 // No graphics window...no need for FPT
 // directly write to files
@@ -39,8 +39,8 @@ int main()
     }
   }
 
-  xwd_map_to_named_xwd_file(idA, "wider.xwd") ;
-  xwd_map_to_named_xwd_file(idB, "taller.xwd") ;
+  xwd_map_to_named_xwd_file(idA, "out/wider.xwd") ;
+  xwd_map_to_named_xwd_file(idB, "out/taller.xwd") ;
 
 }
 

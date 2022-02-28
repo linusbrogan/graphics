@@ -1,4 +1,4 @@
-#include "M3d_matrix_tools.c"
+#include <m3d.h>
 
 // To support the light model :
 double light_in_eye_space[3] ;

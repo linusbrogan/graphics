@@ -1,6 +1,5 @@
-
-#include "FPToolkit.c"
-#include "M3d_matrix_tools.c"
+#include <fpt.h>
+#include <m3d.h>
 
 // stickfigure initially designed as centered for a 400x400 window :
 double x[13] = {175,225,225,300,225,225,250,200,150,175,175,100,175} ;

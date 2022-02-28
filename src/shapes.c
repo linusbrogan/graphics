@@ -1,6 +1,6 @@
-#include "FPToolkit.c"
-#include "M3d_matrix_tools.c"
-#include "2d_shape_functions.c"
+#include <fpt.h>
+#include <m3d.h>
+#include <shape_2d.h>
 
 #define NUM_PTS 1000
 #define NUM_SHAPES 9
