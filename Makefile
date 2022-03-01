@@ -1,4 +1,5 @@
 SRC_FILES = \
+	2d_Simple_RaytracerS \
 	3d_shapes \
 	FPToolkitDemoB \
 	functional \
@@ -34,6 +35,10 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 .PHONY: all clean default main test
 
 default: main
+
+raytracer: clean build/2d_Simple_RaytracerS
+	./build/2d_Simple_RaytracerS
+	display out/2d_Simple_Raytracer.jpg
 
 main: clean build/space_station build/movie_player
 	convert asset/earth.jpg asset/earth.convert.xwd
@@ -79,6 +84,7 @@ test: $(SRC_TARGETS)
 
 clean:
 	-rm -r build
+	-rm out/2d_Simple_RaytracerS.xwd
 	-rm -r out/Graph_3D
 	-rm out/demo.bmp
 	-rm -r out/Growing_Sun
