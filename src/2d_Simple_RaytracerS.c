@@ -1,6 +1,5 @@
-#include "FPToolkit.c"
-#include "M3d_matrix_tools.c"
-
+#include <fpt.h>
+#include <m3d.h>
 
 double obmat[100][4][4] ;
 double obinv[100][4][4] ;
@@ -175,7 +174,7 @@ int test01()
 
     G_rgb(1,1,1) ; G_draw_string("'q' to quit", 50,50) ;
     while (G_wait_key() != 'q') ;
-    G_save_image_to_file("2d_Simple_Raytracer.xwd") ;
+    G_save_image_to_file("out/2d_Simple_RaytracerS.xwd") ;
 }
 
 

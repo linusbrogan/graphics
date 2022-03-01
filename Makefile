@@ -1,4 +1,5 @@
 SRC_FILES = \
+	2d_Simple_RaytracerS \
 	3d_shapes \
 	FPToolkitDemoB \
 	functional \
@@ -51,6 +52,8 @@ $(LIB_TARGETS):
 	cc -c -o $@ lib/$(basename $(notdir $@)).c $(INCLUDES)
 
 test: $(SRC_TARGETS)
+	./build/2d_Simple_RaytracerS
+	display out/2d_Simple_Raytracer.xwd
 	-timeout 10 ./build/3d_shapes
 	./build/movie_player 1080 720 out/Graph_3D/frame_ 0 $$(($$(ls out/Graph_3D | wc -l) - 1)) 1 40000
 	./build/FPToolkitDemoB
@@ -77,6 +80,7 @@ test: $(SRC_TARGETS)
 
 clean:
 	-rm -r build
+	-rm out/2d_Simple_RaytracerS.xwd
 	-rm -r out/Graph_3D
 	-rm out/demo.bmp
 	-rm -r out/Growing_Sun
