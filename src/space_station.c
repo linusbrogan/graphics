@@ -24,7 +24,7 @@ void save_image(int frame) {
 	LG_save_image_to_file(file_name);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	initialize();
 
 	// Create movement sequence
@@ -35,9 +35,10 @@ int main() {
 	double _i[4][4];
 
 	int frame = 0;
+	if (argc > 1) frame = atoi(argv[1]);
 	double t = 0;
 	while (1) {
-		if (LG_no_wait_key() == 'q' || frame >= FRAMES)
+		if (LG_no_wait_key() == 'q' || frame >= FRAMES || (argc > 2 && frame >= atoi(argv[2])))
 			return 0;
 
 		printf("Rendering frame %04d\n", frame);
