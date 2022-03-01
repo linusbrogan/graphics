@@ -1,0 +1,17 @@
+->RAY TRACING
+Z_BUFFER handles hiding objects well, overlaps
+but not good when we zoom in
+zoom in, what do you think?
+bad at reflection/refracction
+shadows???
+trransparency?
+
+Now project ray from eye through pixel into world/objects
+Find closest intersection, do light moedl, tadah
+no zbuf
+follow reflected rays from mirrors, maybe blend colors
+best looking
+can find shadows, reflect to light, and see blocked path
+how to find intersection?
+easy for simple, hard for complx objects
+
