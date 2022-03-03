@@ -129,3 +129,24 @@ Find the vectors A = Q' - P' and B = R' - P'.
 These vectors span the (approximate) tangent plane at point.
 Their cross product will then be normal to the surface.
 While this may not be exact, it is Good Enough for Government Work (TM).
+
+Raytracing
+Instead of seeing where points on an object end up on the screen, we can see where pixels get their color from.
+We trace a ray from the eye through the screen to the nearest object.
+Checking where the ray intersects an object can be tricky.
+
+Example (transformed unit circle)
+A circle, for example, is described by x^2 + y^2 = 1 and parametrized by (x, y) = (cos(t), sin(t)) for t in [0, tau).
+The ray's tail is the eye E = (x0, y0, z0).
+The ray is parallel to a vector D = (dx, dy, dz).
+The ray is parametrized by E + t * D for t > 0.
+Negative t-values are forbidden because they are behind the eye.
+In this example, we only work in 2D, so the z-components will all be 0.
+Map these points (not the vectors) through the inverse object transformation to get from world space to object space, where the object's mathematical description is simpler.
+Relabel all variables accordingly.
+To find for the intersection point, we solve (x0 + t * dx)^2 + (y0 + t * dy)^2 = 1.
+This becomes x0^2 + 2 * x0 * t * dx + (t * dx)^2 + y0^2 + 2 * y0 * t * dy + (t * dy)^2 - 1 = 0.
+Group like terms to get (dx^2 + dy^2) * t^2 + (2 * x0 * dx + 2 * y0 * dy) * t + (x0^2 + y0^2 - 1) = 0.
+This is a quadratic with coeffiecients a = dx^2 + dy^2, b = 2 * (x0 * dx + y0 * dy), and c = x0^2 + y0^2 - 1.
+Solve with the quadratic formula to find up to 2 values of t where the ray intersects the corresponding object.
+Take the smallest positive solution t as the closest visible intersection with the ray.
