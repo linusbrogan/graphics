@@ -24,7 +24,17 @@ void save_image(int frame) {
 	LG_save_image_to_file(file_name);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+	int frame_start = 0;
+	int frame_stop = FRAMES;
+	if (argc >= 2) {
+		frame_start = atoi(argv[1]);
+	}
+	if (argc >= 3) {
+		frame_stop = atoi(argv[2]);
+	}
+
+
 	initialize();
 
 	// Create movement sequence
@@ -34,10 +44,10 @@ int main() {
 	double M[4][4];
 	double _i[4][4];
 
-	int frame = 0;
+	int frame = frame_start;
 	double t = 0;
 	while (1) {
-		if (LG_no_wait_key() == 'q' || frame >= FRAMES)
+		if (LG_no_wait_key() == 'q' || frame >= frame_stop)
 			return 0;
 
 		printf("Rendering frame %04d\n", frame);
