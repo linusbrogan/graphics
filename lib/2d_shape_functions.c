@@ -13,9 +13,19 @@ double sgn(double x) {
 double (*circle_x)(double) = cos;
 double (*circle_y)(double) = sin;
 
+void d_circle(double x, double y, double d[2]) {
+	d[0] = 2 * x;
+	d[1] = 2 * y;
+}
+
 double (*sum4_x)(double) = identity;
 double sum4_y(double u) {
 	return pow(1 - u * u * u * u, 0.25);
+}
+
+void d_sum4(double x, double y, double d[2]) {
+	d[0] = 4 * pow(x, 3);
+	d[1] = 4 * pow(y, 3);
 }
 
 double square_x(double u) {
@@ -38,6 +48,11 @@ double square_y(double u) {
 	return 0;
 }
 
+void d_square(double x, double y, double d[2]) {
+	d[0] = sgn(x);
+	d[1] = sgn(y);
+}
+
 double square2_x(double u) {
 	return sgn(cos(u)) * pow(cos(u), 2);
 }
@@ -54,12 +69,27 @@ double astroid_y(double u) {
 	return sgn(sin(u)) * pow(sin(u), 4);
 }
 
+void d_astroid(double x, double y, double d[2]) {
+	d[0] = 0.5 * pow(fabs(x), -0.5) * sgn(x);
+	d[1] = 0.5 * pow(fabs(y), -0.5) * sgn(y);
+}
+
 double (*hyperbola_x)(double) = cosh;
 double (*hyperbola_y)(double) = sinh;
+
+void d_hyperbola(double x, double y, double d[2]) {
+	d[0] = 2 * x;
+	d[1] = -2 * y;
+}
 
 double (*parabola_x)(double) = identity;
 double parabola_y(double u) {
 	return u * u;
+}
+
+void d_parabola(double x, double y, double d[2]) {
+	d[0] = 2 * x;
+	d[1] = -1;
 }
 
 double lemon_x(double u) {
@@ -67,6 +97,11 @@ double lemon_x(double u) {
 }
 
 double (*lemon_y)(double) = sin;
+
+void d_lemon(double x, double y, double d[2]) {
+	d[0] = 2 * x;
+	d[1] = 6 * y * pow(1 - y * y, 2);
+}
 
 double brachistochrone_x(double u) {
 	return u - sin(u);
