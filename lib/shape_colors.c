@@ -5,14 +5,16 @@
 enum texture_map_id {
 	TM_CHECKERBOARD = 0,
 	TM_CLOCK,
-	TM_MANDELBROT_SET
+	TM_MANDELBROT_SET,
+	TM_EARTH
 };
 char *TEXTURE_MAP_FILES[] = {
 	"asset/checkerboard.xwd",
 	"asset/clock.xwd",
-	"asset/mandelbrot_set.xwd"
+	"asset/mandelbrot_set.xwd",
+	"asset/earth.xwd"
 };
-int TEXTURE_MAPS = 3;
+int TEXTURE_MAPS = 4;
 int TEXTURE_IDS[100];
 
 void initialize_texture_maps() {
@@ -37,6 +39,18 @@ void clock_map(double u, double v, double *rgb) {
 	get_xwd_map_color(TEXTURE_IDS[TM_CLOCK], x, y, rgb);
 }
 
+void earth_map(double u, double v, double *rgb) {
+	double u_start = 0;
+	double u_end = 2 * M_PI;
+	double v_start = - M_PI / 2;
+	double v_end = M_PI / 2;
+	int d[2];
+	int error = get_xwd_map_dimensions(TEXTURE_IDS[TM_EARTH], d);
+	if (error == -1) return;
+	int x = (u - u_start) / (u_end - u_start) * d[0];
+	int y = (v - v_start) / (v_end - v_start) * d[1];
+	get_xwd_map_color(TEXTURE_IDS[TM_EARTH], x, y, rgb);
+}
 
 void unit_checkerboard_map(double u, double v, double *rgb) {
 	double uu = fmod(u, 2) + 2;

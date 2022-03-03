@@ -36,6 +36,8 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 default: main
 
 main: clean build/space_station build/movie_player
+	convert asset/earth.jpg asset/earth.convert.xwd
+	./tool/change_CONVERTxwd_to_JEFFxwd.exec asset/earth.convert.xwd asset/earth.xwd
 	time ./build/space_station
 	display out/Space_Station/frame_0000.xwd
 	./build/movie_player 1080 720 out/Space_Station/frame_ 0 99 0 40000
@@ -83,5 +85,6 @@ clean:
 	-rm out/M3d_test_sequence.out
 	-rm out/M3d_test_view.out
 	-rm -r out/Space_Station
+	-rm asset/earth.convert.xwd asset/earth.xwd
 	-rm out/view_test04Mb0000.xwd
 	-rm out/taller.xwd out/wider.xwd
