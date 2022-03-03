@@ -14,41 +14,65 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 
 
-double solve_quadratic_min_pos(double a, double b, double c) {
-	double rt = b * b - 4 * a * c;
-	if (rt < 0) return -1;
-	double x1 = (-b + sqrt(rt)) / (2 * a);
-	double x2 = (-b - sqrt(rt)) / (2 * a);
-	if (x1 < 0) x1 = x2;
-	if (x2 < 0) x2 = x1;
-	//???
-	if (x2 < 0) return -1;
-	return x2;
+int solve_quadratic(double a, double b, double c, double x[2]) {
+	double root = b * b - 4 * a * c;
+	if (root < 0) return 0;
+	root = sqrt(root);
+	x[0] = (-b - root) / (2 * a);
+	if (root == 0) return 1;
+	x[1] = (-b + root) / (2 * a);
+	return 2;
 }
 
-void ray(double Rsource[3], double Rtip[3], double argb[3]) {
-	double wsrs[3];
-	M3d_mat_mult_pt(wsrs, obinv[0], Rsource);
-	double wsrt[3];
-	M3d_mat_mult_pt(wsrt, obinv[0], Rtip);
-	double dxyz[3];
-	for (int i = 0; i < 3; i++) {
-		dxyz[i] = wsrt[i] - wsrs[i];
-	}
-	double a = dxyz[0] * dxyz[0] + dxyz[1] * dxyz[1];
-	double b = 2 * (wsrs[0] * dxyz[0] + wsrs[1] * dxyz[1]);
-	double c = wsrs[0] * wsrs[0] + wsrs[1] * wsrs[1] - 1;
-	double t = solve_quadratic_min_pos(a, b, c);
-	if (t == -1) {
-		argb[0] = argb[1] = argb[2] = 0;return;
-	}
+double solve_quadratic_min_pos(double a, double b, double c) {
+	double x[2] = {0, 0};
+	int n = solve_quadratic(a, b, c, x);
+	if (n == 0) return -1;
+	if (n == 1) return x[0];
+	if (x[0] < 0 && x[1] < 0) return -1;
+	if (x[0] < 0) return x[1];
+	if (x[1] < 0) return x[0];
+	return fmin(x[0], x[1]);
+}
+
+
+double ray(double Rsource[3], double Rtip[3], double argb[3]) {
+	argb[0] = 0;
+	argb[1] = 0;
+	argb[2] = 0;
+
+	double t_min = -1;
+	int obj = -1;
 	double ixyz[3];
-	for (int i = 0; i < 3; i++) {
-		ixyz[i] = wsrs[i] + t * dxyz[i];
+	for (int ob = 0; ob < num_objects; ob++) {
+		// World space ray source
+		double wsrs[3];
+		M3d_mat_mult_pt(wsrs, obinv[ob], Rsource);
+		// World space ray tip
+		double wsrt[3];
+		M3d_mat_mult_pt(wsrt, obinv[ob], Rtip);
+		double dxyz[3];
+		for (int i = 0; i < 3; i++) {
+			dxyz[i] = wsrt[i] - wsrs[i];
+		}
+		double a = dxyz[0] * dxyz[0] + dxyz[1] * dxyz[1];
+		double b = 2 * (wsrs[0] * dxyz[0] + wsrs[1] * dxyz[1]);
+		double c = wsrs[0] * wsrs[0] + wsrs[1] * wsrs[1] - 1;
+		double t = solve_quadratic_min_pos(a, b, c);
+		if (t < 0 || (t_min > 0 && t > t_min)) continue;
+		for (int i = 0; i < 3; i++) {
+			ixyz[i] = wsrs[i] + t * dxyz[i];
+		}
+		M3d_mat_mult_pt(ixyz, obmat[ob], ixyz);
+		t_min = t;
+		obj = ob;
 	}
-	M3d_mat_mult_pt(ixyz,obmat[0],ixyz);
-	G_line(ixyz[0], ixyz[1], Rsource[0], Rsource[1]);
-	G_wait_key();
+	if (t_min > 0) {
+		G_rgb(color[obj][0], color[obj][1], color[obj][2]);
+		G_fill_circle(Rtip[0], Rtip[1], 5);
+		G_line(Rsource[0], Rsource[1], ixyz[0], ixyz[1]);
+		G_wait_key();
+	}
 }
 
 
