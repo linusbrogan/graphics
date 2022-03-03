@@ -4,7 +4,7 @@
 #include <light_model.h>
 #include <lg.h>
 
-#define RESOLUTION 500
+#define RESOLUTION 5000
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define WINDOW_SIZE (WS_MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
 #define DX (-((WINDOW_SIZE) - (WINDOW_WIDTH)) / 2)
