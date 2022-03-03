@@ -88,14 +88,14 @@ int main() {
 		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
 		M3d_mat_mult(M, S, M);
-		graph_3d(torus_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, space_grey);
+		graph_3d(space_station_ring_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, space_grey);
 
 		// Build the lower ring
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
 		M3d_mat_mult(M, S, M);
-		graph_3d(torus_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, space_grey);
+		graph_3d(space_station_ring_xyz, 0, 2 * M_PI, 0, 2 * M_PI, M, space_grey);
 
 		double beam_radius = 0.1;
 		// Build the upper cross-bar 1
