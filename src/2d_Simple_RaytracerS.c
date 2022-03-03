@@ -12,13 +12,46 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+double dot_product(double v[3], double w[3]) {
+	double sum = 0;
+	for (int i = 0; i < 3; i++) {
+		sum += v[i] * w[i];
+	}
+	return sum;
+}
 
-void normalize(double tail[3], double head[3]) {
+void real_normalize(double tail[3], double head[3]) {
 	double d[3];
 	double length = 0;
 	for (int i = 0; i < 3; i++) {
 		d[i] = head[i] - tail[i];
 		length += d[i] * d[i];
+	}
+	length = sqrt(length);
+	for (int i = 0; i < 3; i++) {
+		head[i] = tail[i] + d[i] * 50 / length;
+	}
+
+}
+
+void normalize(double tail[3], double head[3], double eye[3]) {
+	double d[3];
+	double eu[3];
+	double length = 0;
+	for (int i = 0; i < 3; i++) {
+		d[i] = head[i] - tail[i];
+		length += d[i] * d[i];
+		eu[i] = eye[i] - tail[i];
+	}
+	double temp = -d[0];
+	d[0] = d[1];
+	d[1] = temp;
+	d[2] = 0;
+	double dot = dot_product(d, eu);
+	if (dot < 0) {
+		for (int i = 0; i < 3; i++) {
+			d[i] = -d[i];
+		}
 	}
 	length = sqrt(length);
 	for (int i = 0; i < 3; i++) {
@@ -77,16 +110,17 @@ double ray(double Rsource[3], double Rtip[3], double argb[3]) {
 			ixyz[i] = wsrs[i] + t * dxyz[i];
 		}
 		double theta = atan2(ixyz[1], ixyz[0]);
-		Ntip[0] = ixyz[0] + cos(theta);
-		Ntip[1] = ixyz[1] + sin(theta);
-		Ntip[2] = ixyz[2];
+		double dtheta = 1e-3;
+		Ntip[0] = cos(theta + dtheta);
+		Ntip[1] = sin(theta + dtheta);
+		Ntip[2] = 0;
 		M3d_mat_mult_pt(ixyz, obmat[ob], ixyz);
 		M3d_mat_mult_pt(Ntip, obmat[ob], Ntip);
 		t_min = t;
 		obj = ob;
 	}
 	if (t_min > 0) {
-		normalize(ixyz, Ntip);
+		normalize(ixyz, Ntip, Rsource);
 		G_rgb(0.5, 0.5, 0.5);
 		G_line(Rsource[0], Rsource[1], ixyz[0], ixyz[1]);
 		G_line(Ntip[0], Ntip[1], ixyz[0], ixyz[1]);
