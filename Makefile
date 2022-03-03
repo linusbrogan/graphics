@@ -34,13 +34,13 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 .PHONY: all clean default main test
 
-default: main
+default: raytracer
 
 raytracer: clean build/2d_Simple_RaytracerS
 	./build/2d_Simple_RaytracerS
 	display out/2d_Simple_Raytracer.jpg
 
-main: clean build/space_station build/movie_player
+space_station: clean build/space_station build/movie_player
 	convert asset/earth.jpg asset/earth.convert.xwd
 	./tool/change_CONVERTxwd_to_JEFFxwd.exec asset/earth.convert.xwd asset/earth.xwd
 	time ./build/space_station 0 100
