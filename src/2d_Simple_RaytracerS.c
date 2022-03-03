@@ -140,8 +140,9 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 		// Find normal vector at intersection
 		find_normal_vector(intersection, normal, tail);
 
-		// Draw ray to intersection and normal
+		// Draw intersection point, ray to intersection, and normal
 		G_rgb(0.5, 0.5, 0.5);
+		G_fill_circle(intersection[0], intersection[1], 2);
 		G_line(tail[0], tail[1], intersection[0], intersection[1]);
 		G_line(normal[0], normal[1], intersection[0], intersection[1]);
 
