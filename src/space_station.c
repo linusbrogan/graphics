@@ -64,12 +64,15 @@ int main() {
 		T_type[T_n] = SX;	T_param[T_n] = planet_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = planet_radius;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = planet_radius;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = 57;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = -38;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = 12000;	T_n++;
 		T_type[T_n] = TY;	T_param[T_n] = 6500;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = 12000;	T_n++;
 		M3d_make_movement_sequence_matrix(M, _i, T_n, T_type, T_param);
 		M3d_mat_mult(M, view, M);
-		graph_3d(sphere_xyz, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, M, unit_checkerboard_map);
+		graph_3d(sphere_xyz, 0, 2 * M_PI, -M_PI / 2, M_PI / 2, M, earth_map);
 
 		// Build the space station
 		double half_height = 0.5;
