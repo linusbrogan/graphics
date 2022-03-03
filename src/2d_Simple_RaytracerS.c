@@ -124,7 +124,10 @@ double ray(double Rsource[3], double Rtip[3], double argb[3]) {
 		G_rgb(0.5, 0.5, 0.5);
 		G_line(Rsource[0], Rsource[1], ixyz[0], ixyz[1]);
 		G_line(Ntip[0], Ntip[1], ixyz[0], ixyz[1]);
-		G_rgb(color[obj][0], color[obj][1], color[obj][2]);
+		for (int i = 0; i < 3; i++) {
+			argb[i] = color[obj][i];
+		}
+		G_rgb(argb[0], argb[1], argb[2]);
 		G_fill_circle(Rtip[0], Rtip[1], 2);
 		G_wait_key();
 	}
