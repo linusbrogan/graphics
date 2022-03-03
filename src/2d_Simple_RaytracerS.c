@@ -12,8 +12,149 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+double sq(double x) {
+	return x * x;
+}
 
+double dot_product(double v[3], double w[3]) {
+	double sum = 0;
+	for (int i = 0; i < 3; i++) {
+		sum += v[i] * w[i];
+	}
+	return sum;
+}
 
+void find_normal_vector(double tail[3], double head[3], double eye[3]) {
+	// Compute vectors from the intersection point (tail) to the adjacent point (head) and to the eye
+	double d[3];
+	double e[3];
+	double length = 0;
+	for (int i = 0; i < 3; i++) {
+		d[i] = head[i] - tail[i];
+		length += d[i] * d[i];
+		e[i] = eye[i] - tail[i];
+	}
+	length = sqrt(length);
+
+	// Compute the negative reciprocal vector (perpendicular to the tangent and normal to the surface)
+	double y = d[0];
+	double x = -d[1];
+	d[0] = x;
+	d[1] = y;
+	d[2] = 0;
+
+	// Orient the normal on the same side as the eye
+	double dot = dot_product(d, e);
+	if (dot < 0) {
+		for (int i = 0; i < 3; i++) {
+			d[i] *= -1;
+		}
+	}
+
+	// Compute the head of the normal vector, scaled nicely
+	for (int i = 0; i < 3; i++) {
+		head[i] = tail[i] + d[i] * 50 / length;
+	}
+}
+
+int solve_quadratic(double a, double b, double c, double x[2]) {
+	double root = b * b - 4 * a * c;
+	if (root < 0) return 0;
+	root = sqrt(root);
+	x[0] = (-b - root) / (2 * a);
+	if (root == 0) return 1;
+	x[1] = (-b + root) / (2 * a);
+	return 2;
+}
+
+double best_quadratic_solution(double a, double b, double c) {
+	double x[2] = {0, 0};
+	int n = solve_quadratic(a, b, c, x);
+	if (n == 0) return -1;
+	if (n == 1) return x[0];
+	if (x[0] < 0 && x[1] < 0) return -1;
+	if (x[0] < 0) return x[1];
+	if (x[1] < 0) return x[0];
+	return fmin(x[0], x[1]);
+}
+
+void ray(double tail[3], double head[3], double rgb[3]) {
+	// Set to default black background
+	rgb[0] = 0;
+	rgb[1] = 0;
+	rgb[2] = 0;
+
+	// Keep track of closest object
+	double t_min = -1;
+	int closest_object = -1;
+	double intersection[3] = {0, 0, 0};
+	double normal[3] = {0, 0, 0};
+
+	for (int object = 0; object < num_objects; object++) {
+		// Map input ray from world space to object space
+		// Oject-space eye
+		double E[3];
+		M3d_mat_mult_pt(E, obinv[object], tail);
+		// Object-space front of ray, where it intersects the screen
+		double F[3];
+		M3d_mat_mult_pt(F, obinv[object], head);
+
+		// Compute vector along ray
+		double D[3];
+		for (int i = 0; i < 3; i++) {
+			D[i] = F[i] - E[i];
+		}
+
+		// Solve quadratic of intersection
+		double a = sq(D[0]) + sq(D[1]);
+		double b = 2 * (E[0] * D[0] + E[1] * D[1]);
+		double c = sq(E[0]) + sq(E[1]) - 1;
+		double t = best_quadratic_solution(a, b, c);
+
+		// Move on if no closer intersection
+		if (t < 0 || (t_min > 0 && t > t_min)) continue;
+
+		// Record closest intersection
+		t_min = t;
+		closest_object = object;
+
+		// Compute intersection point
+		for (int i = 0; i < 3; i++) {
+			intersection[i] = E[i] + t * D[i];
+		}
+
+		// Find adjacent point in object space
+		double theta = atan2(intersection[1], intersection[0]);
+		double dtheta = 1e-3;
+		double theta2 = theta + dtheta;
+		normal[0] = cos(theta2);
+		normal[1] = sin(theta2);
+		normal[2] = 0;
+
+		// Map intersection and head of normal vector back to world space
+		M3d_mat_mult_pt(intersection, obmat[object], intersection);
+		M3d_mat_mult_pt(normal, obmat[object], normal);
+	}
+
+	if (closest_object >= 0) {
+		// Find normal vector at intersection
+		find_normal_vector(intersection, normal, tail);
+
+		// Draw ray to intersection and normal
+		G_rgb(0.5, 0.5, 0.5);
+		G_line(tail[0], tail[1], intersection[0], intersection[1]);
+		G_line(normal[0], normal[1], intersection[0], intersection[1]);
+
+		// Save color at intersection
+		for (int i = 0; i < 3; i++) {
+			rgb[i] = color[closest_object][i];
+		}
+
+		// Draw projection on screen
+		G_rgb(rgb[0], rgb[1], rgb[2]);
+		G_fill_circle(head[0], head[1], 2);
+	}
+}
 
 
 
@@ -166,7 +307,7 @@ int test01()
       Rtip[0]    = 100 ;  Rtip[1]    = ytip ;  Rtip[2]   = 0  ;    
 
       G_rgb(1,1,0) ; G_line(Rsource[0],Rsource[1],  Rtip[0],Rtip[1]) ;
-      //      ray (Rsource, Rtip, argb) ; 
+            ray (Rsource, Rtip, argb) ; 
 
       Draw_the_scene() ;
       G_wait_key() ;
