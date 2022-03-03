@@ -1,0 +1,19 @@
+raytracer
+
+map line y=mx through inverse to intersect simple defualt shape (unit circle
+
+(x,y) = (x0,y0) + t(dx, dy)
+intersect with xx+yy=1
+
+(x0 + tdx)^2 + (y0+tdy)^2=1
+
+write quadratic solver
+a,b,c
+take smallest nonneg t value
+
+A=(dx dx + dy dy)
+B= 2x0 dx + 2 y0 dy
+C = x0 x0 + y0 y0 - 1
+=0
+
+https://fabiensanglard.net/postcard_pathtracer/

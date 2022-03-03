@@ -14,6 +14,42 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 
 
+double solve_quadratic_min_pos(double a, double b, double c) {
+	double rt = b * b - 4 * a * c;
+	if (rt < 0) return -1;
+	double x1 = (-b + sqrt(rt)) / (2 * a);
+	double x2 = (-b - sqrt(rt)) / (2 * a);
+	if (x1 < 0) x1 = x2;
+	if (x2 < 0) x2 = x1;
+	//???
+	if (x2 < 0) return -1;
+	return x2;
+}
+
+void ray(double Rsource[3], double Rtip[3], double argb[3]) {
+	double wsrs[3];
+	M3d_mat_mult_pt(wsrs, obinv[0], Rsource);
+	double wsrt[3];
+	M3d_mat_mult_pt(wsrt, obinv[0], Rtip);
+	double dxyz[3];
+	for (int i = 0; i < 3; i++) {
+		dxyz[i] = wsrt[i] - wsrs[i];
+	}
+	double a = dxyz[0] * dxyz[0] + dxyz[1] * dxyz[1];
+	double b = 2 * (wsrs[0] * dxyz[0] + wsrs[1] * dxyz[1]);
+	double c = wsrs[0] * wsrs[0] + wsrs[1] * wsrs[1] - 1;
+	double t = solve_quadratic_min_pos(a, b, c);
+	if (t == -1) {
+		argb[0] = argb[1] = argb[2] = 0;return;
+	}
+	double ixyz[3];
+	for (int i = 0; i < 3; i++) {
+		ixyz[i] = wsrs[i] + t * dxyz[i];
+	}
+	M3d_mat_mult_pt(ixyz,obmat[0],ixyz);
+	G_line(ixyz[0], ixyz[1], Rsource[0], Rsource[1]);
+	G_wait_key();
+}
 
 
 
@@ -166,7 +202,7 @@ int test01()
       Rtip[0]    = 100 ;  Rtip[1]    = ytip ;  Rtip[2]   = 0  ;    
 
       G_rgb(1,1,0) ; G_line(Rsource[0],Rsource[1],  Rtip[0],Rtip[1]) ;
-      //      ray (Rsource, Rtip, argb) ; 
+            ray (Rsource, Rtip, argb) ; 
 
       Draw_the_scene() ;
       G_wait_key() ;
