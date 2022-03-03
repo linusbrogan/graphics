@@ -13,6 +13,18 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
+void normalize(double tail[3], double head[3]) {
+	double d[3];
+	double length = 0;
+	for (int i = 0; i < 3; i++) {
+		d[i] = head[i] - tail[i];
+		length += d[i] * d[i];
+	}
+	length = sqrt(length);
+	for (int i = 0; i < 3; i++) {
+		head[i] = tail[i] + d[i] * 50 / length;
+	}
+}
 
 int solve_quadratic(double a, double b, double c, double x[2]) {
 	double root = b * b - 4 * a * c;
@@ -43,7 +55,8 @@ double ray(double Rsource[3], double Rtip[3], double argb[3]) {
 
 	double t_min = -1;
 	int obj = -1;
-	double ixyz[3];
+	double ixyz[3] = {0, 0, 0,};
+	double Ntip[3] = {0, 0, 0};
 	for (int ob = 0; ob < num_objects; ob++) {
 		// World space ray source
 		double wsrs[3];
@@ -63,14 +76,22 @@ double ray(double Rsource[3], double Rtip[3], double argb[3]) {
 		for (int i = 0; i < 3; i++) {
 			ixyz[i] = wsrs[i] + t * dxyz[i];
 		}
+		double theta = atan2(ixyz[1], ixyz[0]);
+		Ntip[0] = ixyz[0] + cos(theta);
+		Ntip[1] = ixyz[1] + sin(theta);
+		Ntip[2] = ixyz[2];
 		M3d_mat_mult_pt(ixyz, obmat[ob], ixyz);
+		M3d_mat_mult_pt(Ntip, obmat[ob], Ntip);
 		t_min = t;
 		obj = ob;
 	}
 	if (t_min > 0) {
-		G_rgb(color[obj][0], color[obj][1], color[obj][2]);
-		G_fill_circle(Rtip[0], Rtip[1], 5);
+		normalize(ixyz, Ntip);
+		G_rgb(0.5, 0.5, 0.5);
 		G_line(Rsource[0], Rsource[1], ixyz[0], ixyz[1]);
+		G_line(Ntip[0], Ntip[1], ixyz[0], ixyz[1]);
+		G_rgb(color[obj][0], color[obj][1], color[obj][2]);
+		G_fill_circle(Rtip[0], Rtip[1], 2);
 		G_wait_key();
 	}
 }
