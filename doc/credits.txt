@@ -3,3 +3,6 @@
 - asset/Space_station_v.xwd
 	- From <https://2001.fandom.com/wiki/Space_Station_V?file=Space_station_v.jpg>
 	- Image URL: <https://static.wikia.nocookie.net/2001/images/c/cc/Space_station_v.jpg/revision/latest?cb=20091214012911>
+-asset/earth.jpg
+	- From <https://earthobservatory.nasa.gov/blogs/elegantfigures/2011/10/06/crafting-the-blue-marble/>
+	- Image URL: <https://earthobservatory.nasa.gov/blogs/elegantfigures/wp-content/uploads/sites/4/2011/10/land_shallow_topo_2011_8192.jpg>
