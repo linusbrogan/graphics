@@ -130,7 +130,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 			t = best_quadratic_solution(a, b, c);
 			double x = E[0] + t * D[0];
 			double y = E[1] + t * D[1];
-			t = -1;
+			if (fabs(y) > 1) t = -1;
 			break;
 			case OBJ_LINE:
 			if (D[1] == 0) {
@@ -158,10 +158,8 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 
 		// Find world-space normal vector
 		double d[2];
-printf("GOT HERE");
-		void (*df)(double, double, double[2]) = dfs[object];
+		void (*df)(double, double, double[2]) = dfs[obj_types[object]];
 		df(intersection[0], intersection[1], d);
-printf("YEET");
 		normal[0] = obinv[object][0][0] * d[0] + obinv[object][1][0] * d[1];
 		normal[1] = obinv[object][0][1] * d[0] + obinv[object][1][1] * d[1];
 
@@ -201,6 +199,7 @@ void Draw_ellipsoid (int onum)
   G_rgb (color[onum][0],color[onum][1],color[onum][2]) ;
   
   n = 1000 ;
+  int branch_flag = 1;
   for (i = 0 ; i < n ; i++) {
 		enum obj_type ot = obj_types[onum];
 		switch (ot) {
@@ -210,9 +209,11 @@ void Draw_ellipsoid (int onum)
 			t = i * 2 * M_PI / n ;
 			break;
 			case OBJ_HYPERBOLA:
-			t = -1 + i * 2.5 / n ;
-			xyz[0] = hyperbola_x(t);
+			t = -1 + i * 2.0 / n ;
+			xyz[0] = hyperbola_x(t) * branch_flag;
 			xyz[1] = hyperbola_y(t);
+			if (branch_flag == 1) i--;
+			branch_flag *= -1;
 			break;
 			case OBJ_LINE:
 			t = -1 + i * 2.0 / n ;
@@ -341,16 +342,19 @@ int test01()
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
 	obj_types[num_objects] = OBJ_HYPERBOLA;
-    color[num_objects][0] = 0.5 ;
-    color[num_objects][1] = 0.0 ; 
-    color[num_objects][2] = 1.0 ;
+    color[num_objects][0] = 1.0 ;
+    color[num_objects][1] = 1.0 ; 
+    color[num_objects][2] = 0.0 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  130   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  40   ; Tn++ ;
     Ttypelist[Tn] = SY ; Tvlist[Tn] =   30   ; Tn++ ;
     Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -15   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  200   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  600   ; Tn++ ;
+
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  -100   ; Tn++ ;
     Ttypelist[Tn] = TX ; Tvlist[Tn] =  100   ; Tn++ ;
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  700   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -364,11 +368,11 @@ int test01()
     color[num_objects][2] = 1.0 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  150   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  80   ; Tn++ ;
     Ttypelist[Tn] = SY ; Tvlist[Tn] =   20   ; Tn++ ;
-    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  20   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  120   ; Tn++ ;
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  400   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  25   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  420   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  350   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -377,7 +381,6 @@ int test01()
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
     
-printf("YABABADBABDO");
 
     G_rgb(0,0,0) ;
     G_clear() ;
