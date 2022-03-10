@@ -110,3 +110,16 @@ double brachistochrone_x(double u) {
 double brachistochrone_y(double u) {
 	return 1 - cos(u);
 }
+
+double line_x(double u) {
+	return u;
+}
+
+double line_y(double u) {
+	return 0;
+}
+
+void d_line(double x, double y, double d[2]) {
+	d[0] = 0;
+	d[1] = 1;
+}
