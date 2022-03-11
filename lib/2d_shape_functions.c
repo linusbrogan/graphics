@@ -123,3 +123,36 @@ void d_line(double x, double y, double d[2]) {
 	d[0] = 0;
 	d[1] = 1;
 }
+
+int circle_xyz(int step, int resolution, double xyz[3]) {
+	double t = step * 2 * M_PI / resolution;
+	xyz[0] = circle_x(t);
+	xyz[1] = circle_y(t);
+	xyz[2] = 0;
+	return 1;
+}
+
+int half_hyperbola_xyz(int step, int resolution, double xyz[3]) {
+	double t_max = asinh(1);
+	double t = -t_max + step * 2 * t_max / resolution;
+	xyz[0] = hyperbola_x(t);
+	xyz[1] = hyperbola_y(t);
+	xyz[2] = 0;
+	if (fabs(xyz[1]) > 1) return 0;
+	return 1;
+}
+
+int hyperbola_xyz(int step, int resolution, double xyz[3]) {
+	int status = half_hyperbola_xyz(step, resolution, xyz);
+	if (step % 2 == 1) xyz[0] *= -1;
+	return status;
+}
+
+int line_xyz(int step, int resolution, double xyz[3]) {
+	double t = -1 + step * 2.0 / resolution;
+	xyz[0] = line_x(t);
+	xyz[1] = line_y(t);
+	xyz[2] = 0;
+	if (fabs(xyz[0]) > 1) return 0;
+	return 1;
+}
