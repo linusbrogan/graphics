@@ -13,6 +13,29 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+enum object_type {
+	OBJ_CIRCLE = 0,
+	OBJ_HALF_HYPERBOLA,
+	OBJ_HYPERBOLA,
+	OBJ_LINE
+};
+
+int (*shape_xyz[4])(int, int, double[3]) = {
+	circle_xyz,
+	half_hyperbola_xyz,
+	hyperbola_xyz,
+	line_xyz
+};
+
+void (*gradient[4])(double, double, double[2]) = {
+	d_circle,
+	d_hyperbola,
+	d_hyperbola,
+	d_line
+};
+
+enum object_type object_types[100];
+
 double sq(double x) {
 	return x * x;
 }
@@ -68,6 +91,59 @@ double best_quadratic_solution(double a, double b, double c) {
 	return fmin(x[0], x[1]);
 }
 
+
+double solve_ray_intersection(int object, double D[3], double E[3]) {
+	switch (object_types[object]) {
+		case OBJ_CIRCLE: {
+			double a = sq(D[0]) + sq(D[1]);
+			double b = 2 * (E[0] * D[0] + E[1] * D[1]);
+			double c = sq(E[0]) + sq(E[1]) - 1;
+			return best_quadratic_solution(a, b, c);
+		}
+
+		case OBJ_HALF_HYPERBOLA: {
+			double a = sq(D[0]) - sq(D[1]);
+			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
+			double c = sq(E[0]) - sq(E[1]) - 1;
+			double t[2];solve_quadratic(a, b, c, t);
+			double x = E[0] + t[0] * D[0];
+			double y = E[1] + t[0] * D[1];
+			int sol = 0;
+			if (fabs(y) > 1 || x < 0) {
+				x = E[0] + t[1] * D[0];
+				y = E[1] + t[1] * D[1];
+				sol++;
+			};
+			if (fabs(y) > 1) return -1;
+			return t[sol];
+		}
+
+		case OBJ_HYPERBOLA: {
+			double a = sq(D[0]) - sq(D[1]);
+			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
+			double c = sq(E[0]) - sq(E[1]) - 1;
+			double t[2];solve_quadratic(a, b, c, t);
+			double x = E[0] + t[0] * D[0];
+			double y = E[1] + t[0] * D[1];
+			int sol = 0;
+			if (fabs(y) > 1) {
+				x = E[0] + t[1] * D[0];
+				y = E[1] + t[1] * D[1];
+				sol++;
+			};
+			if (fabs(y) > 1) return -1;
+			return t[sol];
+		}
+
+		case OBJ_LINE: {
+			if (D[1] == 0) return -1;
+			double t = -E[1] / D[1];
+			if (fabs(E[0] + t * D[0]) > 1) return -1;
+			return t;
+		}
+	}
+}
+
 double ray(double tail[3], double head[3], double rgb[3]) {
 	// Set to default black background
 	rgb[0] = 0;
@@ -95,11 +171,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 			D[i] = F[i] - E[i];
 		}
 
-		// Solve quadratic of intersection
-		double a = sq(D[0]) + sq(D[1]);
-		double b = 2 * (E[0] * D[0] + E[1] * D[1]);
-		double c = sq(E[0]) + sq(E[1]) - 1;
-		double t = best_quadratic_solution(a, b, c);
+		double t = solve_ray_intersection(object, D, E);
 
 		// Move on if no closer intersection
 		if (t < 0 || (t_min > 0 && t > t_min)) continue;
@@ -115,7 +187,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 
 		// Find world-space normal vector
 		double d[2];
-		d_circle(intersection[0], intersection[1], d);
+		gradient[object_types[object]](intersection[0], intersection[1], d);
 		normal[0] = obinv[object][0][0] * d[0] + obinv[object][1][0] * d[1];
 		normal[1] = obinv[object][0][1] * d[0] + obinv[object][1][1] * d[1];
 
@@ -155,11 +227,9 @@ void Draw_ellipsoid (int onum)
   G_rgb (color[onum][0],color[onum][1],color[onum][2]) ;
   
   n = 1000 ;
+  int branch_flag = 1;
   for (i = 0 ; i < n ; i++) {
-    t = i*2*M_PI/n ;
-    xyz[0] = cos(t) ;
-    xyz[1] = sin(t) ;
-    xyz[2] = 0 ;
+		shape_xyz[object_types[onum]](i, n, xyz);
     M3d_mat_mult_pt(xyz, obmat[onum], xyz) ;
     x = xyz[0] ;
     y = xyz[1] ;
@@ -175,7 +245,7 @@ void Draw_the_scene()
 {
   int onum ;
   for (onum = 0 ; onum < num_objects ; onum++) {
-    Draw_ellipsoid(onum) ;
+    Draw_ellipsoid(onum);
   }
 }
 
@@ -207,6 +277,7 @@ int test01()
 
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.8 ; 
     color[num_objects][2] = 0.0 ;
@@ -225,6 +296,7 @@ int test01()
     num_objects++ ; // don't forget to do this
 
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 1.0 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 0.0 ;
@@ -242,6 +314,7 @@ int test01()
 
     num_objects++ ; // don't forget to do this
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.3 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 1.0 ;
@@ -259,6 +332,7 @@ int test01()
 
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.5 ;
     color[num_objects][1] = 1.0 ; 
     color[num_objects][2] = 1.0 ;
@@ -276,7 +350,66 @@ int test01()
 
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_HYPERBOLA;
+    color[num_objects][0] = 1.0 ;
+    color[num_objects][1] = 1.0 ; 
+    color[num_objects][2] = 0.0 ;
+	
+    Tn = 0 ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  40   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =   30   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -15   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  200   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  700   ; Tn++ ;
 
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  -100   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  100   ; Tn++ ;
+	
+    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
+    M3d_mat_mult(obmat[num_objects], vm, m) ;
+    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+
+    num_objects++ ; // don't forget to do this        
+    //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_HALF_HYPERBOLA;
+    color[num_objects][0] = 1.0 ;
+    color[num_objects][1] = 0.5 ; 
+    color[num_objects][2] = 0.5 ;
+	
+    Tn = 0 ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  40   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =   30   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -15   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  150   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  600   ; Tn++ ;
+
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  -100   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  100   ; Tn++ ;
+	
+    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
+    M3d_mat_mult(obmat[num_objects], vm, m) ;
+    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+
+    num_objects++ ; // don't forget to do this        
+    //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_LINE;
+    color[num_objects][0] = 0.75 ;
+    color[num_objects][1] = 0.5 ; 
+    color[num_objects][2] = 1.0 ;
+	
+    Tn = 0 ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  80   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =   20   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  25   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  370   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  300   ; Tn++ ;
+	
+    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
+    M3d_mat_mult(obmat[num_objects], vm, m) ;
+    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+
+    num_objects++ ; // don't forget to do this        
+    //////////////////////////////////////////////////////////////
     
 
     G_rgb(0,0,0) ;

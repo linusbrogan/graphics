@@ -132,14 +132,19 @@ int circle_xyz(int step, int resolution, double xyz[3]) {
 	return 1;
 }
 
-int hyperbola_xyz(int step, int resolution, double xyz[3]) {
+int half_hyperbola_xyz(int step, int resolution, double xyz[3]) {
 	double t = -1 + step * 2.0 / resolution;
 	xyz[0] = hyperbola_x(t);
-	if (step % 2 == 1) xyz[0] *= -1;
 	xyz[1] = hyperbola_y(t);
 	xyz[2] = 0;
 	if (fabs(xyz[1]) > 1) return 0;
 	return 1;
+}
+
+int hyperbola_xyz(int step, int resolution, double xyz[3]) {
+	int status = half_hyperbola_xyz(step, resolution, xyz);
+	if (step % 2 == 1) xyz[0] *= -1;
+	return status;
 }
 
 int line_xyz(int step, int resolution, double xyz[3]) {
