@@ -13,6 +13,29 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+enum object_type {
+	OBJ_CIRCLE = 0,
+	OBJ_HALF_HYPERBOLA,
+	OBJ_HYPERBOLA,
+	OBJ_LINE
+};
+
+int (*shape_xyz[4])(int, int, double[3]) = {
+	circle_xyz,
+	half_hyperbola_xyz,
+	hyperbola_xyz,
+	line_xyz
+};
+
+void (*gradient[4])(double, double, double[2]) = {
+	d_circle,
+	d_hyperbola,
+	d_hyperbola,
+	d_line
+};
+
+enum object_type object_types[100];
+
 double sq(double x) {
 	return x * x;
 }
@@ -58,19 +81,82 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 }
 
 double solve_ray_intersection(int object, double E[3], double D[3]) {
-		double a = sq(D[0]) + sq(D[1]);
-		double b = 2 * (E[0] * D[0] + E[1] * D[1]);
-		double c = sq(E[0]) + sq(E[1]) - 1;
+	switch (object_types[object]) {
+		case OBJ_CIRCLE: {
+			double a = sq(D[0]) + sq(D[1]);
+			double b = 2 * (E[0] * D[0] + E[1] * D[1]);
+			double c = sq(E[0]) + sq(E[1]) - 1;
 
-		double t[2] = {-1, -1};
-		int n = solve_quadratic(a, b, c, t);
+			double t[2] = {-1, -1};
+			int n = solve_quadratic(a, b, c, t);
 
-		if (n == 0) return -1;
-		if (n == 1) return t[0];
-		if (t[0] <= 0 && t[1] <= 0) return -1;
-		if (t[0] <= 0) return t[1];
-		if (t[1] <= 0) return t[0];
-		return fmin(t[0], t[1]);
+			if (n == 0) return -1;
+			if (n == 1) return t[0];
+			if (t[0] <= 0 && t[1] <= 0) return -1;
+			if (t[0] <= 0) return t[1];
+			if (t[1] <= 0) return t[0];
+			return fmin(t[0], t[1]);
+		}
+
+		case OBJ_HALF_HYPERBOLA: {
+			double a = sq(D[0]) - sq(D[1]);
+			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
+			double c = sq(E[0]) - sq(E[1]) - 1;
+
+			double t[2] = {-1, -1};
+			int n = solve_quadratic(a, b, c, t);
+
+			if (n == 0) return -1;
+
+			// Check for invalid solutions
+			for (int solution = 0; solution < 2; solution++) {
+				double x = E[0] + t[solution] * D[0];
+				double y = E[1] + t[solution] * D[1];
+				if (fabs(y) > 1 || x < 0 || t[solution] <= 0) {
+					t[solution] = -1;
+				}
+			};
+
+			if (n == 1) return t[0];
+			if (t[0] <= 0 && t[1] <= 0) return -1;
+			if (t[0] <= 0) return t[1];
+			if (t[1] <= 0) return t[0];
+			return fmin(t[0], t[1]);
+		}
+
+		case OBJ_HYPERBOLA: {
+			double a = sq(D[0]) - sq(D[1]);
+			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
+			double c = sq(E[0]) - sq(E[1]) - 1;
+
+			double t[2] = {-1, -1};
+			int n = solve_quadratic(a, b, c, t);
+
+			if (n == 0) return -1;
+
+			// Check for invalid solutions
+			for (int solution = 0; solution < 2; solution++) {
+				double x = E[0] + t[solution] * D[0];
+				double y = E[1] + t[solution] * D[1];
+				if (fabs(y) > 1 || t[solution] <= 0) {
+					t[solution] = -1;
+				}
+			};
+
+			if (n == 1) return t[0];
+			if (t[0] <= 0 && t[1] <= 0) return -1;
+			if (t[0] <= 0) return t[1];
+			if (t[1] <= 0) return t[0];
+			return fmin(t[0], t[1]);
+		}
+
+		case OBJ_LINE: {
+			if (D[1] == 0) return -1;
+			double t = -E[1] / D[1];
+			if (fabs(E[0] + t * D[0]) > 1) return -1;
+			return t;
+		}
+	}
 }
 
 double ray(double tail[3], double head[3], double rgb[3]) {
@@ -117,7 +203,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 
 		// Find world-space normal vector
 		double d[2];
-		d_circle(intersection[0], intersection[1], d);
+		gradient[object_types[object]](intersection[0], intersection[1], d);
 		normal[0] = obinv[object][0][0] * d[0] + obinv[object][1][0] * d[1];
 		normal[1] = obinv[object][0][1] * d[0] + obinv[object][1][1] * d[1];
 
@@ -148,8 +234,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 
 
 
-void Draw_ellipsoid (int onum)
-{
+void Draw_shape(int onum) {
   int n,i ;
   double t, xyz[3] ;
   double x,y ;
@@ -158,10 +243,7 @@ void Draw_ellipsoid (int onum)
   
   n = 1000 ;
   for (i = 0 ; i < n ; i++) {
-    t = i*2*M_PI/n ;
-    xyz[0] = cos(t) ;
-    xyz[1] = sin(t) ;
-    xyz[2] = 0 ;
+		shape_xyz[object_types[onum]](i, n, xyz);
     M3d_mat_mult_pt(xyz, obmat[onum], xyz) ;
     x = xyz[0] ;
     y = xyz[1] ;
@@ -177,7 +259,7 @@ void Draw_the_scene()
 {
   int onum ;
   for (onum = 0 ; onum < num_objects ; onum++) {
-    Draw_ellipsoid(onum) ;
+		Draw_shape(onum);
   }
 }
 
@@ -209,6 +291,7 @@ int test01()
 
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.8 ; 
     color[num_objects][2] = 0.0 ;
@@ -227,6 +310,7 @@ int test01()
     num_objects++ ; // don't forget to do this
 
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 1.0 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 0.0 ;
@@ -244,6 +328,7 @@ int test01()
 
     num_objects++ ; // don't forget to do this
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.3 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 1.0 ;
@@ -261,6 +346,7 @@ int test01()
 
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_CIRCLE;
     color[num_objects][0] = 0.5 ;
     color[num_objects][1] = 1.0 ; 
     color[num_objects][2] = 1.0 ;
