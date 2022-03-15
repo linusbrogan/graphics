@@ -52,8 +52,8 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 	if (root < 0) return 0;
 	root = sqrt(root);
 	x[0] = (-b - root) / (2 * a);
-	if (root == 0) return 1;
 	x[1] = (-b + root) / (2 * a);
+	if (root == 0) return 1;
 	return 2;
 }
 
