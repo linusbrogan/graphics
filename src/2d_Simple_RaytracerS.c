@@ -57,15 +57,20 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 	return 2;
 }
 
-double best_quadratic_solution(double a, double b, double c) {
-	double x[2] = {0, 0};
-	int n = solve_quadratic(a, b, c, x);
-	if (n == 0) return -1;
-	if (n == 1) return x[0];
-	if (x[0] < 0 && x[1] < 0) return -1;
-	if (x[0] < 0) return x[1];
-	if (x[1] < 0) return x[0];
-	return fmin(x[0], x[1]);
+double solve_ray_intersection(int object, double E[3], double D[3]) {
+		double a = sq(D[0]) + sq(D[1]);
+		double b = 2 * (E[0] * D[0] + E[1] * D[1]);
+		double c = sq(E[0]) + sq(E[1]) - 1;
+
+		double t[2] = {-1, -1};
+		int n = solve_quadratic(a, b, c, t);
+
+		if (n == 0) return -1;
+		if (n == 1) return t[0];
+		if (t[0] <= 0 && t[1] <= 0) return -1;
+		if (t[0] <= 0) return t[1];
+		if (t[1] <= 0) return t[0];
+		return fmin(t[0], t[1]);
 }
 
 double ray(double tail[3], double head[3], double rgb[3]) {
@@ -95,11 +100,8 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 			D[i] = F[i] - E[i];
 		}
 
-		// Solve quadratic of intersection
-		double a = sq(D[0]) + sq(D[1]);
-		double b = 2 * (E[0] * D[0] + E[1] * D[1]);
-		double c = sq(E[0]) + sq(E[1]) - 1;
-		double t = best_quadratic_solution(a, b, c);
+		// Find intersection point
+		double t = solve_ray_intersection(object, E, D);
 
 		// Move on if no closer intersection
 		if (t < 0 || (t_min > 0 && t > t_min)) continue;
