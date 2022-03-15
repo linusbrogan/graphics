@@ -13,7 +13,7 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-#define REFLECTIONS 5
+#define REFLECTIONS 4
 
 enum object_type {
 	OBJ_CIRCLE = 0,
@@ -158,7 +158,6 @@ double solve_ray_intersection(int object, double D[3], double E[3]) {
 			solve_quadratic(a, b, c, t);
 
 			for (int solution = 0; solution < 2; solution++) {
-				double x = E[0] + t[solution] * D[0];
 				double y = E[1] + t[solution] * D[1];
 				if (fabs(y) > 1 || t[solution] <= 0) {
 					t[solution] = -1;
@@ -168,6 +167,8 @@ double solve_ray_intersection(int object, double D[3], double E[3]) {
 			if (t[0] == -1 && t[1] == -1) return -1;
 			if (t[0] == -1) return t[1];
 			if (t[1] == -1) return t[0];
+			if (t[0] < t[1]) return t[0];
+			return t[1];
 			return fmin(t[0], t[1]);
 		}
 
@@ -239,22 +240,21 @@ void ray_reflect(double tail[3], double head[3], double rgb[3], int bounces) {
 		double normal_head[3];
 		change_normal_to_normal_head(intersection, normal, tail, normal_head);
 
-		// Draw intersection point, ray to intersection, and normal
-		double gr = (1.0 / REFLECTIONS) * (1 + bounces);
-		G_rgb(gr, gr, gr);
-		//G_rgb(0.5, 0.5, 0.5);
-		G_fill_circle(intersection[0], intersection[1], 2);
-		G_line(tail[0], tail[1], intersection[0], intersection[1]);
-		G_line(normal_head[0], normal_head[1], intersection[0], intersection[1]);
-
 		// Save color at intersection
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = color[closest_object][i];
 		}
 
-		// Draw projection on screen
+		// Draw intersection point, ray to intersection, and normal
+		//G_rgb(0.5, 0.5, 0.5);
+		//G_line(normal_head[0], normal_head[1], intersection[0], intersection[1]);
 		G_rgb(rgb[0], rgb[1], rgb[2]);
-		G_fill_circle(head[0], head[1], 2);
+		G_fill_circle(intersection[0], intersection[1], 2);
+		G_line(tail[0], tail[1], intersection[0], intersection[1]);
+
+		// Draw projection on screen
+		//G_rgb(rgb[0], rgb[1], rgb[2]);
+		//G_fill_circle(head[0], head[1], 2);
 
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
@@ -263,13 +263,23 @@ void ray_reflect(double tail[3], double head[3], double rgb[3], int bounces) {
 			L[i] = head[i] - tail[i];
 		}
 		find_reflection_vector(L, normal, r);
+		normalize(r);
+		double R[3];
 		for (int i = 0; i < 3; i++) {
-			r[i] += intersection[i];
+			R[i] = r[i] * 30 + intersection[i];
 		}
+
+		// Draw reflected ray
+		G_rgb(1, 1, 1);
+		G_line(intersection[0], intersection[1], R[0], R[1]);
+
+for (int i = 0; i < 3; i++) {
+	intersection[i] += 0.0001 * r[i];
+}
 
 		// Reflect
 		double reflected_rgb[3];
-		ray_reflect(intersection, r, reflected_rgb, bounces - 1);
+		ray_reflect(intersection, R, reflected_rgb, bounces - 1);
 	}
 }
 
@@ -288,7 +298,8 @@ void Draw_ellipsoid (int onum)
   n = 1000 ;
   int branch_flag = 1;
   for (i = 0 ; i < n ; i++) {
-		shape_xyz[object_types[onum]](i, n, xyz);
+		int draw = shape_xyz[object_types[onum]](i, n, xyz);
+		if (!draw) continue;
     M3d_mat_mult_pt(xyz, obmat[onum], xyz) ;
     x = xyz[0] ;
     y = xyz[1] ;
@@ -314,7 +325,17 @@ void Draw_the_scene()
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-
+void move_tip_on_screen(double tail[3], double head[3]) {
+	double d[3];
+	for (int i = 0; i < 3; i++) {
+		d[i] = head[i] - tail[i];
+	}
+	double scale = (100 - tail[0]) / d[0];
+	for (int i = 0; i < 3; i++) {
+		d[i] *= scale;
+		head[i] = tail[i] + d[i];
+	}
+}
 
 
 
@@ -415,35 +436,11 @@ int test01()
     color[num_objects][2] = 0.0 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  40   ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =   30   ; Tn++ ;
-    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -15   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  15   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =   80   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -7   ; Tn++ ;
     Ttypelist[Tn] = TX ; Tvlist[Tn] =  200   ; Tn++ ;
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  700   ; Tn++ ;
-
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  -100   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  100   ; Tn++ ;
-	
-    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
-    M3d_mat_mult(obmat[num_objects], vm, m) ;
-    M3d_mat_mult(obinv[num_objects], mi, vi) ;
-
-    num_objects++ ; // don't forget to do this        
-    //////////////////////////////////////////////////////////////
-	object_types[num_objects] = OBJ_HALF_HYPERBOLA;
-    color[num_objects][0] = 1.0 ;
-    color[num_objects][1] = 0.5 ; 
-    color[num_objects][2] = 0.5 ;
-	
-    Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  40   ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =   30   ; Tn++ ;
-    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -15   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  150   ; Tn++ ;
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  600   ; Tn++ ;
-
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  -100   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  100   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  630   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -457,10 +454,9 @@ int test01()
     color[num_objects][2] = 1.0 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  80   ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =   20   ; Tn++ ;
-    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  25   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  370   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  50   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  110   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  300   ; Tn++ ;
     Ttypelist[Tn] = TY ; Tvlist[Tn] =  300   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
@@ -479,22 +475,33 @@ int test01()
     Rsource[0] =  20 ;  Rsource[1] =  400 ;  Rsource[2] = 0 ;    
     G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
     G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
+	G_rgb(1, 1, 1);
+	G_fill_rectangle(0, 0, 80, 15);
+	G_rgb(0, 0, 0);
+	G_draw_string("click to quit", 0, 0);
     
-	G_wait_key();
-    
-    double ytip ;
-    for (ytip = 200 ; ytip <= 600 ; ytip++) {
-	G_rgb(0, 0, 0);G_clear();
-    G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
-    G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
-      Rtip[0]    = 100 ;  Rtip[1]    = ytip ;  Rtip[2]   = 0  ;    
+
+	while (1) {
+		double p[2];
+		G_wait_click(p);
+		if (p[0] < 80 && p[1] < 15) exit(0);
+
+		G_rgb(0, 0, 0);
+		G_clear();
+		G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
+		G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
+     	Rtip[0]    = p[0] ;  Rtip[1]    = p[1] ;  Rtip[2]   = 0  ;    
+		move_tip_on_screen(Rsource, Rtip);
 
       G_rgb(1,1,0) ; G_line(Rsource[0],Rsource[1],  Rtip[0],Rtip[1]) ;
             ray (Rsource, Rtip, argb) ; 
 
-      Draw_the_scene() ;
-      G_wait_key() ;
-    }
+		Draw_the_scene() ;
+		G_rgb(1, 1, 1);
+		G_fill_rectangle(0, 0, 80, 15);
+		G_rgb(0, 0, 0);
+		G_draw_string("click to quit", 0, 0);
+	}
 
     G_rgb(1,1,1) ; G_draw_string("'q' to quit", 50,50) ;
     while (G_wait_key() != 'q') ;
