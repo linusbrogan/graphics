@@ -13,6 +13,8 @@ int    num_objects ;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+#define REFLECTIONS 5
+
 enum object_type {
 	OBJ_CIRCLE = 0,
 	OBJ_HALF_HYPERBOLA,
@@ -48,7 +50,31 @@ double dot_product(double v[3], double w[3]) {
 	return sum;
 }
 
-void change_normal_to_normal_head(double intersection[3], double normal[3], double eye[3]) {
+void normalize(double v[3]) {
+	double length = sqrt(dot_product(v, v));
+	if (length == 0) return;
+	for (int i = 0; i < 3; i++) {
+		v[i] /= length;
+	}
+}
+
+void find_reflection_vector(double D[3], double N[3], double r[3]) {
+	double l[3];
+	double n[3];
+	for (int i = 0; i < 3; i++) {
+		l[i] = -D[i];
+		n[i] = N[i];
+	}
+	normalize(l);
+	normalize(n);
+	double scale = 2 * dot_product(l, n);
+	for (int i = 0; i < 3; i++) {
+		r[i] = scale * n[i] - l[i];
+	}
+}
+
+
+void change_normal_to_normal_head(double intersection[3], double normal[3], double eye[3], double normal_head[3]) {
 	// Find vector from intersection point to eye
 	double e[3];
 	for (int i = 0; i < 3; i++) {
@@ -64,9 +90,9 @@ void change_normal_to_normal_head(double intersection[3], double normal[3], doub
 	}
 
 	// Compute the head of the normal vector, scaled nicely
-	double length = sqrt(dot_product(normal, normal));
+	normalize(normal);
 	for (int i = 0; i < 3; i++) {
-		normal[i] = intersection[i] + normal[i] * 50 / length;
+		normal_head[i] = intersection[i] + normal[i] * 50;
 	}
 }
 
@@ -75,8 +101,8 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 	if (root < 0) return 0;
 	root = sqrt(root);
 	x[0] = (-b - root) / (2 * a);
-	if (root == 0) return 1;
 	x[1] = (-b + root) / (2 * a);
+	if (root == 0) return 1;
 	return 2;
 }
 
@@ -105,34 +131,44 @@ double solve_ray_intersection(int object, double D[3], double E[3]) {
 			double a = sq(D[0]) - sq(D[1]);
 			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
 			double c = sq(E[0]) - sq(E[1]) - 1;
-			double t[2];solve_quadratic(a, b, c, t);
-			double x = E[0] + t[0] * D[0];
-			double y = E[1] + t[0] * D[1];
-			int sol = 0;
-			if (fabs(y) > 1 || x < 0) {
-				x = E[0] + t[1] * D[0];
-				y = E[1] + t[1] * D[1];
-				sol++;
-			};
-			if (fabs(y) > 1) return -1;
-			return t[sol];
+
+			double t[2];
+			solve_quadratic(a, b, c, t);
+
+			for (int solution = 0; solution < 2; solution++) {
+				double x = E[0] + t[solution] * D[0];
+				double y = E[1] + t[solution] * D[1];
+				if (fabs(y) > 1 || x < 0 || t[solution] <= 0) {
+					t[solution] = -1;
+				}
+			}
+
+			if (t[0] == -1 && t[1] == -1) return -1;
+			if (t[0] == -1) return t[1];
+			if (t[1] == -1) return t[0];
+			return fmin(t[0], t[1]);
 		}
 
 		case OBJ_HYPERBOLA: {
 			double a = sq(D[0]) - sq(D[1]);
 			double b = 2 * (E[0] * D[0] - E[1] * D[1]);
 			double c = sq(E[0]) - sq(E[1]) - 1;
-			double t[2];solve_quadratic(a, b, c, t);
-			double x = E[0] + t[0] * D[0];
-			double y = E[1] + t[0] * D[1];
-			int sol = 0;
-			if (fabs(y) > 1) {
-				x = E[0] + t[1] * D[0];
-				y = E[1] + t[1] * D[1];
-				sol++;
-			};
-			if (fabs(y) > 1) return -1;
-			return t[sol];
+
+			double t[2];
+			solve_quadratic(a, b, c, t);
+
+			for (int solution = 0; solution < 2; solution++) {
+				double x = E[0] + t[solution] * D[0];
+				double y = E[1] + t[solution] * D[1];
+				if (fabs(y) > 1 || t[solution] <= 0) {
+					t[solution] = -1;
+				}
+			}
+
+			if (t[0] == -1 && t[1] == -1) return -1;
+			if (t[0] == -1) return t[1];
+			if (t[1] == -1) return t[0];
+			return fmin(t[0], t[1]);
 		}
 
 		case OBJ_LINE: {
@@ -144,7 +180,9 @@ double solve_ray_intersection(int object, double D[3], double E[3]) {
 	}
 }
 
-double ray(double tail[3], double head[3], double rgb[3]) {
+void ray_reflect(double tail[3], double head[3], double rgb[3], int bounces) {
+	if (bounces < 0) return;
+
 	// Set to default black background
 	rgb[0] = 0;
 	rgb[1] = 0;
@@ -153,7 +191,7 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 	// Keep track of closest object
 	double t_min = -1;
 	int closest_object = -1;
-	double intersection[3] = {0, 0, 0,};
+	double intersection[3] = {0, 0, 0};
 	double normal[3] = {0, 0, 0};
 
 	for (int object = 0; object < num_objects; object++) {
@@ -174,7 +212,8 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 		double t = solve_ray_intersection(object, D, E);
 
 		// Move on if no closer intersection
-		if (t < 0 || (t_min > 0 && t > t_min)) continue;
+		if (t <= 0.00001 || (t_min > 0 && t > t_min)) continue;
+//???
 
 		// Record closest intersection
 		t_min = t;
@@ -197,13 +236,16 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 
 	if (closest_object >= 0) {
 		// Find head of normal vector from intersection point
-		change_normal_to_normal_head(intersection, normal, tail);
+		double normal_head[3];
+		change_normal_to_normal_head(intersection, normal, tail, normal_head);
 
 		// Draw intersection point, ray to intersection, and normal
-		G_rgb(0.5, 0.5, 0.5);
+		double gr = (1.0 / REFLECTIONS) * (1 + bounces);
+		G_rgb(gr, gr, gr);
+		//G_rgb(0.5, 0.5, 0.5);
 		G_fill_circle(intersection[0], intersection[1], 2);
 		G_line(tail[0], tail[1], intersection[0], intersection[1]);
-		G_line(normal[0], normal[1], intersection[0], intersection[1]);
+		G_line(normal_head[0], normal_head[1], intersection[0], intersection[1]);
 
 		// Save color at intersection
 		for (int i = 0; i < 3; i++) {
@@ -213,10 +255,27 @@ double ray(double tail[3], double head[3], double rgb[3]) {
 		// Draw projection on screen
 		G_rgb(rgb[0], rgb[1], rgb[2]);
 		G_fill_circle(head[0], head[1], 2);
+
+		// Find reflected ray
+		double r[3] = {0, 0, 0};
+		double L[3];
+		for (int i = 0; i < 3; i++) {
+			L[i] = head[i] - tail[i];
+		}
+		find_reflection_vector(L, normal, r);
+		for (int i = 0; i < 3; i++) {
+			r[i] += intersection[i];
+		}
+
+		// Reflect
+		double reflected_rgb[3];
+		ray_reflect(intersection, r, reflected_rgb, bounces - 1);
 	}
 }
 
-
+void ray(double tail[3], double head[3], double rgb[3]) {
+	ray_reflect(tail, head, rgb, REFLECTIONS);
+}
 
 void Draw_ellipsoid (int onum)
 {
@@ -421,10 +480,13 @@ int test01()
     G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
     G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
     
-    G_wait_key() ;
+	G_wait_key();
     
     double ytip ;
     for (ytip = 200 ; ytip <= 600 ; ytip++) {
+	G_rgb(0, 0, 0);G_clear();
+    G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
+    G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
       Rtip[0]    = 100 ;  Rtip[1]    = ytip ;  Rtip[2]   = 0  ;    
 
       G_rgb(1,1,0) ; G_line(Rsource[0],Rsource[1],  Rtip[0],Rtip[1]) ;
