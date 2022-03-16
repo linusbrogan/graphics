@@ -159,7 +159,7 @@ double solve_ray_intersection(int object, double E[3], double D[3]) {
 	}
 }
 
-double ray(double tail[3], double head[3], double rgb[3]) {
+void ray(double tail[3], double head[3], double rgb[3]) {
 	// Set to default black background
 	rgb[0] = 0;
 	rgb[1] = 0;
