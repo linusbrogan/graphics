@@ -168,7 +168,7 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 	// Keep track of closest object
 	double t_min = -1;
 	int closest_object = -1;
-	double intersection[3] = {0, 0, 0,};
+	double intersection[3] = {0, 0, 0};
 	double normal[3] = {0, 0, 0};
 
 	for (int object = 0; object < num_objects; object++) {
