@@ -364,6 +364,41 @@ int test01()
 
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_HYPERBOLA;
+    color[num_objects][0] = 0.8;
+    color[num_objects][1] = 0;
+    color[num_objects][2] = 0.2;
+
+    Tn = 0 ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  15   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =   80   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  -7   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  200   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  630   ; Tn++ ;
+
+    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
+    M3d_mat_mult(obmat[num_objects], vm, m) ;
+    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+
+    num_objects++ ; // don't forget to do this        
+    //////////////////////////////////////////////////////////////
+	object_types[num_objects] = OBJ_LINE;
+    color[num_objects][0] = 0.8;
+    color[num_objects][1] = 0;
+    color[num_objects][2] = 0.2;
+
+    Tn = 0 ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  50   ; Tn++ ;
+    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  110   ; Tn++ ;
+    Ttypelist[Tn] = TX ; Tvlist[Tn] =  300   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  300   ; Tn++ ;
+
+    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
+    M3d_mat_mult(obmat[num_objects], vm, m) ;
+    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+
+    num_objects++ ; // don't forget to do this        
+    //////////////////////////////////////////////////////////////
 
     
 
