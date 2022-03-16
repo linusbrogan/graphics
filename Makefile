@@ -38,7 +38,6 @@ default: raytracer
 
 raytracer: clean build/2d_Simple_RaytracerS
 	./build/2d_Simple_RaytracerS
-	display out/2d_Simple_Raytracer.jpg
 
 space_station: clean build/space_station build/movie_player
 	convert asset/earth.jpg asset/earth.convert.xwd
