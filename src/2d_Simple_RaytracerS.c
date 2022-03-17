@@ -266,6 +266,8 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 			R[i] = r[i] * 30 + intersection[i];
 			intersection[i] += r[i] * 1e-10;
 		}
+		G_rgb(1, 1, 1);
+		G_line(intersection[0], intersection[1], R[0], R[1]);
 		double reflected_rgb[3];
 		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
 	}
