@@ -314,9 +314,12 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 			R[i] = r[i] * 30 + intersection[i];
 			intersection[i] += r[i] * 1e-10;
 		}
-		G_rgb(1, 1, 1);
 		double reflected_rgb[3];
 		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
+		for (int i = 0; i < 3; i++) {
+			double ref = reflectivity[closest_object];
+			rgb[i] = rgb[i] * (1 -  ref) + ref * reflected_rgb[i];
+		}
 	}
 }
 
@@ -332,7 +335,7 @@ void proj_px_to_screen(double x, double y, double px[3]) {
 
 int test01()
 {
-  double vm[4][4], vi[4][4];
+for (int frame=0;;frame++){  double vm[4][4], vi[4][4];
   double Tvlist[100];
   int Tn, Ttypelist[100];
   double m[4][4], mi[4][4];
@@ -349,6 +352,7 @@ int test01()
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_SPHERE;
+	reflectivity[num_objects] = 0.5;
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.8 ; 
     color[num_objects][2] = 0.0 ;
@@ -356,6 +360,7 @@ int test01()
     Tn = 0 ;
     Ttypelist[Tn] = TZ ; Tvlist[Tn] =  10   ; Tn++ ;
     Ttypelist[Tn] = TX ; Tvlist[Tn] =  3   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  3 * sin(frame * M_PI / 50)   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -365,13 +370,17 @@ int test01()
 
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_SPHERE;
+	reflectivity[num_objects] = 0;
     color[num_objects][0] = 0.8 ;
     color[num_objects][1] = 0.0 ; 
     color[num_objects][2] = 0.0 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = TZ ; Tvlist[Tn] =  7   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  1.2   ; Tn++ ;
+    Ttypelist[Tn] = SY ; Tvlist[Tn] =  2   ; Tn++ ;
+    Ttypelist[Tn] = TZ ; Tvlist[Tn] =  10   ; Tn++ ;
     Ttypelist[Tn] = TX ; Tvlist[Tn] =  -2   ; Tn++ ;
+    Ttypelist[Tn] = TY ; Tvlist[Tn] =  2 * sin(M_PI / 4 + frame * M_PI / 75)   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -380,14 +389,16 @@ int test01()
     num_objects++ ; // don't forget to do this
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_PLANE;
+	reflectivity[num_objects] = 0.8;
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 0.5 ;
 	
     Tn = 0 ;
-    Ttypelist[Tn] = TZ ; Tvlist[Tn] =  7   ; Tn++ ;
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  1   ; Tn++ ;
-    Ttypelist[Tn] = RZ ; Tvlist[Tn] =  30   ; Tn++ ;
+    Ttypelist[Tn] = SX ; Tvlist[Tn] =  5   ; Tn++ ;
+    Ttypelist[Tn] = RX ; Tvlist[Tn] =  30   ; Tn++ ;
+    Ttypelist[Tn] = RX ; Tvlist[Tn] =  10   ; Tn++ ;
+    Ttypelist[Tn] = TZ ; Tvlist[Tn] =  10   ; Tn++ ;
 	
     M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
     M3d_mat_mult(obmat[num_objects], vm, m) ;
@@ -407,6 +418,7 @@ int test01()
 		}
 	}
 	G_wait_key();
+}
 }
 
 
