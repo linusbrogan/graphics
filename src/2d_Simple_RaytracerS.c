@@ -2,6 +2,8 @@
 #include <m3d.h>
 #include <shape_2d.h>
 
+#define MAXIMUM_REFLECTIONS 4
+
 double obmat[100][4][4] ;
 double obinv[100][4][4] ;
 double color[100][3] ;
@@ -48,7 +50,30 @@ double dot_product(double v[3], double w[3]) {
 	return sum;
 }
 
-void change_normal_to_normal_head(double intersection[3], double normal[3], double eye[3]) {
+void normalize(double v[3]) {
+	double length = sqrt(dot_product(v, v));
+	if (length == 0) return;
+	for (int i = 0; i < 3; i++) {
+		v[i] /= length;
+	}
+}
+
+void find_reflection_vector(double incident[3], double normal[3], double reflected[3]) {
+	double l[3];
+	double n[3];
+	for (int i = 0; i < 3; i++) {
+		l[i] = -incident[i];
+		n[i] = normal[i];
+	}
+	normalize(l);
+	normalize(n);
+	double scale = 2 * dot_product(l, n);
+	for (int i = 0; i < 3; i++) {
+		reflected[i] = scale * n[i] - l[i];
+	}
+}
+
+void find_normal_head(double intersection[3], double normal[3], double eye[3], double normal_head[3]) {
 	// Find vector from intersection point to eye
 	double e[3];
 	for (int i = 0; i < 3; i++) {
@@ -63,10 +88,11 @@ void change_normal_to_normal_head(double intersection[3], double normal[3], doub
 		}
 	}
 
+	normalize(normal);
+
 	// Compute the head of the normal vector, scaled nicely
-	double length = sqrt(dot_product(normal, normal));
 	for (int i = 0; i < 3; i++) {
-		normal[i] = intersection[i] + normal[i] * 50 / length;
+		normal_head[i] = intersection[i] + normal[i] * 50;
 	}
 }
 
@@ -136,7 +162,6 @@ double solve_ray_intersection(int object, double E[3], double D[3]) {
 
 			// Check for invalid solutions
 			for (int solution = 0; solution < 2; solution++) {
-				double x = E[0] + t[solution] * D[0];
 				double y = E[1] + t[solution] * D[1];
 				if (fabs(y) > 1 || t[solution] <= 0) {
 					t[solution] = -1;
@@ -159,11 +184,13 @@ double solve_ray_intersection(int object, double E[3], double D[3]) {
 	}
 }
 
-void ray(double tail[3], double head[3], double rgb[3]) {
+void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_reflections) {
 	// Set to default black background
 	rgb[0] = 0;
 	rgb[1] = 0;
 	rgb[2] = 0;
+
+	if (remaining_reflections < 0) return;
 
 	// Keep track of closest object
 	double t_min = -1;
@@ -190,7 +217,7 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 		double t = solve_ray_intersection(object, E, D);
 
 		// Move on if no closer intersection
-		if (t < 0 || (t_min > 0 && t > t_min)) continue;
+		if (t <= 1e-5 || (t_min > 0 && t > t_min)) continue;
 
 		// Record closest intersection
 		t_min = t;
@@ -213,25 +240,40 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 
 	if (closest_object >= 0) {
 		// Find head of normal vector from intersection point
-		change_normal_to_normal_head(intersection, normal, tail);
-
-		// Draw intersection point, ray to intersection, and normal
-		G_rgb(0.5, 0.5, 0.5);
-		G_fill_circle(intersection[0], intersection[1], 2);
-		G_line(tail[0], tail[1], intersection[0], intersection[1]);
-		G_line(normal[0], normal[1], intersection[0], intersection[1]);
+		double normal_head[3];
+		find_normal_head(intersection, normal, tail, normal_head);
 
 		// Save color at intersection
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = color[closest_object][i];
 		}
 
-		// Draw projection on screen
+		// Draw intersection point and ray to intersection
 		G_rgb(rgb[0], rgb[1], rgb[2]);
-		G_fill_circle(head[0], head[1], 2);
+		G_fill_circle(intersection[0], intersection[1], 2);
+		G_line(tail[0], tail[1], intersection[0], intersection[1]);
+
+		// Find reflected ray
+		double r[3] = {0, 0, 0};
+		double L[3];
+		for (int i = 0; i < 3; i++) {
+			L[i] = head[i] - tail[i];
+		}
+		find_reflection_vector(L, normal, r);
+		normalize(r);
+		double R[3];
+		for (int i = 0; i < 3; i++) {
+			R[i] = r[i] * 30 + intersection[i];
+			intersection[i] += r[i] * 1e-10;
+		}
+		double reflected_rgb[3];
+		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
 	}
 }
 
+void ray(double tail[3], double head[3], double rgb[3]) {
+	reflect_ray(tail, head, rgb, MAXIMUM_REFLECTIONS);
+}
 
 
 void Draw_shape(int onum) {
@@ -243,7 +285,8 @@ void Draw_shape(int onum) {
   
   n = 1000 ;
   for (i = 0 ; i < n ; i++) {
-		shape_xyz[object_types[onum]](i, n, xyz);
+		int draw = shape_xyz[object_types[onum]](i, n, xyz);
+		if (!draw) continue;
     M3d_mat_mult_pt(xyz, obmat[onum], xyz) ;
     x = xyz[0] ;
     y = xyz[1] ;
@@ -263,6 +306,18 @@ void Draw_the_scene()
   }
 }
 
+
+void project_head_onto_screen(double tail[3], double head[3]) {
+	double d[3];
+	for (int i = 0; i < 3; i++) {
+		d[i] = head[i] - tail[i];
+	}
+	double scale = (100 - tail[0]) / d[0];
+	for (int i = 0; i < 3; i++) {
+		d[i] *= scale;
+		head[i] = tail[i] + d[i];
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
@@ -402,6 +457,15 @@ int test01()
 
     
 
+	int first = 1;
+
+	while(1) {
+	double p[2] = {0, 0};
+	if (!first) {
+		G_wait_click(p);
+		if (p[0] < 80 && p[1] < 15) exit(0);
+	}
+
     G_rgb(0,0,0) ;
     G_clear() ;
 
@@ -411,22 +475,25 @@ int test01()
     G_rgb(1,0,1) ; G_fill_circle(Rsource[0], Rsource[1], 3) ;
     G_rgb(1,0,1) ; G_line(100,200,  100,600) ;
     
-    G_wait_key() ;
-    
-    double ytip ;
-    for (ytip = 200 ; ytip <= 600 ; ytip++) {
-      Rtip[0]    = 100 ;  Rtip[1]    = ytip ;  Rtip[2]   = 0  ;    
+	G_rgb(1, 1, 1);
+	G_fill_rectangle(0, 0, 80, 15);
+	G_rgb(0, 0, 0);
+	G_draw_string("Click to quit", 0, 0);
 
+	
+	
+	if (first) {
+		first = 0;
+		continue;
+	}
+	Rtip[0] = p[0];
+	Rtip[1] = p[1];
+	Rtip[2] = 0;
+	project_head_onto_screen(Rsource, Rtip);
       G_rgb(1,1,0) ; G_line(Rsource[0],Rsource[1],  Rtip[0],Rtip[1]) ;
             ray (Rsource, Rtip, argb) ; 
 
-      Draw_the_scene() ;
-      G_wait_key() ;
     }
-
-    G_rgb(1,1,1) ; G_draw_string("'q' to quit", 50,50) ;
-    while (G_wait_key() != 'q') ;
-    G_save_image_to_file("out/2d_Simple_RaytracerS.xwd") ;
 }
 
 
