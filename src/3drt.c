@@ -420,7 +420,7 @@ for (int frame=0;;frame++){  double vm[4][4], vi[4][4];
 			G_point(x, y);
 		}
 	}
-	G_wait_key();
+	G_display_image();//wait_key();
 }
 }
 

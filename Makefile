@@ -1,6 +1,7 @@
 SRC_FILES = \
 	2d_Simple_RaytracerS \
 	3d_shapes \
+	3drt \
 	FPToolkitDemoB \
 	functional \
 	get_image_from_file \
@@ -34,7 +35,10 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 .PHONY: all clean default main test
 
-default: raytracer
+default: 3drt
+
+3drt: clean build/3drt
+	./build/3drt
 
 raytracer: clean build/2d_Simple_RaytracerS
 	./build/2d_Simple_RaytracerS
