@@ -335,6 +335,9 @@ void proj_px_to_screen(double x, double y, double px[3]) {
 
 int test01()
 {
+light_in_eye_space[0] = -5;
+light_in_eye_space[1] = 10;
+light_in_eye_space[2] = 2;
 for (int frame=0;;frame++){  double vm[4][4], vi[4][4];
   double Tvlist[100];
   int Tn, Ttypelist[100];
