@@ -7,6 +7,7 @@
 double obmat[100][4][4] ;
 double obinv[100][4][4] ;
 double color[100][3] ;
+double reflectivity[100];
 int    num_objects ;
 
 
@@ -274,6 +275,12 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		// Find color from reflection
 		double reflected_rgb[3];
 		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
+
+		// Find object color, including reflection
+		double ref = reflectivity[closest_object];
+		for (int i = 0; i < 3; i++) {
+			rgb[i] = color[closest_object][i] * (1 - ref) + reflected_rgb[i] * ref;
+		}
 	}
 }
 
@@ -356,6 +363,7 @@ int test01()
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.8 ; 
     color[num_objects][2] = 0.0 ;
+	reflectivity[num_objects] = 0;
 	
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =   60   ; Tn++ ;
@@ -375,6 +383,7 @@ int test01()
     color[num_objects][0] = 1.0 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 0.0 ;
+	reflectivity[num_objects] = 0;
 	
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =  180   ; Tn++ ;
@@ -393,6 +402,7 @@ int test01()
     color[num_objects][0] = 0.3 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 1.0 ;
+	reflectivity[num_objects] = 0;
 	
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =   75   ; Tn++ ;
@@ -411,6 +421,7 @@ int test01()
     color[num_objects][0] = 0.5 ;
     color[num_objects][1] = 1.0 ; 
     color[num_objects][2] = 1.0 ;
+	reflectivity[num_objects] = 0;
 	
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =  130   ; Tn++ ;
@@ -429,6 +440,7 @@ int test01()
     color[num_objects][0] = 0.8;
     color[num_objects][1] = 0;
     color[num_objects][2] = 0.2;
+	reflectivity[num_objects] = 0.5;
 
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =  15   ; Tn++ ;
@@ -447,6 +459,7 @@ int test01()
     color[num_objects][0] = 0.8;
     color[num_objects][1] = 0;
     color[num_objects][2] = 0.2;
+	reflectivity[num_objects] = 0.9;
 
     Tn = 0 ;
     Ttypelist[Tn] = SX ; Tvlist[Tn] =  50   ; Tn++ ;
