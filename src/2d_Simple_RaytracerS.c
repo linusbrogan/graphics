@@ -244,16 +244,6 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		double normal_head[3];
 		find_normal_head(intersection, normal, tail, normal_head);
 
-		// Save color at intersection
-		for (int i = 0; i < 3; i++) {
-			rgb[i] = color[closest_object][i];
-		}
-
-		// Draw intersection point and ray to intersection
-		G_rgb(rgb[0], rgb[1], rgb[2]);
-		G_fill_circle(intersection[0], intersection[1], 2);
-		G_line(tail[0], tail[1], intersection[0], intersection[1]);
-
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
 		double L[3];
@@ -281,6 +271,11 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = color[closest_object][i] * (1 - ref) + reflected_rgb[i] * ref;
 		}
+
+		// Draw intersection point and ray to intersection
+		G_rgb(rgb[0], rgb[1], rgb[2]);
+		G_fill_circle(intersection[0], intersection[1], 2);
+		G_line(tail[0], tail[1], intersection[0], intersection[1]);
 	}
 }
 
