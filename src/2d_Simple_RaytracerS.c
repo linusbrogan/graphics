@@ -74,7 +74,7 @@ void find_reflection_vector(double incident[3], double normal[3], double reflect
 	}
 }
 
-void find_normal_head(double intersection[3], double normal[3], double eye[3], double normal_head[3]) {
+void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 	// Find vector from intersection point to eye
 	double e[3];
 	for (int i = 0; i < 3; i++) {
@@ -90,11 +90,6 @@ void find_normal_head(double intersection[3], double normal[3], double eye[3], d
 	}
 
 	normalize(normal);
-
-	// Compute the head of the normal vector, scaled nicely
-	for (int i = 0; i < 3; i++) {
-		normal_head[i] = intersection[i] + normal[i] * 50;
-	}
 }
 
 int solve_quadratic(double a, double b, double c, double x[2]) {
@@ -240,9 +235,7 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 	}
 
 	if (closest_object >= 0) {
-		// Find head of normal vector from intersection point
-		double normal_head[3];
-		find_normal_head(intersection, normal, tail, normal_head);
+		orient_normal(intersection, normal, tail);
 
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
