@@ -35,7 +35,7 @@ LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
 INCLUDES = -Iinclude
 C_FLAGS = -lm -lX11 $(INCLUDES)
 
-.PHONY: all clean default main test
+.PHONY: all clean default test
 
 default: raytracer
 
