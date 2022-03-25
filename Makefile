@@ -8,6 +8,7 @@ SRC_FILES = \
 	M3d_test_sequence \
 	M3d_test_view \
 	movie_player \
+	raytracer_3d \
 	shapes \
 	space_station \
 	sprint \
@@ -39,7 +40,9 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: clean raytracer
 
-raytracer:
+raytracer: build/raytracer_3d build/movie_player
+	./build/raytracer_3d
+	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
 
 asset/earth.xwd:
 	convert asset/earth.jpg asset/earth.convert.xwd
@@ -94,6 +97,7 @@ clean:
 	-rm -r out/Growing_Sun
 	-rm out/M3d_test_sequence.out
 	-rm out/M3d_test_view.out
+	-rm -r out/Raytracer_3D
 	-rm -r out/Space_Station
 	-rm asset/earth.convert.xwd asset/earth.xwd
 	-rm out/view_test04Mb0000.xwd
