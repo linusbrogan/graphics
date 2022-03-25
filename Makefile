@@ -23,6 +23,7 @@ LIB_FILES = \
 	g3d \
 	lg \
 	light_model \
+	raytracing \
 	rt_shapes \
 	rt_utils \
 	shape_colors \
