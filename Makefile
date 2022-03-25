@@ -42,9 +42,11 @@ default: clean raytracer
 raytracer: build/2d_Simple_RaytracerS
 	./build/2d_Simple_RaytracerS
 
-space_station: build/space_station build/movie_player
+asset/earth.xwd:
 	convert asset/earth.jpg asset/earth.convert.xwd
 	./tool/change_CONVERTxwd_to_JEFFxwd.exec asset/earth.convert.xwd asset/earth.xwd
+
+space_station: build/space_station build/movie_player asset/earth.xwd
 	time ./build/space_station 0 100
 	display out/Space_Station/frame_0000.xwd
 	./build/movie_player 1080 720 out/Space_Station/frame_ 0 99 0 40000
