@@ -61,7 +61,7 @@ $(LIB_TARGETS):
 	mkdir -p $(dir $@)
 	cc -c -o $@ lib/$(basename $(notdir $@)).c $(INCLUDES)
 
-test: $(SRC_TARGETS)
+test: asset/earth.xwd $(SRC_TARGETS)
 	-timeout 10 ./build/3d_shapes
 	./build/movie_player 1080 720 out/Graph_3D/frame_ 0 $$(($$(ls out/Graph_3D | wc -l) - 1)) 1 40000
 	./build/FPToolkitDemoB
