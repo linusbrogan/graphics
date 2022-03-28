@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 0.5;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.25;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.25;	T_n++;
@@ -91,6 +92,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.2;
 		object_color[objects][_B] = 0.2;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -108,6 +110,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 1;
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -125,6 +128,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.2;
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -141,6 +145,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		double diagonal_length = 2 * sqrt(2);
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
@@ -161,6 +166,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -179,6 +185,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
+		object_opacity[objects] = 1;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;

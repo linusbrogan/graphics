@@ -6,25 +6,35 @@
 
 #define MAXIMUM_OBJECTS 100
 #define MAXIMUM_REFLECTIONS 4
+#define MINIMUM_INTENSITY 0.05
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define WINDOW_SIZE (WS_MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
+#define EPSILON (1e-10)
 
 enum object_type object_type[MAXIMUM_OBJECTS];
 double object_matrix[MAXIMUM_OBJECTS][4][4];
 double object_matrix_i[MAXIMUM_OBJECTS][4][4];
 double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
+double object_opacity[MAXIMUM_OBJECTS];
 int objects = 0;
 
-void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_reflections) {
+void trace_ray(
+	double tail[3],
+	double head[3],
+	double rgb[3],
+	int remaining_collisions,
+	double intensity
+) {
 	// Set to default black background
 	rgb[0] = 0;
 	rgb[1] = 0;
 	rgb[2] = 0;
 
-	if (remaining_reflections < 0) return;
+	if (remaining_collisions < 0) return;
+	if (intensity < MINIMUM_INTENSITY) return;
 
 	// Keep track of closest object
 	double t_min = -1;
@@ -51,7 +61,7 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		double t = solve_ray_intersection[object_type[object]](E, D);
 
 		// Move on if no closer intersection
-		if (t <= 1e-5 || (t_min > 0 && t > t_min)) continue;
+		if (t <= EPSILON || (t_min > 0 && t > t_min)) continue;
 
 		// Record closest intersection
 		t_min = t;
@@ -84,28 +94,52 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		}
 		find_reflection_vector(L, normal, r);
 		normalize(r);
-		double R[3];
+		double reflected_tail[3];
+		double reflected_head[3];
+		double transmitted_tail[3];
+		double transmitted_head[3];
 		for (int i = 0; i < 3; i++) {
-			R[i] = r[i] * 30 + intersection[i];
-			intersection[i] += r[i] * 1e-10;
+			reflected_tail[i] = intersection[i] + r[i] * EPSILON;
+			reflected_head[i] = intersection[i] + r[i];
+			double delta = head[i] - tail[i];
+			transmitted_tail[i] = intersection[i] + delta * EPSILON;
+			transmitted_head[i] = intersection[i] + delta;
 		}
 
 		// Find color from reflection
+		double ref = object_reflectivity[closest_object];
 		double reflected_rgb[3];
-		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
+		trace_ray(
+			reflected_tail,
+			reflected_head,
+			reflected_rgb,
+			remaining_collisions - 1,
+			intensity * ref
+		);
 
-		// Find object color, including reflection
+		// Find transmitted color from behind object
+		double trans = 1 - object_opacity[closest_object];
+		double transmitted_rgb[3];
+		trace_ray(
+			transmitted_tail,
+			transmitted_head,
+			transmitted_rgb,
+			remaining_collisions - 1,
+			intensity * trans
+		);
+
+		// Find object color, including reflection and transparent transmission
 		double eye[3] = {0, 0, 0};
 		Light_Model(object_color[closest_object], eye, intersection, normal, rgb);
-		double ref = object_reflectivity[closest_object];
 		for (int i = 0; i < 3; i++) {
+			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;
 		}
 	}
 }
 
 void ray(double tail[3], double head[3], double rgb[3]) {
-	reflect_ray(tail, head, rgb, MAXIMUM_REFLECTIONS);
+	trace_ray(tail, head, rgb, MAXIMUM_REFLECTIONS, 1);
 }
 
 void map_pixel_onto_world_space_screen(double p[3]) {
