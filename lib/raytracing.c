@@ -21,20 +21,21 @@ double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
 int objects = 0;
 
-void trace_ray(
+int trace_ray(
 	double tail[3],
 	double head[3],
 	double rgb[3],
 	int remaining_collisions,
-	double intensity
+	double intensity,
+	int check_shadow
 ) {
 	// Set to default black background
 	rgb[0] = 0;
 	rgb[1] = 0;
 	rgb[2] = 0;
 
-	if (remaining_collisions < 0) return;
-	if (intensity < MINIMUM_INTENSITY) return;
+	if (remaining_collisions < 0) return 0;
+	if (intensity < MINIMUM_INTENSITY) return 0;
 
 	// Keep track of closest object
 	double t_min = -1;
@@ -84,6 +85,8 @@ void trace_ray(
 	}
 
 	if (closest_object >= 0) {
+		if (check_shadow) return t_min >= 0 && t_min <= 1;
+
 		orient_normal(intersection, normal, tail);
 
 		// Find reflected ray
@@ -94,17 +97,35 @@ void trace_ray(
 		}
 		find_reflection_vector(L, normal, r);
 		normalize(r);
+		double light_tail[3];
+		double light_head[3];
 		double reflected_tail[3];
 		double reflected_head[3];
 		double transmitted_tail[3];
 		double transmitted_head[3];
 		for (int i = 0; i < 3; i++) {
+			double l = light_in_eye_space[i] - intersection[i];
+			light_tail[i] = intersection[i] + l * EPSILON;
+			light_head[i] = intersection[i] + l;
+
 			reflected_tail[i] = intersection[i] + r[i] * EPSILON;
 			reflected_head[i] = intersection[i] + r[i];
+
 			double delta = head[i] - tail[i];
 			transmitted_tail[i] = intersection[i] + delta * EPSILON;
 			transmitted_head[i] = intersection[i] + delta;
 		}
+
+		// Find object casting a shadow
+		double dummy_rgb[3];
+		int shadowed = trace_ray(
+			light_tail,
+			light_head,
+			dummy_rgb,
+			0,
+			MINIMUM_INTENSITY,
+			1
+		);
 
 		// Find color from reflection
 		double ref = object_reflectivity[closest_object];
@@ -114,7 +135,8 @@ void trace_ray(
 			reflected_head,
 			reflected_rgb,
 			remaining_collisions - 1,
-			intensity * ref
+			intensity * ref,
+			0
 		);
 
 		// Find transmitted color from behind object
@@ -125,21 +147,24 @@ void trace_ray(
 			transmitted_head,
 			transmitted_rgb,
 			remaining_collisions - 1,
-			intensity * trans
+			intensity * trans,
+			0
 		);
 
 		// Find object color, including reflection and transparent transmission
 		double eye[3] = {0, 0, 0};
-		Light_Model(object_color[closest_object], eye, intersection, normal, rgb);
+		Light_Model_rt(object_color[closest_object], eye, intersection, normal, rgb, shadowed);
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;
 		}
+		return 1;
 	}
+	return 0;
 }
 
 void ray(double tail[3], double head[3], double rgb[3]) {
-	trace_ray(tail, head, rgb, MAXIMUM_REFLECTIONS, 1);
+	trace_ray(tail, head, rgb, MAXIMUM_REFLECTIONS, 1, 0);
 }
 
 void map_pixel_onto_world_space_screen(double p[3]) {

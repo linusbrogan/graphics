@@ -1,16 +1,21 @@
 #include <m3d.h>
 
+#define SHADOW_DIM 0.25
+
 // To support the light model :
 double light_in_eye_space[3] ;
 double AMBIENT      = 0.2 ;
 double MAX_DIFFUSE  = 0.5 ;
 double SPECPOW      = 50 ;
 
-int Light_Model (double irgb[3],
-                 double s[3],
-                 double p[3],
-                 double n[3],
-                 double argb[3])
+int Light_Model_rt(
+	double irgb[3],
+	double s[3],
+	double p[3],
+	double n[3],
+	double argb[3],
+	int shadowed
+)
 // s,p,n in eyespace
 
 // irgb == inherent color of object (input to this function)
@@ -79,6 +84,7 @@ int Light_Model (double irgb[3],
 
   // printf("%lf %lf\n",diffuse,specular) ;
   intensity = AMBIENT + diffuse + specular ;
+	if (shadowed) intensity = AMBIENT + diffuse * SHADOW_DIM;
 
  LLL : ;
 
@@ -98,4 +104,14 @@ int Light_Model (double irgb[3],
   }
 
   return 1 ;
+}
+
+int Light_Model(
+	double irgb[3],
+	double s[3],
+	double p[3],
+	double n[3],
+	double argb[3]
+) {
+	return Light_Model_rt(irgb, s, p, n, argb, 0);
 }
