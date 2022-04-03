@@ -1,6 +1,8 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#define TAU (2 * M_PI)
+
 enum color {
 	_R = 0,
 	_G,
