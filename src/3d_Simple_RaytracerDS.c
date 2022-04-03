@@ -6,6 +6,8 @@
 #include <m3d.h>
 #include <raytracing.h>
 
+#define FILE_NAME "out/3d_Simple_RaytracerDS.xwd"
+
 void initialize() {
 	LG_init_graphics(800, 800);
 	HALF_ANGLE = 40 * DEGREES;
@@ -96,6 +98,7 @@ int main() {
 	}
 
 	render();
-	while (G_wait_key() != 'q');
+	LG_save_image_to_file(FILE_NAME);
+
 	return 0;
 }

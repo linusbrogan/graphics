@@ -43,6 +43,7 @@ default: clean raytracer
 
 raytracer: build/3d_Simple_RaytracerDS build/raytracer_3d build/movie_player
 	./build/3d_Simple_RaytracerDS
+	display out/3d_Simple_RaytracerDS.xwd
 	./build/raytracer_3d
 	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
 
@@ -94,6 +95,7 @@ test: asset/earth.xwd $(SRC_TARGETS)
 clean:
 	-rm -r build
 	-rm out/2d_Simple_RaytracerS.xwd
+	-rm out/3d_Simple_RaytracerDS.xwd
 	-rm -r out/Graph_3D
 	-rm out/demo.bmp
 	-rm -r out/Growing_Sun
