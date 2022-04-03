@@ -6,6 +6,8 @@
 
 #define RESOLUTION 5000
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define WINDOW_WIDTH 1080
+#define WINDOW_HEIGHT 720
 #define WINDOW_SIZE (WS_MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
 #define DX (-((WINDOW_SIZE) - (WINDOW_WIDTH)) / 2)
 #define DY (-((WINDOW_SIZE) - (WINDOW_HEIGHT)) / 2)

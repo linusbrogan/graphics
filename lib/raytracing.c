@@ -8,7 +8,7 @@
 #define MAXIMUM_REFLECTIONS 4
 #define MINIMUM_INTENSITY 0.05
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define WINDOW_SIZE (WS_MAX(WINDOW_WIDTH, WINDOW_HEIGHT))
+#define WINDOW_SIZE (WS_MAX(LG_WINDOW_WIDTH, LG_WINDOW_HEIGHT))
 #define HALF_ANGLE (M_PI / 6)
 #define H (tan(HALF_ANGLE))
 #define EPSILON (1e-10)
@@ -168,15 +168,15 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 }
 
 void map_pixel_onto_world_space_screen(double p[3]) {
-	p[_X] = (p[_X] * 2 - WINDOW_WIDTH) * H / WINDOW_SIZE;
-	p[_Y] = (p[_Y] * 2 - WINDOW_HEIGHT) * H / WINDOW_SIZE;
+	p[_X] = (p[_X] * 2 - LG_WINDOW_WIDTH) * H / WINDOW_SIZE;
+	p[_Y] = (p[_Y] * 2 - LG_WINDOW_HEIGHT) * H / WINDOW_SIZE;
 	p[_Z] = 1;
 }
 
 void render() {
 	double eye[3] = {0, 0, 0};
-	for (int x = 0; x < WINDOW_WIDTH; x++) {
-		for (int y = 0; y < WINDOW_HEIGHT; y++) {
+	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
+		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double p[3] = {x, y, 0};
 			map_pixel_onto_world_space_screen(p);
 			double rgb[3];

@@ -9,7 +9,7 @@
 #define FRAMES 100
 
 void initialize() {
-	LG_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LG_init_graphics(1080, 720);
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);

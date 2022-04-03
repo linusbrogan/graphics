@@ -8,23 +8,29 @@
 #include <xwd.h>
 #include <graphics.h>
 
-#define WINDOW_WIDTH 1080
-#define WINDOW_HEIGHT 720
-
+int LG_WINDOW_WIDTH = 0;
+int LG_WINDOW_HEIGHT = 0;
 #ifndef LG_USE_FPT
-int LG_WINDOW_ID = 0;
+int LG_WINDOW_ID = -1;
+int LG_INITIALIZED = 0;
 double LG_RGB[3] = {0, 0, 0};
 #endif
 
 void LG_init_graphics(int width, int height) {
+	LG_WINDOW_WIDTH = width;
+	LG_WINDOW_HEIGHT = height;
 #ifdef LG_USE_FPT
-	G_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
+	G_init_graphics(width, height);
 #else
-	LG_WINDOW_ID = create_new_xwd_map(width, height);
+	if (!LG_INITIALIZED) {
+		LG_INITIALIZED = 1;
+		LG_WINDOW_ID = create_new_xwd_map(width, height);
+	}
 	if (LG_WINDOW_ID == -1) {
 		fprintf(stderr, "Could not initialize XWD map.");
-		exit(LG_WINDOW_ID);
+		exit(-1);
 	}
+
 #endif
 }
 
@@ -53,8 +59,8 @@ void LG_clear() {
 #ifdef LG_USE_FPT
 	G_clear();
 #else
-	for (int x = 0; x < WINDOW_WIDTH; x++) {
-		for (int y = 0; y < WINDOW_WIDTH; y++) {
+	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
+		for (int y = 0; y < LG_WINDOW_WIDTH; y++) {
 			LG_point(x, y);
 		}
 	}
