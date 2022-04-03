@@ -1,5 +1,5 @@
 // Graphics library shims for FPT or XWD Tools
-#undef LG_USE_FPT
+#define LG_USE_FPT
 
 #ifdef LG_USE_FPT
 #include <fpt.h>
