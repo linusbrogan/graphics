@@ -1,6 +1,7 @@
 SRC_FILES = \
 	2d_Simple_RaytracerS \
 	3d_shapes \
+	3d_Simple_RaytracerDS \
 	FPToolkitDemoB \
 	functional \
 	get_image_from_file \
@@ -40,7 +41,8 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: clean raytracer
 
-raytracer: build/raytracer_3d build/movie_player
+raytracer: build/3d_Simple_RaytracerDS build/raytracer_3d build/movie_player
+	./build/3d_Simple_RaytracerDS
 	./build/raytracer_3d
 	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
 

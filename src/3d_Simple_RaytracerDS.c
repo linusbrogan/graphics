@@ -1,90 +1,101 @@
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fpt.h>
+#include <lg.h>
+#include <light_model.h>
+#include <m3d.h>
+#include <raytracing.h>
 
+void initialize() {
+	LG_init_graphics(800, 800);
+	HALF_ANGLE = 40 * DEGREES;
+}
 
+int main() {
+	initialize();
 
-  double halfangle_degrees = 40 ;
+	// Create movement sequence
+	int T_n = 0;
+	int T_type[100];
+	double T_param[100];
+	double M[4][4];
+	double M_i[4][4];
 
-  
-  double eye[3], coi[3], up[3] ;
-  eye[0] = 0 ; eye[1] = 400 ; eye[2] = -1000 ;
-  coi[0] = 0 ; coi[1] =  0 ; coi[2] =   0 ;
-  up[0] = eye[0] ; up[1] = eye[1]+1 ; up[2] = eye[2] ;
-  M3d_view(vm,vi,  eye,coi,up) ;
+	// Reset frame
+	LG_rgb(0, 0, 0);
+	LG_clear();
+	objects = 0;
 
-  double light_in_world_space[3] = { 100, 300, 50 } ;
-  M3d_mat_mult_pt(light_in_eye_space,   vm, light_in_world_space) ;
-  AMBIENT = 0.20 ;
-  MAX_DIFFUSE = 0.50 ;
-  SPECPOW = 50 ;
-  
-  int nn,ii ;
-    
-    num_objects = 0 ;
+	// Configure frame
+	double eye[3] = {0, 400, -1000};
+	double coi[3] = {0, 0, 0};
+	double up[3] = {eye[_X], eye[_Y] + 1, eye[_Z]};
 
-    //////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////
-    obtype[num_objects] = 1 ; // sphere
-    color[num_objects][0] = 0.8 ;
-    color[num_objects][1] = 0.8 ; 
-    color[num_objects][2] = 0.8 ;
-	
-    Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  800  ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =   10   ; Tn++ ;
-    Ttypelist[Tn] = SZ ; Tvlist[Tn] =  800   ; Tn++ ;    
-    Ttypelist[Tn] = TY ; Tvlist[Tn] = -150   ; Tn++ ;
-	
-    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
-    M3d_mat_mult(obmat[num_objects], vm, m) ;
-    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+	// Make view matrix
+	double view[4][4];
+	double view_i[4][4];
+	M3d_view(view, view_i, eye, coi, up);
 
-    num_objects++ ; // don't forget to do this
+	// Set light
+	double light_in_world_space[3] = {100, 300, 50};
+	M3d_mat_mult_pt(light_in_eye_space, view, light_in_world_space);
 
+	// Build objects
+	object_type[objects] = OBJ_SPHERE;
+	object_color[objects][_R] = 0.8;
+	object_color[objects][_G] = 0.8;
+	object_color[objects][_B] = 0.8;
+	object_reflectivity[objects] = 0;
+	object_opacity[objects] = 1;
+	T_n = 0;
+	T_type[T_n] = SX;	T_param[T_n] = 800;	T_n++;
+	T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
+	T_type[T_n] = SZ;	T_param[T_n] = 800;	T_n++;
+	T_type[T_n] = TY;	T_param[T_n] = -150;	T_n++;
+	M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+	M3d_mat_mult(object_matrix[objects], view, M);
+	M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+	objects++;
 
-    //////////////////////////////////////////////////////////////
-    nn = 3 ;
-    for (ii = 0 ; ii < nn ; ii++) {
-    obtype[num_objects] = 1 ; // sphere
-    color[num_objects][0] = 1.0 ;
-    color[num_objects][1] = 0.8 ; 
-    color[num_objects][2] = 0.8 ;
-	
-    Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =  500  ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =  100   ; Tn++ ;
-    Ttypelist[Tn] = SZ ; Tvlist[Tn] =   80   ; Tn++ ;
-    Ttypelist[Tn] = RY ; Tvlist[Tn] =  ii*360/nn   ; Tn++ ;        
-    Ttypelist[Tn] = TY ; Tvlist[Tn] =  650   ; Tn++ ;
-	
-    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
-    M3d_mat_mult(obmat[num_objects], vm, m) ;
-    M3d_mat_mult(obinv[num_objects], mi, vi) ;
+	for (int i = 0; i < 3; i++) {
+		object_type[objects] = OBJ_SPHERE;
+		object_color[objects][_R] = 1;
+		object_color[objects][_G] = 0.8;
+		object_color[objects][_B] = 0.8;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 500;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 100;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 80;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = i * 360 / 3;	T_n++;
+		T_type[T_n] = TY;	T_param[T_n] = 650;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+	}
 
-    num_objects++ ; // don't forget to do this
-    }
-    
+	for (int i = 0; i < 6; i++) {
+		object_type[objects] = OBJ_HYPERBOLOID;
+		object_color[objects][_R] = 0.8;
+		object_color[objects][_G] = 0.4;
+		object_color[objects][_B] = 0.2;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 40;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 150;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 40;	T_n++;
+		T_type[T_n] = TX;	T_param[T_n] = 600;	T_n++;
+		T_type[T_n] = RY;	T_param[T_n] = i * 360 / 6;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+	}
 
-    //////////////////////////////////////////////////////////////
-
-    nn = 6 ;
-    for (ii = 0 ; ii < nn ; ii++) {
-      
-    obtype[num_objects] = 2 ; // hyperboloid
-    color[num_objects][0] = 0.8 ;
-    color[num_objects][1] = 0.4 ;
-    color[num_objects][2] = 0.2 ;
-	
-    Tn = 0 ;
-    Ttypelist[Tn] = SX ; Tvlist[Tn] =   40   ; Tn++ ;
-    Ttypelist[Tn] = SY ; Tvlist[Tn] =  150   ; Tn++ ;
-    Ttypelist[Tn] = SZ ; Tvlist[Tn] =   40   ; Tn++ ;    
-    Ttypelist[Tn] = TX ; Tvlist[Tn] =  600  ; Tn++ ;
-    Ttypelist[Tn] = RY ; Tvlist[Tn] =  ii*360/nn  ; Tn++ ;    
-    
-    M3d_make_movement_sequence_matrix(m, mi, Tn, Ttypelist, Tvlist);
-    M3d_mat_mult(obmat[num_objects], vm, m) ;
-    M3d_mat_mult(obinv[num_objects], mi, vi) ;
-
-    num_objects++ ; // don't forget to do this
-
-    }
-
+	render();
+	while (G_wait_key() != 'q');
+	return 0;
+}
