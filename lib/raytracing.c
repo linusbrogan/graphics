@@ -9,7 +9,7 @@
 #define MINIMUM_INTENSITY 0.05
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define WINDOW_SIZE (WS_MAX(LG_WINDOW_WIDTH, LG_WINDOW_HEIGHT))
-#define HALF_ANGLE (M_PI / 6)
+double HALF_ANGLE = (M_PI / 6);
 #define H (tan(HALF_ANGLE))
 #define EPSILON (1e-10)
 
