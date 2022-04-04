@@ -360,53 +360,49 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 
 /////////////////////
 
-int M3d_view(double v[4][4], double v_i[4][4], double eye[3], double coi[3], double up[3]) {
+int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3]) {
+	// Initialize movement sequence
+	int mtype[100];
+	double mparam[100];
+	int n = 0;
+
 	// Copy inputs
-	double up_bar[3];
+	double eye[3];
+	double coi[3];
+	double coi0[3];
+	double up[3];
 	for (int i = 0; i < 3; i++) {
-		up_bar[i] = up[i];
+		eye[i] = eyeA[i];
+		coi[i] = coiA[i];
+		coi0[i] = coiA[i];
+		up[i] = upA[i];
 	}
 
-	double a = coi[0] - eye[0];
-	double b = coi[1] - eye[1];
-	double c = coi[2] - eye[2];
-	double p = sqrt(a * a + c * c);
-	double r = sqrt(b * b + p * p);
+	// Create temporary movement sequence matrix
+	double t[4][4];
+	double t_i[4][4];
 
 	// Translate camera by negative of its location
-	double t[4][4];
-	M3d_make_translation(t, -eye[0], -eye[1], -eye[2]);
-	double t_i[4][4];
-	M3d_make_translation(t_i, eye[0], eye[1], eye[2]);
+	mtype[n] = TX;	mparam[n] = -eye[0];	n++;
+	mtype[n] = TY;	mparam[n] = -eye[1];	n++;
+	mtype[n] = TZ;	mparam[n] = -eye[2];	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi, t, coi);
 
 	// Rotate about y-axis to bring CoI onto y-z plane
-	double ry[4][4];
-	M3d_make_y_rotation_cs(ry, c / p, -a / p);
-	double ry_i[4][4];
-	M3d_make_y_rotation_cs(ry_i, c / p, a / p);
-	M3d_mat_mult(v, ry, t);
-	M3d_mat_mult(v_i, t_i, ry_i);
+	double theta = atan2(coi[0], coi[2]) / DEGREES;
+	mtype[n] = RY;	mparam[n] = -theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi0, t, coi0);
 
 	// Rotate about x-axis to bring CoI onto z-axis
-	double rx[4][4];
-	M3d_make_x_rotation_cs(rx, p / r, b / r);
-	double rx_i[4][4];
-	M3d_make_x_rotation_cs(rx_i, p / r, -b / r);
-	M3d_mat_mult(v, rx, v);
-	M3d_mat_mult(v_i, v_i, rx_i);
-
-	M3d_mat_mult_pt(up, v, up);
-	double x = up[0];
-	double y = up[1];
-	double H = sqrt(x * x + y * y);
+	theta = atan2(coi0[1], coi0[2]) / DEGREES;
+	mtype[n] = RX;	mparam[n] = theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(up, t, up);
 
 	//Rotate about z-axis to bring Up onto  y-z plane
-	double rz[4][4];
-	M3d_make_z_rotation_cs(rz, y / H, x / H);
-	double rz_i[4][4];
-	M3d_make_z_rotation_cs(rz_i, y / H, -x / H);
-	M3d_mat_mult(v, rz, v);
-	M3d_mat_mult(v_i, v_i, rz_i);
-
-	return 1;
+	theta = atan2(up[0], up[1]) / DEGREES;
+	mtype[n] = RZ;	mparam[n] = theta;	n++;
+	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
