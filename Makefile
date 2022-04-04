@@ -79,11 +79,11 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	./build/functional
 	echo "700 650 asset/a.xwd" | ./build/get_image_from_file
 	./build/growing_sun 600 400 100 1.5
+	./build/movie_player 600 400 out/Growing_Sun/frame_ 0 99 1 30000
 	./build/M3d_test_sequence > out/M3d_test_sequence.out
 	diff out/M3d_test_sequence.res out/M3d_test_sequence.out
 	./build/M3d_test_view > out/M3d_test_view.out
 	diff out/M3d_test_view.res out/M3d_test_view.out
-	./build/movie_player 600 400 out/Growing_Sun/frame_ 0 99 1 30000
 	./build/sprint
 	./build/stickfigureS 640 30000
 	./build/view_test04Mb
