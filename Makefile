@@ -44,7 +44,7 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: clean raytracer
 
-raytracer: build/3d_Simple_RaytracerDS build/raytracer_3d build/movie_player
+raytracer: build/3d_Simple_RaytracerDS build/raytracer_3d build/movie_player asset/earth.xwd
 	./build/3d_Simple_RaytracerDS
 	display out/3d_Simple_RaytracerDS.xwd
 	./build/raytracer_3d

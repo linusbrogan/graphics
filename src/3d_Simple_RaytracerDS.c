@@ -9,6 +9,7 @@
 #define FILE_NAME "out/3d_Simple_RaytracerDS.xwd"
 
 void initialize() {
+	initialize_texture_maps();
 	LG_init_graphics(800, 800);
 	HALF_ANGLE = 40 * DEGREES;
 }
@@ -49,6 +50,7 @@ int main() {
 	object_color[objects][_B] = 0.8;
 	object_reflectivity[objects] = 0;
 	object_opacity[objects] = 1;
+	object_texture[objects] = TM_SOLID_COLOR;
 	T_n = 0;
 	T_type[T_n] = SX;	T_param[T_n] = 800;	T_n++;
 	T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -66,6 +68,7 @@ int main() {
 		object_color[objects][_B] = 0.8;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 500;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 100;	T_n++;
@@ -85,6 +88,7 @@ int main() {
 		object_color[objects][_B] = 0.2;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 40;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 150;	T_n++;

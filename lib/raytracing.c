@@ -3,6 +3,7 @@
 #include <m3d.h>
 #include <rt_shapes.h>
 #include <rt_utils.h>
+#include <textures.h>
 
 #define MAXIMUM_OBJECTS 100
 #define MAXIMUM_REFLECTIONS 4
@@ -19,7 +20,14 @@ double object_matrix_i[MAXIMUM_OBJECTS][4][4];
 double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
+enum texture_map object_texture[MAXIMUM_OBJECTS];
 int objects = 0;
+
+void shape_texture_map(int object, double xyz[3], double rgb[3]) {
+	double uv[2];
+	reverse_parametrize[object_type[object]](xyz, uv);
+	texture_map(object_texture[object], uv[_X], uv[_Y], rgb);
+}
 
 int trace_ray(
 	double tail[3],
@@ -40,6 +48,7 @@ int trace_ray(
 	// Keep track of closest object
 	double t_min = -1;
 	int closest_object = -1;
+	double object_space_intersection[3] = {0, 0, 0};
 	double intersection[3] = {0, 0, 0};
 	double normal[3] = {0, 0, 0};
 
@@ -70,18 +79,18 @@ int trace_ray(
 
 		// Compute intersection point
 		for (int i = 0; i < 3; i++) {
-			intersection[i] = E[i] + t * D[i];
+			object_space_intersection[i] = E[i] + t * D[i];
 		}
 
 		// Find world-space normal vector
 		double d[3];
-		gradient[object_type[object]](intersection, d);
+		gradient[object_type[object]](object_space_intersection, d);
 		normal[0] = object_matrix_i[object][0][0] * d[0] + object_matrix_i[object][1][0] * d[1] + object_matrix_i[object][2][0] * d[2];
 		normal[1] = object_matrix_i[object][0][1] * d[0] + object_matrix_i[object][1][1] * d[1] + object_matrix_i[object][2][1] * d[2];
 		normal[2] = object_matrix_i[object][0][2] * d[0] + object_matrix_i[object][1][2] * d[1] + object_matrix_i[object][2][2] * d[2];
 
 		// Map intersection point back to world space
-		M3d_mat_mult_pt(intersection, object_matrix[object], intersection);
+		M3d_mat_mult_pt(intersection, object_matrix[object], object_space_intersection);
 	}
 
 	if (closest_object >= 0) {
@@ -152,8 +161,16 @@ int trace_ray(
 		);
 
 		// Find object color, including reflection and transparent transmission
+		double inherent_rgb[3];
+		if (object_texture[closest_object] == TM_SOLID_COLOR) {
+			for (int i = 0; i < 3; i++) {
+				inherent_rgb[i] = object_color[closest_object][i];
+			}
+		} else {
+			shape_texture_map(closest_object, object_space_intersection, inherent_rgb);
+		}
 		double eye[3] = {0, 0, 0};
-		Light_Model_rt(object_color[closest_object], eye, intersection, normal, rgb, shadowed);
+		Light_Model_rt(inherent_rgb, eye, intersection, normal, rgb, shadowed);
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;

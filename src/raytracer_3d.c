@@ -10,6 +10,7 @@
 
 void initialize() {
 	LG_init_graphics(1080, 720);
+	initialize_texture_maps();
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -77,6 +78,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 0;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 0.5;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.25;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.25;	T_n++;
@@ -93,6 +95,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 0.2;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -111,6 +114,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -129,6 +133,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -146,6 +151,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		double diagonal_length = 2 * sqrt(2);
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
@@ -167,6 +173,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
@@ -186,6 +193,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.1;	T_n++;
