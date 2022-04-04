@@ -9,6 +9,7 @@ SRC_FILES = \
 	growing_sun \
 	M3d_test_sequence \
 	M3d_test_view \
+	mirror_testS \
 	movie_player \
 	raytracer_3d \
 	shapes \
@@ -84,6 +85,8 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	diff out/M3d_test_sequence.res out/M3d_test_sequence.out
 	./build/M3d_test_view > out/M3d_test_view.out
 	diff out/M3d_test_view.res out/M3d_test_view.out
+	./build/mirror_testS
+	./build/movie_player 800 800 out/Mirror_Test/frame_ 0 99 1 30000
 	./build/sprint
 	./build/stickfigureS 640 30000
 	./build/view_test04Mb
@@ -107,6 +110,7 @@ clean:
 	-rm -r out/Growing_Sun
 	-rm out/M3d_test_sequence.out
 	-rm out/M3d_test_view.out
+	-rm -r out/Mirror_Test
 	-rm -r out/Raytracer_3D
 	-rm -r out/Space_Station
 	-rm asset/earth.convert.xwd asset/earth.xwd
