@@ -22,9 +22,11 @@ SRC_FILES = \
 LIB_FILES = \
 	2d_shape_functions \
 	3d_shape_functions \
+	FPToolkit \
 	g3d \
 	lg \
 	light_model \
+	M3d_matrix_tools \
 	raytracing \
 	rt_shapes \
 	rt_utils \
