@@ -360,17 +360,12 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 
 /////////////////////
 
-int M3d_view(double view[4][4], double view_inverse[4][4], double eye[3], double coi[3], double up[3]) {
-	double A[4][4];
-	double B[4][4];
-	double C[4][4];
-	double D[4][4];
-	double Ai[4][4];
-	double Bi[4][4];
-	double Ci[4][4];
-	double Di[4][4];
-	double Up[3];
-	double Uplen;
+int M3d_view(double v[4][4], double v_i[4][4], double eye[3], double coi[3], double up[3]) {
+	// Copy inputs
+	double up_bar[3];
+	for (int i = 0; i < 3; i++) {
+		up_bar[i] = up[i];
+	}
 
 	double a = coi[0] - eye[0];
 	double b = coi[1] - eye[1];
@@ -378,32 +373,40 @@ int M3d_view(double view[4][4], double view_inverse[4][4], double eye[3], double
 	double p = sqrt(a * a + c * c);
 	double r = sqrt(b * b + p * p);
 
-	M3d_make_translation(A, -eye[0], -eye[1], -eye[2]);
-	M3d_make_y_rotation_cs(B, c/p, -a/p);
-	M3d_make_x_rotation_cs(C, p/r, b/r);
+	// Translate camera by negative of its location
+	double t[4][4];
+	M3d_make_translation(t, -eye[0], -eye[1], -eye[2]);
+	double t_i[4][4];
+	M3d_make_translation(t_i, eye[0], eye[1], eye[2]);
 
-	M3d_make_identity(view);
-	M3d_mat_mult(view, A, view);
-	M3d_mat_mult(view, B, view);
-	M3d_mat_mult(view, C, view);
+	// Rotate about y-axis to bring CoI onto y-z plane
+	double ry[4][4];
+	M3d_make_y_rotation_cs(ry, c / p, -a / p);
+	double ry_i[4][4];
+	M3d_make_y_rotation_cs(ry_i, c / p, a / p);
+	M3d_mat_mult(v, ry, t);
+	M3d_mat_mult(v_i, t_i, ry_i);
 
-	M3d_mat_mult_pt(Up, view, up);
-	Uplen = sqrt(Up[0] * Up[0] + Up[1] * Up[1]);
-	if (Uplen == 0) return 0;
-	M3d_make_z_rotation_cs(D, Up[1]/Uplen, Up[0]/Uplen);
-	M3d_mat_mult(view, D, view);
+	// Rotate about x-axis to bring CoI onto z-axis
+	double rx[4][4];
+	M3d_make_x_rotation_cs(rx, p / r, b / r);
+	double rx_i[4][4];
+	M3d_make_x_rotation_cs(rx_i, p / r, -b / r);
+	M3d_mat_mult(v, rx, v);
+	M3d_mat_mult(v_i, v_i, rx_i);
 
-	// now make the inverse
+	M3d_mat_mult_pt(up, v, up);
+	double x = up[0];
+	double y = up[1];
+	double H = sqrt(x * x + y * y);
 
-	M3d_make_translation(Ai, eye[0], eye[1], eye[2]);
-	M3d_make_y_rotation_cs(Bi, c/p, a/p);
-	M3d_make_x_rotation_cs(Ci, p/r, -b/r);
-	M3d_make_z_rotation_cs(Di, Up[1]/Uplen, -Up[0]/Uplen);
-	M3d_make_identity(view_inverse);
-	M3d_mat_mult(view_inverse, Di, view_inverse);
-	M3d_mat_mult(view_inverse, Ci, view_inverse);
-	M3d_mat_mult(view_inverse, Bi, view_inverse);
-	M3d_mat_mult(view_inverse, Ai, view_inverse);
+	//Rotate about z-axis to bring Up onto  y-z plane
+	double rz[4][4];
+	M3d_make_z_rotation_cs(rz, y / H, x / H);
+	double rz_i[4][4];
+	M3d_make_z_rotation_cs(rz_i, y / H, -x / H);
+	M3d_mat_mult(v, rz, v);
+	M3d_mat_mult(v_i, v_i, rz_i);
 
 	return 1;
 }
