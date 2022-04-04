@@ -8,6 +8,7 @@
 #define MAXIMUM_OBJECTS 100
 #define MAXIMUM_REFLECTIONS 4
 #define MINIMUM_INTENSITY 0.05
+#define INTENSITY_DECAY 0.99
 #define WS_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define WINDOW_SIZE (WS_MAX(LG_WINDOW_WIDTH, LG_WINDOW_HEIGHT))
 double HALF_ANGLE = (M_PI / 6);
@@ -44,6 +45,7 @@ int trace_ray(
 
 	if (remaining_collisions < 0) return 0;
 	if (intensity < MINIMUM_INTENSITY) return 0;
+	intensity *= INTENSITY_DECAY;
 
 	// Keep track of closest object
 	double t_min = -1;
