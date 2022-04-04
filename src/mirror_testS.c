@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
+		//objects++;
 
 		render();
 		save_image(frame);

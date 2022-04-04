@@ -170,14 +170,7 @@ int trace_ray(
 			shape_texture_map(closest_object, object_space_intersection, inherent_rgb);
 		}
 		double eye[3] = {0, 0, 0};
-		if (object_reflectivity[closest_object] == -1) {
-			ref = 0;
-			for (int i = 0; i < 3; i++) {
-				rgb[i] = inherent_rgb[i];
-			}
-		} else {
-			Light_Model_rt(inherent_rgb, eye, intersection, normal, rgb, shadowed);
-		}
+		Light_Model_rt(inherent_rgb, eye, intersection, normal, rgb, shadowed);
 		for (int i = 0; i < 3; i++) {
 			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;
