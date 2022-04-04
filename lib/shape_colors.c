@@ -1,55 +1,23 @@
 #include <math.h>
 #include <stdio.h>
 #include <lg.h>
+#include <textures.h>
 
-enum texture_map_id {
-	TM_CHECKERBOARD = 0,
-	TM_CLOCK,
-	TM_MANDELBROT_SET,
-	TM_EARTH
-};
-char *TEXTURE_MAP_FILES[] = {
-	"asset/checkerboard.xwd",
-	"asset/clock.xwd",
-	"asset/mandelbrot_set.xwd",
-	"asset/earth.xwd"
-};
-int TEXTURE_MAPS = 4;
-int TEXTURE_IDS[100];
-
-void initialize_texture_maps() {
-	for (int i = 0; i < TEXTURE_MAPS; i++) {
-		TEXTURE_IDS[i] = init_xwd_map_from_file(TEXTURE_MAP_FILES[i]);
-		if (TEXTURE_IDS[i] == -1) {
-			fprintf(stderr, "Failed to load texture %d\n", i);
-		}
-	}
-}
+#define SPHERE_U_START 0
+#define SPHERE_U_END TAU
+#define SPHERE_V_END (M_PI / 2)
+#define SPHERE_V_START (-SPHERE_V_END)
 
 void clock_map(double u, double v, double *rgb) {
-	double u_start = 0;
-	double u_end = 2 * M_PI;
-	double v_start = - M_PI / 2;
-	double v_end = M_PI / 2;
-	int d[2];
-	int error = get_xwd_map_dimensions(TEXTURE_IDS[TM_CLOCK], d);
-	if (error == -1) return;
-	int x = (u - u_start) / (u_end - u_start) * d[0];
-	int y = (v - v_start) / (v_end - v_start) * d[1];
-	get_xwd_map_color(TEXTURE_IDS[TM_CLOCK], x, y, rgb);
+	double x = (u - SPHERE_U_START) / (SPHERE_U_END - SPHERE_U_START);
+	double y = (v - SPHERE_V_START) / (SPHERE_V_END - SPHERE_V_START);
+	texture_map(TM_CLOCK, x, y, rgb);
 }
 
 void earth_map(double u, double v, double *rgb) {
-	double u_start = 0;
-	double u_end = 2 * M_PI;
-	double v_start = - M_PI / 2;
-	double v_end = M_PI / 2;
-	int d[2];
-	int error = get_xwd_map_dimensions(TEXTURE_IDS[TM_EARTH], d);
-	if (error == -1) return;
-	int x = (u - u_start) / (u_end - u_start) * d[0];
-	int y = (v - v_start) / (v_end - v_start) * d[1];
-	get_xwd_map_color(TEXTURE_IDS[TM_EARTH], x, y, rgb);
+	double x = (u - SPHERE_U_START) / (SPHERE_U_END - SPHERE_U_START);
+	double y = (v - SPHERE_V_START) / (SPHERE_V_END - SPHERE_V_START);
+	texture_map(TM_EARTH, x, y, rgb);
 }
 
 void unit_checkerboard_map(double u, double v, double *rgb) {

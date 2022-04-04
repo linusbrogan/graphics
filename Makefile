@@ -29,6 +29,7 @@ LIB_FILES = \
 	rt_shapes \
 	rt_utils \
 	shape_colors \
+	textures \
 	xwd_tools_03
 
 SRC_TARGETS = $(addprefix build/,$(SRC_FILES))
