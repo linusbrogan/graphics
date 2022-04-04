@@ -2,6 +2,7 @@ SRC_FILES = \
 	2d_Simple_RaytracerS \
 	3d_shapes \
 	3d_Simple_RaytracerDS \
+	checkerboard \
 	FPToolkitDemoB \
 	functional \
 	get_image_from_file \
@@ -73,6 +74,7 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	./build/2d_Simple_RaytracerS
 	-timeout 10 ./build/3d_shapes
 	./build/movie_player 1080 720 out/Graph_3D/frame_ 0 $$(($$(ls out/Graph_3D | wc -l) - 1)) 1 40000
+	./build/checkerboard 10 100
 	./build/FPToolkitDemoB
 	./build/functional
 	echo "700 650 asset/a.xwd" | ./build/get_image_from_file
@@ -100,6 +102,7 @@ clean:
 	-rm out/2d_Simple_RaytracerS.xwd
 	-rm out/3d_Simple_RaytracerDS.xwd
 	-rm -r out/Graph_3D
+	-rm asset/checkerboard_*.xwd
 	-rm out/demo.bmp
 	-rm -r out/Growing_Sun
 	-rm out/M3d_test_sequence.out
