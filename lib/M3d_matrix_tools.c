@@ -359,8 +359,43 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 
 
 /////////////////////
+double M3d_dot_product(double v[3], double w[3]) {
+	double sum = 0;
+	for (int i = 0; i < 3; i++) {
+		sum += v[i] * w[i];
+	}
+	return sum;
+}
+
+
+void M3d_normalize(double v[3]) {
+	double length = sqrt(M3d_dot_product(v, v));
+	if (length == 0) return;
+	for (int i = 0; i < 3; i++) {
+		v[i] /= length;
+	}
+}
+
+
 
 int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3], double lr) {
+	lr *= -1; // Fix LH coordinate problem
+	// for RH coordinates, but we are in LH coordinates :( idk
+	double EC[3];
+	double EU[3];
+	for (int i = 0; i < 3; i++) {
+		EC[i] = coiA[i] - eyeA[i];
+		EU[i] = upA[i] - eyeA[i];
+	}
+	double ECxEU[3];
+	M3d_x_product(ECxEU, EC, EU);
+	M3d_normalize(ECxEU);
+	for (int i = 0; i < 3; i++) {
+		ECxEU[i] *= lr;
+		eyeA[i] += ECxEU[i];
+		upA[i] += ECxEU[i];
+	}
+
 	// Initialize movement sequence
 	int mtype[100];
 	double mparam[100];
@@ -406,7 +441,8 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
 
 	// Shift eye
-	mtype[n] = TX;	mparam[n] = -lr;	n++;
+//OLD:
+	//mtype[n] = TX;	mparam[n] = -lr;	n++;
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }

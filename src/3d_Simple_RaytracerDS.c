@@ -21,6 +21,10 @@ void handle_keys() {
 	while (1) {
 		int key = G_wait_key();
 		switch (key) {
+			case 'd':
+			printf("display\n");
+			return;
+
 			case 'm':
 			dLR += ddLR;
 			printf("increase dLR by %lf to %lf\n", ddLR, dLR);
@@ -42,13 +46,13 @@ void handle_keys() {
 			printf("increase ddLR by 10x to %lf\n", ddLR);
 			break;
 
-			case 'd':
-			printf("display\n");
-			return;
-
 			case 'q':
 			printf("quit\n");
 			exit(0);
+
+			case 's':
+			printf("save\n");
+			LG_save_image_to_file(FILE_NAME);
 		}
 	}
 }
