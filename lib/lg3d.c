@@ -78,16 +78,16 @@ void LG3d_color_filter() {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
 			int error = get_xwd_map_color(LG_WINDOW_ID_LEFT, x, y, rgb_l);
-			rgb_l[_G] *= 0.5;
-			rgb_l[_B] *= 0.5;
+			rgb_l[_G] = 0;
+			rgb_l[_B] = 0;
 
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
-			rgb_r[_R] *= 0.5;
+			rgb_r[_R] = 0;
 
 			double rgb[3];
 			for (int i = 0; i < 3; i++) {
-				rgb[i] = (rgb_l[i] + rgb_r[i]) / 2;
+				rgb[i] = (rgb_l[i] + rgb_r[i]);
 			}
 
 			G_rgb(rgb[_R], rgb[_G], rgb[_B]);
