@@ -7,6 +7,7 @@ SRC_FILES = \
 	functional \
 	get_image_from_file \
 	growing_sun \
+	lr \
 	M3d_test_sequence \
 	M3d_test_view \
 	mirror_testS \
