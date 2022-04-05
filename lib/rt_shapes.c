@@ -161,7 +161,10 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
 }
 
 // Torus: (sqrt(x^2 + y^2) - R)^2 + z^2 - r^2 = 0
+const double torus_R = 1;
+const double torus_r = 0.1;
 void d_torus(double p[3], double d[3]) {
+	double R = torus_R;
 	double dxy = 2 * (1 - R / sqrt(sq(p[_X]) + sq(p[_Y])));
 	d[_X] = dxy * p[_X];
 	d[_Y] = dxy * p[_Y];
@@ -169,6 +172,8 @@ void d_torus(double p[3], double d[3]) {
 }
 
 double solve_torus_intersection(double E[3], double D[3]) {
+	double R = torus_R;
+	double r = torus_r;
 	return -1;
 }
 
@@ -178,8 +183,9 @@ double solve_torus_intersection(double E[3], double D[3]) {
 // u in [-arcsinh(1), arcsinh(1)]
 // v in [0, tau)
 void reverse_parametrize_torus(double xyz[3], double uv[2]) {
+	double R = torus_R;
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
-	uv[_Y] = atanp(xyz[_Z], sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / TAU
+	uv[_Y] = atanp(xyz[_Z], sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / TAU;
 }
 
 void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
