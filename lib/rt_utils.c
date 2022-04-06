@@ -62,3 +62,7 @@ void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 
 	normalize(normal);
 }
+
+int solve_quartic(double c[5], double t[4]) {
+	return 0;
+}
