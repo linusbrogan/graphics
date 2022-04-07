@@ -74,17 +74,19 @@ void LG_save_image_to_file(char *file_name) {
 }
 
 void LG3d_color_filter() {
+// From https://en.wikipedia.org/wiki/Luma_(video)
+double C[3] = {0.2126, 0.7152, 0.0722};
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
 			int error = get_xwd_map_color(LG_WINDOW_ID_LEFT, x, y, rgb_l);
-			rgb_l[_R] = (rgb_l[_R] + rgb_l[_G] + rgb_l[_B]) / 3;
+			rgb_l[_R] = (rgb_l[_R] * C[_R] + rgb_l[_G] * C[_G] + rgb_l[_B] * C[_B]);
 			rgb_l[_G] = 0;
 			rgb_l[_B] = 0;
 
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
-			rgb_r[_G] = (rgb_r[_R] + rgb_r[_G] + rgb_r[_B]) / 3;
+			rgb_r[_G] = (rgb_r[_R] * C[_R] + rgb_r[_G] * C[_G] + rgb_r[_B] * C[_B]);
 			rgb_r[_B] = rgb_r[_G];
 			rgb_r[_R] = 0;
 
