@@ -7,6 +7,7 @@ enum object_type {
 	OBJ_CYLINDER,
 	OBJ_PLANE,
 	OBJ_HYPERBOLOID,
+	OBJ_SS_RING,
 	OBJ_COUNT
 };
 
@@ -159,23 +160,50 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
 	uv[_Y] = atanp(xyz[_Z], xyz[_X]) / TAU;
 }
 
+// Space station ring: z = 0
+const double ss_ring_R = 1 - 0.2 / sqrt(2);
+const double ss_ring_r = 0.4 / sqrt(2);
+
+double solve_ss_ring_intersection(double E[3], double D[3]) {
+	if (D[_Z] == 0) return -1;
+	double t = -E[_Z] / D[_Z];
+	double x = E[_X] + t * D[_X];
+	double y = E[_Y] + t * D[_Y];
+	double r = sqrt(sq(x) + sq(y));
+	if (r < ss_ring_R || r >  ss_ring_R + ss_ring_r) return -1;
+	return t;
+}
+
+// x(u, v) = (R + ru) * cos(v)
+// y(u, v) = (R + ru) * sin(v)
+// z(u, v) = 0
+// u in [0, 1]
+// v in [0, tau)
+void reverse_parametrize_ss_ring(double xyz[3], double uv[2]) {
+	uv[_X] = (sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - ss_ring_R) / ss_ring_r;
+	uv[_Y] = atanp(xyz[_Y], xyz[_X]) / TAU;
+}
+
 void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
-	d_hyperboloid
+	d_hyperboloid,
+	d_plane
 };
 
 double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
 	solve_sphere_intersection,
 	solve_cylinder_intersection,
 	solve_plane_intersection,
-	solve_hyperboloid_intersection
+	solve_hyperboloid_intersection,
+	solve_ss_ring_intersection
 };
 
 void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2]) = {
 	reverse_parametrize_sphere,
 	reverse_parametrize_cylinder,
 	reverse_parametrize_plane,
-	reverse_parametrize_hyperboloid
+	reverse_parametrize_hyperboloid,
+	reverse_parametrize_ss_ring
 };
