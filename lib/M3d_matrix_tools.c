@@ -379,6 +379,9 @@ void M3d_normalize(double v[3]) {
 
 
 int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3], double lr) {
+	// FOR BAD JUST SHIFTING pixels 1 eye 3d-ified:
+	lr = 0;
+
 	lr *= -1; // Fix LH coordinate problem
 	// for RH coordinates, but we are in LH coordinates :( idk
 	double EC[3];

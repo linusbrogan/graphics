@@ -73,16 +73,30 @@ void LG_save_image_to_file(char *file_name) {
 	G_save_image_to_file(file_name);
 }
 
+
+int RIGHT_get_xwd_map_color(int id, int x, int y, double *rgb) {
+	x += 25;
+	if (x >= LG_WINDOW_WIDTH) x = LG_WINDOW_WIDTH - 1;
+	return get_xwd_map_color(id, x, y, rgb);
+}
+
+int LEFT_get_xwd_map_color(int id, int x, int y, double *rgb) {
+	x -= 25;
+	if (x < 0) x = 0;
+	return get_xwd_map_color(id, x, y, rgb);
+}
+
+
 void LG3d_color_filter() {
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
-			int error = get_xwd_map_color(LG_WINDOW_ID_LEFT, x, y, rgb_l);
+			int error = LEFT_get_xwd_map_color(LG_WINDOW_ID_LEFT, x, y, rgb_l);
 			rgb_l[_G] = 0;
 			rgb_l[_B] = 0;
 
 			double rgb_r[3];
-			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
+			error = RIGHT_get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
 			rgb_r[_R] = 0;
 
 			double rgb[3];
