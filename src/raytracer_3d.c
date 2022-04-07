@@ -24,6 +24,8 @@ void save_image(int frame) {
 	LG_save_image_to_file(file_name);
 }
 
+double ssrrs[2] = {0, 3};
+
 int main(int argc, char *argv[]) {
 	int frame_start = 0;
 	int frame_stop = FRAMES;
@@ -77,6 +79,7 @@ int main(int argc, char *argv[]) {
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
 		object_texture[objects] = TM_EARTH;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = planet_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = planet_radius;	T_n++;
@@ -115,6 +118,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = (void *) ssrrs;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height + beam_radius;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -129,6 +133,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height - beam_radius;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -143,6 +148,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 1 + 0.2 / sqrt(2);	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 1 + 0.2 / sqrt(2);	T_n++;
@@ -161,6 +167,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height + beam_radius;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -175,6 +182,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height - beam_radius;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -190,6 +198,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -209,6 +218,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -228,6 +238,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -247,6 +258,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -266,6 +278,7 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
+		object_params[objects] = NULL;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.15;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.15;	T_n++;

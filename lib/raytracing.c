@@ -22,11 +22,12 @@ double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
 enum texture_map object_texture[MAXIMUM_OBJECTS];
+void *object_params[MAXIMUM_OBJECTS];
 int objects = 0;
 
 void shape_texture_map(int object, double xyz[3], double rgb[3]) {
 	double uv[2];
-	reverse_parametrize[object_type[object]](xyz, uv);
+	reverse_parametrize[object_type[object]](xyz, uv, object_params[object]);
 	texture_map(object_texture[object], uv[_X], uv[_Y], rgb);
 }
 
@@ -70,7 +71,7 @@ int trace_ray(
 		}
 
 		// Find intersection point
-		double t = solve_ray_intersection[object_type[object]](E, D);
+		double t = solve_ray_intersection[object_type[object]](E, D, object_params[object]);
 
 		// Move on if no closer intersection
 		if (t <= EPSILON || (t_min > 0 && t > t_min)) continue;
@@ -86,7 +87,7 @@ int trace_ray(
 
 		// Find world-space normal vector
 		double d[3];
-		gradient[object_type[object]](object_space_intersection, d);
+		gradient[object_type[object]](object_space_intersection, d, object_params[object]);
 		normal[0] = object_matrix_i[object][0][0] * d[0] + object_matrix_i[object][1][0] * d[1] + object_matrix_i[object][2][0] * d[2];
 		normal[1] = object_matrix_i[object][0][1] * d[0] + object_matrix_i[object][1][1] * d[1] + object_matrix_i[object][2][1] * d[2];
 		normal[2] = object_matrix_i[object][0][2] * d[0] + object_matrix_i[object][1][2] * d[1] + object_matrix_i[object][2][2] * d[2];
