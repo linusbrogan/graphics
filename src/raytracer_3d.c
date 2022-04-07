@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 		t = 2 * M_PI * frame / FRAMES;
 		double eye[3] = {0, 0, 0};
 		double coi[3] = {sin(-t), 0, cos(t)};
-		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
+		double up[3] = {eye[_X], eye[_Y]+1, eye[_Z]};
 
 		// Make view matrix
 		double view[4][4];
@@ -94,6 +94,7 @@ int main(int argc, char *argv[]) {
 
 		// Build the space station
 		double half_height = 0.5;
+		double beam_radius = 0.1;
 		// Make the space station transformation sequence
 		double S[4][4];
 		double S_i[4][4];
@@ -115,12 +116,41 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
 		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = half_height + beam_radius;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], S, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
+		objects++;
+
+		object_type[objects] = OBJ_SS_RING;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = half_height - beam_radius;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], S, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
+		objects++;
+
+		object_type[objects] = OBJ_CYLINDER;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 1 + 0.2 / sqrt(2);	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 1 + 0.2 / sqrt(2);	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = beam_radius / 2;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 		// Build the lower ring
@@ -132,15 +162,26 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
 		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = -half_height + beam_radius;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
-		double beam_radius = 0.1;
+		object_type[objects] = OBJ_SS_RING;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = -half_height - beam_radius;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], S, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
+		objects++;
+
 		// Build the upper cross-bar 1
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
@@ -156,10 +197,8 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 		// Build the upper cross-bar 2
@@ -170,7 +209,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 0.5;
 		object_color[objects][_B] = 0.75;
-
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -178,10 +216,8 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 		// Build the lower cross-bar 1
@@ -199,10 +235,8 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 		// Build the lower cross-bar 2
@@ -220,10 +254,8 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 		// Build the central axis
@@ -239,10 +271,8 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = SY;	T_param[T_n] = 0.15;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = 0.7;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(M, view, M);
 		M3d_mat_mult(object_matrix[objects], S, M);
-		M3d_mat_mult(M_i, M_i, S);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		M3d_mat_mult(object_matrix_i[objects], M_i, S_i);
 		objects++;
 
 // caps
