@@ -46,7 +46,7 @@ int solve_line(double a, double b, double *x) {
 
 int solve_quadratic(double a, double b, double c, double x[2]) {
 	if (a == 0) {
-		int n = solve_line(b, c, &(x[0]));
+		int n = solve_line(b, c, x);
 		if (n == 1) {
 			x[1] = x[0];
 		}
@@ -60,6 +60,14 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 	x[1] = (-b + root) / (2 * a);
 	if (root == 0) return 1;
 	return 2;
+}
+
+int solve_cubic(double c[4], double x[3]) {
+	if (c[3] == 0) {
+		return solve_quadratic(c[2], c[1], c[0], x);
+	}
+
+	return 0;
 }
 
 void orient_normal(double intersection[3], double normal[3], double eye[3]) {
