@@ -35,7 +35,24 @@ void find_reflection_vector(double incident[3], double normal[3], double reflect
 	}
 }
 
+int solve_line(double a, double b, double *x) {
+	if (a == 0) {
+		if (b == 0) return -1;
+		return 0;
+	}
+	*x = -b / a;
+	return 1;
+}
+
 int solve_quadratic(double a, double b, double c, double x[2]) {
+	if (a == 0) {
+		int n = solve_line(b, c, &(x[0]));
+		if (n == 1) {
+			x[1] = x[0];
+		}
+		return n;
+	}
+
 	double root = b * b - 4 * a * c;
 	if (root < 0) return 0;
 	root = sqrt(root);
