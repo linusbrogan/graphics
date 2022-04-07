@@ -11,6 +11,7 @@
 void initialize() {
 	LG_init_graphics(1080, 720);
 	initialize_texture_maps();
+	HALF_ANGLE = M_PI / 4;
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -109,7 +110,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_SS_RING;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -123,7 +127,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_SS_RING;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = -half_height;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
@@ -138,7 +145,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -156,7 +166,11 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
+
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -174,7 +188,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -192,7 +209,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = beam_radius;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = beam_radius;	T_n++;
@@ -210,7 +230,10 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_CYLINDER;
 		object_reflectivity[objects] = 0;
 		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH; // blue
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.5;
+		object_color[objects][_G] = 0.5;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 0.15;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 0.15;	T_n++;
@@ -222,6 +245,7 @@ int main(int argc, char *argv[]) {
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
 		objects++;
 
+// caps
 
 		render();
 		save_image(frame);
