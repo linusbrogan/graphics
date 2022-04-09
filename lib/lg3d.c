@@ -98,11 +98,11 @@ void LG3d_color_filter() {
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
 
-			// Red/cyan monochrome mode
+			// Color mode
 			double rgb[3];
-			rgb[_R] = rgb_l[_R] * C[_R] + rgb_l[_G] * C[_G] + rgb_l[_B] * C[_B];
-			rgb[_G] = rgb_r[_R] * C[_R] + rgb_r[_G] * C[_G] + rgb_r[_B] * C[_B];
-			rgb[_B] = rgb[_G];
+			rgb[_R] = rgb_l[_R];
+			rgb[_G] = rgb_r[_G];
+			rgb[_B] = rgb_r[_B];
 
 			G_rgb(rgb[_R], rgb[_G], rgb[_B]);
 			G_point(x, y);
