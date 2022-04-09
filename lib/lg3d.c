@@ -89,7 +89,7 @@ double lstar(double Y) {
 
 void LG3d_color_filter() {
 // From http://stereo.jpn.org/eng/stphmkr/help/stereo_13.htm
-	double C[3] = {0.299, 0.587, 0.114};
+	double C[3] = {0, 0.45, 1.05};
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
@@ -98,11 +98,11 @@ void LG3d_color_filter() {
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
 
-			// reverse half-color mode
+			// Optimized mode
 			double rgb[3];
-			rgb[_R] = rgb_l[_R];
-			rgb[_G] = rgb_r[_G] * C[_R] + rgb_r[_G] * C[_G] + rgb_r[_B] * C[_B];
-			rgb[_B] = rgb[_G];
+			rgb[_R] = rgb_l[_G] * C[_G] + rgb_l[_B] *  C[_B];
+			rgb[_G] = rgb_r[_G];
+			rgb[_B] = rgb_r[_B];
 
 			G_rgb(rgb[_R], rgb[_G], rgb[_B]);
 			G_point(x, y);
