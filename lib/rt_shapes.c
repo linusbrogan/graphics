@@ -8,6 +8,7 @@ enum object_type {
 	OBJ_PLANE,
 	OBJ_HYPERBOLOID,
 	OBJ_CONE,
+	OBJ_ANNULUS,
 	OBJ_COUNT
 };
 
@@ -202,12 +203,34 @@ void reverse_parametrize_cone(double xyz[3], double uv[2]) {
 	uv[_Y] = xyz[_Z];
 }
 
+// Annulus: z = 0
+double solve_annulus_intersection(double E[3], double D[3]) {
+	if (D[_Z] == 0) return -1;
+	double t = -E[_Z] / D[_Z];
+	double x = E[_X] + t * D[_X];
+	double y = E[_Y] + t * D[_Y];
+	double radius = sqrt(sq(x) + sq(y));
+	if (radius < 1 || radius > 2) return -1;
+	return t;
+}
+
+// x(u, v) = v * cos(u)
+// y(u, v) = v * sin(u)
+// z(u, v) = 0
+// u in [0, tau)
+// v in [1, 2]
+void reverse_parametrize_annulus(double xyz[3], double uv[2]) {
+	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
+	uv[_Y] = sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - 1;
+}
+
 void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
 	d_hyperboloid,
-	d_cone
+	d_cone,
+	d_plane
 };
 
 double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
@@ -215,7 +238,8 @@ double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
 	solve_cylinder_intersection,
 	solve_plane_intersection,
 	solve_hyperboloid_intersection,
-	solve_cone_intersection
+	solve_cone_intersection,
+	solve_annulus_intersection
 };
 
 void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2]) = {
@@ -223,5 +247,6 @@ void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2]) = {
 	reverse_parametrize_cylinder,
 	reverse_parametrize_plane,
 	reverse_parametrize_hyperboloid,
-	reverse_parametrize_cone
+	reverse_parametrize_cone,
+	reverse_parametrize_annulus
 };
