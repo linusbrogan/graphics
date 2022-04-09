@@ -89,7 +89,6 @@ double lstar(double Y) {
 
 void LG3d_color_filter() {
 // From http://stereo.jpn.org/eng/stphmkr/help/stereo_13.htm
-	double C[3] = {0, 0.45, 1.05};
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
@@ -98,11 +97,11 @@ void LG3d_color_filter() {
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
 
-			// Optimized mode
+			// Dubois mode
 			double rgb[3];
-			rgb[_R] = rgb_l[_G] * C[_G] + rgb_l[_B] *  C[_B];
-			rgb[_G] = rgb_r[_G];
-			rgb[_B] = rgb_r[_B];
+			rgb[_R] = rgb_l[_R] * 0.456 + rgb_l[_G] * 0.5 + rgb_l[_B] * 0.176 + rgb_r[_R] * -0.043 + rgb_r[_G] * -0.088 + rgb_r[_B] * -0.002;
+			rgb[_G] = rgb_l[_R] * -0.04 + rgb_l[_G] * -0.038 + rgb_l[_B] * -0.016 + rgb_r[_R] * 0.378 + rgb_r[_G] * 0.734 + rgb_r[_B] * -0.018;
+			rgb[_B] = rgb_l[_R] * -0.015 + rgb_l[_G] * -0.021 + rgb_l[_B] * -0.005 + rgb_r[_R] * -0.072 + rgb_r[_G] * -0.113 + rgb_r[_B] * 1.226;
 
 			G_rgb(rgb[_R], rgb[_G], rgb[_B]);
 			G_point(x, y);
