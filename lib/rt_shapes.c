@@ -7,6 +7,7 @@ enum object_type {
 	OBJ_CYLINDER,
 	OBJ_PLANE,
 	OBJ_HYPERBOLOID,
+	OBJ_CONE,
 	OBJ_COUNT
 };
 
@@ -159,23 +160,68 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
 	uv[_Y] = atanp(xyz[_Z], xyz[_X]) / TAU;
 }
 
+// Cone: = x^2 + y^2 - z^2 = 0
+void d_cone(double p[3], double d[3]) {
+	d[_X] = 2 * p[_X];
+	d[_Y] = 2 * p[_Y];
+	d[_Z] = -2 * p[_Z];
+}
+
+double solve_cone_intersection(double E[3], double D[3]) {
+	double a = sq(D[_X]) + sq(D[_Y]) - sq(D[_Z]);
+	double b = 2 * (E[_X] * D[_X] + E[_Y] * D[_Y] - E[_Z] * D[_Z]);
+	double c = sq(E[_X]) + sq(E[_Y]) - sq(E[_Z]);
+
+	double t[2] = {-1, -1};
+	int n = solve_quadratic(a, b, c, t);
+
+	if (n == 0) return -1;
+
+	// Check for invalid solutions
+	for (int solution = 0; solution < 2; solution++) {
+		double z = E[2] + t[solution] * D[2];
+		if (z < 0 || z > 1 || t[solution] <= 0) {
+			t[solution] = -1;
+		}
+	};
+
+	if (n == 1) return t[0];
+	if (t[0] <= 0 && t[1] <= 0) return -1;
+	if (t[0] <= 0) return t[1];
+	if (t[1] <= 0) return t[0];
+	return fmin(t[0], t[1]);
+}
+
+// x(u, v) = v * cos(u)
+// y(u, v) = v * sin(u)
+// z(u, v) = v
+// u in [0, tau)
+// v in [0, 1]
+void reverse_parametrize_cone(double xyz[3], double uv[2]) {
+	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
+	uv[_Y] = xyz[_Z];
+}
+
 void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
-	d_hyperboloid
+	d_hyperboloid,
+	d_cone
 };
 
 double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
 	solve_sphere_intersection,
 	solve_cylinder_intersection,
 	solve_plane_intersection,
-	solve_hyperboloid_intersection
+	solve_hyperboloid_intersection,
+	solve_cone_intersection
 };
 
 void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2]) = {
 	reverse_parametrize_sphere,
 	reverse_parametrize_cylinder,
 	reverse_parametrize_plane,
-	reverse_parametrize_hyperboloid
+	reverse_parametrize_hyperboloid,
+	reverse_parametrize_cone
 };
