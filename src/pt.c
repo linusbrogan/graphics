@@ -84,9 +84,38 @@ int del_ferro_playing() {
 	double cs[4] = {42, -4, 0, 1};
 	double xs[3] = {0, 0, 0};
 	int n = solve_cubic(cs, xs);
-	assert(n == 2);
-	printf(T"x0 = %lf"N, xs[0]);
-	printf(T"x1 = %lf"N, xs[1]);
+	assert(n >= 1 && n <= 3);
+	for (int i = 0; i < n; i++) {
+		double y = evaluate_polynomial(cs, 3, xs[i]);
+		assert(eq(y, 0));
+	}
+	if (n >= 2) {
+		assert(eq(xs[0], xs[1]));
+	}
+
+	cs[0] = -95;
+	cs[1] = 7;
+	n = solve_cubic(cs, xs);
+	assert(n >= 1 && n <= 3);
+	for (int i = 0; i < n; i++) {
+		double y = evaluate_polynomial(cs, 3, xs[i]);
+		assert(eq(y, 0));
+	}
+	if (n >= 2) {
+		assert(eq(xs[0], xs[1]));
+	}
+
+	cs[0] = -18;
+	cs[1] = -70;
+	n = solve_cubic(cs, xs);
+	printf(T"n: %d, %lf, %lf, %lf"N, n, xs[0],xs[1], xs[2]);
+	assert(n >= 1 && n <= 3);
+	for (int i = 0; i < n; i++) {
+		double y = evaluate_polynomial(cs, 3, xs[i]);
+		printf("soln: %lf\n", xs[i]);
+		assert(eq(y, 0));
+	}
+
 	return 1;
 }
 
