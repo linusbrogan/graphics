@@ -379,7 +379,8 @@ void M3d_normalize(double v[3]) {
 
 
 int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3], double lr) {
-	lr *= -1; // Fix LH coordinate problem
+// TRY 1
+//	lr *= -1; // Fix LH coordinate problem
 	// for RH coordinates, but we are in LH coordinates :( idk
 	double EC[3];
 	double EU[3];
@@ -390,11 +391,11 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	double ECxEU[3];
 	M3d_x_product(ECxEU, EC, EU);
 	M3d_normalize(ECxEU);
-	for (int i = 0; i < 3; i++) {
-		ECxEU[i] *= lr;
-		eyeA[i] += ECxEU[i];
-		upA[i] += ECxEU[i];
-	}
+//	for (int i = 0; i < 3; i++) {
+//		ECxEU[i] *= lr;
+//		eyeA[i] += ECxEU[i];
+//		upA[i] += ECxEU[i];
+//	}
 
 	// Initialize movement sequence
 	int mtype[100];
@@ -406,11 +407,15 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	double coi[3];
 	double coi0[3];
 	double up[3];
+	double coi_3d[3];
+	double eye_3d[3];
 	for (int i = 0; i < 3; i++) {
 		eye[i] = eyeA[i];
 		coi[i] = coiA[i];
 		coi0[i] = coiA[i];
 		up[i] = upA[i];
+		coi_3d[i] = coiA[i];
+		eye_3d[i] = eyeA[i];
 	}
 
 	// Create temporary movement sequence matrix
@@ -436,13 +441,28 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
 	M3d_mat_mult_pt(up, t, up);
 
-	//Rotate about z-axis to bring Up onto  y-z plane
+	// Rotate about z-axis to bring Up onto y-z plane
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
 
 	// Shift eye
 //OLD:
 	//mtype[n] = TX;	mparam[n] = -lr;	n++;
+
+// new (v3) (3DDDD)
+	// Move CoI to origin
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi_3d, t, coi_3d);
+	//mtype[n] = TX;	mparam[n] = -coi_3d[0];	n++; // should be zero
+	//mtype[n] = TY;	mparam[n] = -coi_3d[1];	n++; // should be zero
+	mtype[n] = TZ;	mparam[n] = -coi_3d[2];	n++;
+	// Rotate to eye angle
+	double eye_angle = -lr;
+	mtype[n] = RY;	mparam[n] = eye_angle;	n++;
+	// Put eye back at origin
+	double new_eye_radius = 1; // should be |ElC|/|EC|
+	mtype[n] = TZ;	mparam[n] = coi_3d[2] * new_eye_radius;	n++;
+
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
