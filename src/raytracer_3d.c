@@ -216,7 +216,28 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = SX;	T_param[T_n] = 3;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 3;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = 3;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1 + 2 * 2 + sqrt(pow(3, 2) - 1);	T_n++;
+		double sphere_center = 1 + 2 * 2 + sqrt(pow(3, 2) - 1);
+		T_type[T_n] = TZ;	T_param[T_n] = sphere_center;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+
+		// Build hat
+		object_type[objects] = OBJ_CONE;
+		object_color[objects][_R] = 0;
+		object_color[objects][_G] = 0;
+		object_color[objects][_B] = 0;
+		object_reflectivity[objects] = 0;
+		object_opacity[objects] = 1;
+		object_texture[objects] = TM_CHECKERBOARD;
+		T_n = 0;
+		T_type[T_n] = NZ;	T_param[T_n] = -1;	T_n++;
+		T_type[T_n] = SX;	T_param[T_n] = 3;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 3;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 3;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = -40 * t;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 6 + sphere_center;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
