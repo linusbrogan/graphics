@@ -134,6 +134,24 @@ int M3d_make_z_rotation_cs (double a[4][4], double cs, double sn)
 }
 
 
+int M3d_make_shear(
+	double a[4][4],
+	double xy,
+	double xz,
+	double yx,
+	double yz,
+	double zx,
+	double zy
+) {
+	M3d_make_identity(a);
+	a[0][1] = xy;
+	a[0][2] = xz;
+	a[1][0] = yx;
+	a[1][2] = yz;
+	a[2][0] = zx;
+	a[2][1] = zy;
+	return 1;
+}
 
 
 
@@ -258,21 +276,27 @@ int M3d_x_product (double res[3], double a[3], double b[3])
 
 
 
-#define SX 0
-#define SY 1
-#define SZ 2
+enum transformation {
+	SX,
+	SY,
+	SZ,
+	RX,
+	RY,
+	RZ,
+	TX,
+	TY,
+	TZ,
+	NX,
+	NY,
+	NZ,
+	HXY,
+	HXZ,
+	HYX,
+	HYZ,
+	HZX,
+	HZY
+};
 
-#define RX 3
-#define RY 4
-#define RZ 5
-
-#define TX 6
-#define TY 7
-#define TZ 8
-
-#define NX 9
-#define NY 10
-#define NZ 11
 
 
 //////////////
@@ -309,6 +333,19 @@ int fill_action_matrix(double result[4][4], int action_type, double parameter) {
 		case NZ:
 		return M3d_make_scaling(result, 1, 1, -1);
 
+		case HXY:
+		return M3d_make_shear(result, parameter, 0, 0, 0, 0, 0);
+		case HXZ:
+		return M3d_make_shear(result, 0, parameter, 0, 0, 0, 0);
+		case HYX:
+		return M3d_make_shear(result, 0, 0, parameter, 0, 0, 0);
+		case HYZ:
+		return M3d_make_shear(result, 0, 0, 0, parameter, 0, 0);
+		case HZX:
+		return M3d_make_shear(result, 0, 0, 0, 0, parameter, 0);
+		case HZY:
+		return M3d_make_shear(result, 0, 0, 0, 0, 0, parameter);
+
 		default:
 		return 0;
 	}
@@ -328,6 +365,12 @@ int fill_action_matrix_inverse(double result[4][4], int action_type, double para
 		case TX:
 		case TY:
 		case TZ:
+		case HXY:
+		case HXZ:
+		case HYX:
+		case HYZ:
+		case HZX:
+		case HZY:
 		parameter = -parameter;
 	}
 	return fill_action_matrix(result, action_type, parameter);
