@@ -88,28 +88,21 @@ double lstar(double Y) {
 }
 
 void LG3d_color_filter() {
-// From https://en.wikipedia.org/wiki/Luma_(video)
-double C[3] = {0.2126, 0.7152, 0.0722};
+// From http://stereo.jpn.org/eng/stphmkr/help/stereo_13.htm
+	double C[3] = {0.299, 0.587, 0.114};
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double rgb_l[3];
 			int error = get_xwd_map_color(LG_WINDOW_ID_LEFT, x, y, rgb_l);
-			linearize(rgb_l);
-			rgb_l[_R] = lstar(rgb_l[_R] * C[_R] + rgb_l[_G] * C[_G] + rgb_l[_B] * C[_B]) / 100;
-			rgb_l[_G] = 0;
-			rgb_l[_B] = 0;
 
 			double rgb_r[3];
 			error = get_xwd_map_color(LG_WINDOW_ID_RIGHT, x, y, rgb_r);
-			linearize(rgb_r);
-			rgb_r[_G] = lstar(rgb_r[_R] * C[_R] + rgb_r[_G] * C[_G] + rgb_r[_B] * C[_B]) / 100;
-			rgb_r[_B] = rgb_r[_G];
-			rgb_r[_R] = 0;
 
+			// Red/cyan monochrome mode
 			double rgb[3];
-			for (int i = 0; i < 3; i++) {
-				rgb[i] = (rgb_l[i] + rgb_r[i]);
-			}
+			rgb[_R] = rgb_l[_R] * C[_R] + rgb_l[_G] * C[_G] + rgb_l[_B] * C[_B];
+			rgb[_G] = rgb_r[_R] * C[_R] + rgb_r[_G] * C[_G] + rgb_r[_B] * C[_B];
+			rgb[_B] = rgb[_G];
 
 			G_rgb(rgb[_R], rgb[_G], rgb[_B]);
 			G_point(x, y);
