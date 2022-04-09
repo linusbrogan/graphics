@@ -449,7 +449,7 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 //OLD:
 	//mtype[n] = TX;	mparam[n] = -lr;	n++;
 
-// new (v3) (3DDDD)
+// new (v4) (3DDDD)
 	// Move CoI to origin
 	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
 	M3d_mat_mult_pt(coi_3d, t, coi_3d);
@@ -457,12 +457,13 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	//mtype[n] = TY;	mparam[n] = -coi_3d[1];	n++; // should be zero
 	mtype[n] = TZ;	mparam[n] = -coi_3d[2];	n++;
 	// Rotate to eye angle
-	double eye_angle = -lr;
-	mtype[n] = RY;	mparam[n] = eye_angle;	n++;
-	// Put eye back at origin
-	double new_eye_radius = 1; // should be |ElC|/|EC|
+	double ElC = sqrt(pow(coi_3d[2], 2) + pow(lr, 2));
+	double eye_angle = asin(lr / ElC); //= -lr;
+	// OR eye_angle = atan2(lr / coi_3d[2]); // where coi_3d[2] IS |EC|
+	mtype[n] = RY;	mparam[n] = eye_angle / DEGREES;	n++;
+	// Put new eye back at origin
+	double new_eye_radius = ElC / coi_3d[2];
 	mtype[n] = TZ;	mparam[n] = coi_3d[2] * new_eye_radius;	n++;
-
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
