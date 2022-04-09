@@ -22,7 +22,17 @@ double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
 enum texture_map object_texture[MAXIMUM_OBJECTS];
-int objects = 0;
+int objects = MAXIMUM_OBJECTS;
+
+void clear_objects() {
+	for (int i = 0; i < objects; i++) {
+		object_type[i] = -1;
+		object_reflectivity[i] = 0;
+		object_opacity[i] = 1;
+		object_texture[i] = TM_SOLID_COLOR;
+	}
+	objects = 0;
+}
 
 void shape_texture_map(int object, double xyz[3], double rgb[3]) {
 	double uv[2];
