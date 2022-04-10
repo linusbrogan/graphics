@@ -20,13 +20,13 @@ double atanp(double y, double x) {
 }
 
 // Sphere: x^2 + y^2 + z^2 = 1
-void d_sphere(double p[3], double d[3]) {
+void d_sphere(double p[3], double d[3], void *params) {
 	d[_X] = 2 * p[_X];
 	d[_Y] = 2 * p[_Y];
 	d[_Z] = 2 * p[_Z];
 }
 
-double solve_sphere_intersection(double E[3], double D[3]) {
+double solve_sphere_intersection(double E[3], double D[3], void *params) {
 	double a = sq(D[_X]) + sq(D[_Y]) + sq(D[_Z]);
 	double b = 2 * (E[_X] * D[_X] + E[_Y] * D[_Y] + E[_Z] * D[_Z]);
 	double c = sq(E[_X]) + sq(E[_Y]) + sq(E[_Z]) - 1;
@@ -47,19 +47,19 @@ double solve_sphere_intersection(double E[3], double D[3]) {
 // z(u, v) = sin(v);
 // u in [0, tau)
 // v in [-pi / 2, pi / 2]
-void reverse_parametrize_sphere(double xyz[3], double uv[2]) {
+void reverse_parametrize_sphere(double xyz[3], double uv[2], void *params) {
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
 	uv[_Y] = asin(xyz[_Z]) / M_PI + 0.5;
 }
 
 // Cylinder: x^2 + y^2 = 1
-void d_cylinder(double p[3], double d[3]) {
+void d_cylinder(double p[3], double d[3], void *params) {
 	d[_X] = 2 * p[_X];
 	d[_Y] = 2 * p[_Y];
 	d[_Z] = 0;
 }
 
-double solve_cylinder_intersection(double E[3], double D[3]) {
+double solve_cylinder_intersection(double E[3], double D[3], void *params) {
 	double a = sq(D[_X]) + sq(D[_Y]);
 	double b = 2 * (E[_X] * D[_X] + E[_Y] * D[_Y]);
 	double c = sq(E[_X]) + sq(E[_Y]) - 1;
@@ -89,19 +89,19 @@ double solve_cylinder_intersection(double E[3], double D[3]) {
 // z(u, v) = z
 // u in [0, tau)
 // v in [-1, 1]
-void reverse_parametrize_cylinder(double xyz[3], double uv[2]) {
+void reverse_parametrize_cylinder(double xyz[3], double uv[2], void *params) {
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
 	uv[_Y] = (xyz[_Z] + 1) / 2;
 }
 
 // Plane: z = 0
-void d_plane(double p[3], double d[3]) {
+void d_plane(double p[3], double d[3], void *params) {
 	d[_X] = 0;
 	d[_Y] = 0;
 	d[_Z] = 1;
 }
 
-double solve_plane_intersection(double E[3], double D[3]) {
+double solve_plane_intersection(double E[3], double D[3], void *params) {
 	if (D[_Z] == 0) return -1;
 	double t = -E[_Z] / D[_Z];
 	double x = E[_X] + t * D[_X];
@@ -114,19 +114,19 @@ double solve_plane_intersection(double E[3], double D[3]) {
 // y(u, v) = v
 // z(u, v) = 0
 // u, v in [-1, 1]
-void reverse_parametrize_plane(double xyz[3], double uv[2]) {
+void reverse_parametrize_plane(double xyz[3], double uv[2], void *params) {
 	uv[_X] = (xyz[_X] + 1) / 2;
 	uv[_Y] = (xyz[_Y] + 1) / 2;
 }
 
 // Hyperboloid: x^2 - y^2 + z^2 = 1
-void d_hyperboloid(double p[3], double d[3]) {
+void d_hyperboloid(double p[3], double d[3], void *params) {
 	d[_X] = 2 * p[_X];
 	d[_Y] = -2 * p[_Y];
 	d[_Z] = 2 * p[_Z];
 }
 
-double solve_hyperboloid_intersection(double E[3], double D[3]) {
+double solve_hyperboloid_intersection(double E[3], double D[3], void *params) {
 	double a = sq(D[_X]) - sq(D[_Y]) + sq(D[_Z]);
 	double b = 2 * (E[_X] * D[_X] - E[_Y] * D[_Y] + E[_Z] * D[_Z]);
 	double c = sq(E[_X]) - sq(E[_Y]) + sq(E[_Z]) - 1;
@@ -156,19 +156,19 @@ double solve_hyperboloid_intersection(double E[3], double D[3]) {
 // z(u, v) = cosh(u) * sin(v)
 // u in [-arcsinh(1), arcsinh(1)]
 // v in [0, tau)
-void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
+void reverse_parametrize_hyperboloid(double xyz[3], double uv[2], void *params) {
 	uv[_X] = (asinh(xyz[_Y]) / asinh(1) + 1) / 2;
 	uv[_Y] = atanp(xyz[_Z], xyz[_X]) / TAU;
 }
 
 // Cone: = x^2 + y^2 - z^2 = 0
-void d_cone(double p[3], double d[3]) {
+void d_cone(double p[3], double d[3], void *params) {
 	d[_X] = 2 * p[_X];
 	d[_Y] = 2 * p[_Y];
 	d[_Z] = -2 * p[_Z];
 }
 
-double solve_cone_intersection(double E[3], double D[3]) {
+double solve_cone_intersection(double E[3], double D[3], void *params) {
 	double a = sq(D[_X]) + sq(D[_Y]) - sq(D[_Z]);
 	double b = 2 * (E[_X] * D[_X] + E[_Y] * D[_Y] - E[_Z] * D[_Z]);
 	double c = sq(E[_X]) + sq(E[_Y]) - sq(E[_Z]);
@@ -198,13 +198,13 @@ double solve_cone_intersection(double E[3], double D[3]) {
 // z(u, v) = v
 // u in [0, tau)
 // v in [0, 1]
-void reverse_parametrize_cone(double xyz[3], double uv[2]) {
+void reverse_parametrize_cone(double xyz[3], double uv[2], void *params) {
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
 	uv[_Y] = xyz[_Z];
 }
 
 // Annulus: z = 0
-double solve_annulus_intersection(double E[3], double D[3]) {
+double solve_annulus_intersection(double E[3], double D[3], void *params) {
 	if (D[_Z] == 0) return -1;
 	double t = -E[_Z] / D[_Z];
 	double x = E[_X] + t * D[_X];
@@ -219,12 +219,12 @@ double solve_annulus_intersection(double E[3], double D[3]) {
 // z(u, v) = 0
 // u in [0, tau)
 // v in [1, 2]
-void reverse_parametrize_annulus(double xyz[3], double uv[2]) {
+void reverse_parametrize_annulus(double xyz[3], double uv[2], void *params) {
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
 	uv[_Y] = sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - 1;
 }
 
-void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
+void (*gradient[OBJ_COUNT])(double[3], double[3], void *) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
@@ -233,7 +233,7 @@ void (*gradient[OBJ_COUNT])(double[3], double[3]) = {
 	d_plane
 };
 
-double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
+double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3], void *) = {
 	solve_sphere_intersection,
 	solve_cylinder_intersection,
 	solve_plane_intersection,
@@ -242,7 +242,7 @@ double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3]) = {
 	solve_annulus_intersection
 };
 
-void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2]) = {
+void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2], void *) = {
 	reverse_parametrize_sphere,
 	reverse_parametrize_cylinder,
 	reverse_parametrize_plane,
