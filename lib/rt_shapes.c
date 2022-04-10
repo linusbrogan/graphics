@@ -204,24 +204,37 @@ void reverse_parametrize_cone(double xyz[3], double uv[2], void *params) {
 }
 
 // Annulus: z = 0
+// Parameters: inner radius R, annulus width r
+// Constraints: R > r > 0
+double default_annulus_parameters[2] = {1, 2};
 double solve_annulus_intersection(double E[3], double D[3], void *params) {
+	if (params == NULL) params = default_annulus_parameters;
+	double *parameters = params;
+	double R = parameters[0];
+	double r = parameters[1];
+
 	if (D[_Z] == 0) return -1;
 	double t = -E[_Z] / D[_Z];
 	double x = E[_X] + t * D[_X];
 	double y = E[_Y] + t * D[_Y];
 	double radius = sqrt(sq(x) + sq(y));
-	if (radius < 1 || radius > 2) return -1;
+	if (radius < R || radius > R + r) return -1;
 	return t;
 }
 
-// x(u, v) = v * cos(u)
-// y(u, v) = v * sin(u)
+// x(u, v) = (R + r * v) * cos(u)
+// y(u, v) = (R + r * v) * sin(u)
 // z(u, v) = 0
 // u in [0, tau)
-// v in [1, 2]
+// v in [0, 1]
 void reverse_parametrize_annulus(double xyz[3], double uv[2], void *params) {
+	if (params == NULL) params = default_annulus_parameters;
+	double *parameters = params;
+	double R = parameters[0];
+	double r = parameters[1];
+
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
-	uv[_Y] = sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - 1;
+	uv[_Y] = (sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / r;
 }
 
 void (*gradient[OBJ_COUNT])(double[3], double[3], void *) = {
