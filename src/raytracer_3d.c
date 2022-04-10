@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 		// Reset frame
 		LG_rgb(0, 0, 0);
 		LG_clear();
-		objects = 0;
+		clear_objects();
 
 		// Configure frame
 		t = 0.1 * frame;
@@ -83,8 +83,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 1;
 		object_color[objects][_B] = 0.5;
 		object_reflectivity[objects] = 0.7;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = half_width;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = half_width;	T_n++;
@@ -98,9 +96,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 1;
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
@@ -116,9 +111,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 1;
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
@@ -134,9 +126,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 1;
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
@@ -152,9 +141,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 1;
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
@@ -171,9 +157,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 1;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = 0.5;	T_n++;
@@ -187,9 +170,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 1;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
 		double scale = 1 / cosh(asinh(1));
@@ -208,7 +188,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
 		object_reflectivity[objects] = 0.2;
-		object_opacity[objects] = 1;
 		object_texture[objects] = TM_EARTH;
 		T_n = 0;
 		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
@@ -228,8 +207,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 0;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
 		object_texture[objects] = TM_CHECKERBOARD;
 		T_n = 0;
 		T_type[T_n] = NZ;	T_param[T_n] = -1;	T_n++;

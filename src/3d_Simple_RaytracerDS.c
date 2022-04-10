@@ -27,7 +27,7 @@ int main() {
 	// Reset frame
 	LG_rgb(0, 0, 0);
 	LG_clear();
-	objects = 0;
+	clear_objects();
 
 	// Configure frame
 	double eye[3] = {0, 400, -1000};
@@ -48,9 +48,6 @@ int main() {
 	object_color[objects][_R] = 0.8;
 	object_color[objects][_G] = 0.8;
 	object_color[objects][_B] = 0.8;
-	object_reflectivity[objects] = 0;
-	object_opacity[objects] = 1;
-	object_texture[objects] = TM_SOLID_COLOR;
 	T_n = 0;
 	T_type[T_n] = SX;	T_param[T_n] = 800;	T_n++;
 	T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -66,9 +63,6 @@ int main() {
 		object_color[objects][_R] = 1;
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0.8;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 500;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 100;	T_n++;
@@ -86,9 +80,6 @@ int main() {
 		object_color[objects][_R] = 0.8;
 		object_color[objects][_G] = 0.4;
 		object_color[objects][_B] = 0.2;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 40;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 150;	T_n++;

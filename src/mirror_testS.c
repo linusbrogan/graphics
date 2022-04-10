@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 		// Reset frame
 		LG_rgb(0, 0, 0);
 		LG_clear();
-		objects = 0;
+		clear_objects();
 
 		// Configure frame
 		t = 0.1 * frame;
@@ -80,9 +80,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 2;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -97,9 +94,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 2;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -115,9 +109,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 2;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -133,9 +124,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0;
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 2;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
@@ -151,9 +139,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.7;
 		object_color[objects][_G] = 0.7;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 10;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 2;	T_n++;
@@ -169,9 +154,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_R] = 0.7;
 		object_color[objects][_G] = 0.7;
 		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 1;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 2;	T_n++;
@@ -189,8 +171,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 0;
 		object_reflectivity[objects] = 0.8;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 30;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 30;	T_n++;
@@ -208,8 +188,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.8;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 20;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 20;	T_n++;
@@ -228,8 +206,6 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_G] = 0.2;
 		object_color[objects][_B] = 0.2;
 		object_reflectivity[objects] = -1; // No light model
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 100;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 100;	T_n++;
@@ -239,11 +215,13 @@ int main(int argc, char *argv[]) {
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		//objects++;
 
 		render();
 		save_image(frame);
 		frame++;
+
+		// Count the world sphere when clearing objects
+		objects++;
 	}
 
 	return 0;
