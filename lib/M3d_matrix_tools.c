@@ -500,12 +500,13 @@ int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3]
 	//mtype[n] = TY;	mparam[n] = -coi_3d[1];	n++; // should be zero
 	mtype[n] = TZ;	mparam[n] = -coi_3d[2];	n++;
 	// Rotate to eye angle
-	double ElC = sqrt(pow(coi_3d[2], 2) + pow(lr, 2));
-	double eye_angle = asin(lr / ElC); //= -lr;
+//	double ElC = sqrt(pow(coi_3d[2], 2) + pow(lr, 2));
+//	double eye_angle = asin(lr / ElC); //= -lr;
 	// OR eye_angle = atan2(lr / coi_3d[2]); // where coi_3d[2] IS |EC|
-	mtype[n] = RY;	mparam[n] = eye_angle / DEGREES;	n++;
+//	mtype[n] = RY;	mparam[n] = eye_angle / DEGREES;	n++;
 	// Put new eye back at origin
-	double new_eye_radius = ElC / coi_3d[2];
+	double new_eye_radius = 1;//ElC / coi_3d[2];
+	mtype[n] = HXZ;	mparam[n] = -lr / coi_3d[2];	n++;
 	mtype[n] = TZ;	mparam[n] = coi_3d[2] * new_eye_radius;	n++;
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
