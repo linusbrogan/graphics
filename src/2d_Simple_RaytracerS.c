@@ -39,6 +39,7 @@ void (*gradient[4])(double, double, double[2]) = {
 };
 
 enum object_type object_types[100];
+double object_refractive_index[100];
 
 double solve_ray_intersection(int object, double E[3], double D[3]) {
 	switch (object_types[object]) {
@@ -173,7 +174,7 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 	}
 
 	if (closest_object >= 0) {
-		orient_normal(intersection, normal, tail);
+		int normal_sign = orient_normal(intersection, normal, tail);
 
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
@@ -186,21 +187,52 @@ void reflect_ray(double tail[3], double head[3], double rgb[3], int remaining_re
 		double R[3];
 		for (int i = 0; i < 3; i++) {
 			R[i] = r[i] * 30 + intersection[i];
-			intersection[i] += r[i] * 1e-10;
 		}
 
-		// Indicate direction of reflection
-		G_rgb(1, 1, 1);
-		G_line(intersection[0], intersection[1], R[0], R[1]);
+		// Find refracted ray
+		double refracted[3] = {0, 0, 0};
+		double n_obj = object_refractive_index[closest_object];
+		double n1 = 1; // Vacuum vacuum outside of object (might want to be more clever)
+		double n2 = n_obj;
+		// Check ray direction: inward or outward?
+		double refraction_orientation = normal_sign * dot_product(L, normal);
+		if (refraction_orientation > 0) {
+			double temp = n1;
+			n1 = n2;
+			n2 = temp;
+		}
+		int refraction = find_refraction_vector(n1, n2, normal, L, refracted);
 
-		// Find color from reflection
-		double reflected_rgb[3];
-		reflect_ray(intersection, R, reflected_rgb, remaining_reflections - 1);
+		double refracted_rgb[3] = {0, 0, 0};
+		if (refraction) {
+			normalize(refracted);
+			double refracted_tail[3];
+			double refracted_head[3];
+			double normal_head[3];
+			double normal_tail[3];
+			for (int i = 0; i < 3; i++) {
+				refracted_tail[i] = intersection[i] + refracted[i] * 1e-5;
+				refracted_head[i] = intersection[i] + refracted[i] * 30;
+				normal_head[i] = intersection[i] + normal[i] * 30;
+				normal_tail[i] = intersection[i] - normal[i] * 30;
+			}
 
-		// Find object color, including reflection
-		double ref = reflectivity[closest_object];
+			// Indicate normal and direction of refraction
+			G_rgb(0.75, 0.5, 0.5);
+			G_line(intersection[0], intersection[1], normal_head[0], normal_head[1]);
+			G_rgb(0.5, 0.75, 0.75);
+			G_line(intersection[0], intersection[1], normal_tail[0], normal_tail[1]);
+			G_rgb(1, 1, 1);
+			G_line(refracted_tail[0], refracted_tail[1], refracted_head[0], refracted_head[1]);
+
+			// Find refracted color
+			reflect_ray(refracted_tail, refracted_head, refracted_rgb, remaining_reflections - 1);
+		}
+
+		// Find object color, including refraction
+		double refr = 0.5;
 		for (int i = 0; i < 3; i++) {
-			rgb[i] = color[closest_object][i] * (1 - ref) + reflected_rgb[i] * ref;
+			rgb[i] = color[closest_object][i] * (1 - refr) + refracted_rgb[i] * refr;
 		}
 
 		// Draw intersection point and ray to intersection
@@ -286,6 +318,7 @@ int test01()
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_CIRCLE;
+	object_refractive_index[num_objects] = 1.5;
     color[num_objects][0] = 0.0 ;
     color[num_objects][1] = 0.8 ; 
     color[num_objects][2] = 0.0 ;
@@ -306,6 +339,7 @@ int test01()
 
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_CIRCLE;
+	object_refractive_index[num_objects] = 1;
     color[num_objects][0] = 1.0 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 0.0 ;
@@ -325,6 +359,7 @@ int test01()
     num_objects++ ; // don't forget to do this
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_CIRCLE;
+	object_refractive_index[num_objects] = 1;
     color[num_objects][0] = 0.3 ;
     color[num_objects][1] = 0.3 ; 
     color[num_objects][2] = 1.0 ;
@@ -344,6 +379,7 @@ int test01()
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_CIRCLE;
+	object_refractive_index[num_objects] = 1;
     color[num_objects][0] = 0.5 ;
     color[num_objects][1] = 1.0 ; 
     color[num_objects][2] = 1.0 ;
@@ -363,6 +399,7 @@ int test01()
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_HYPERBOLA;
+	object_refractive_index[num_objects] = 3;
     color[num_objects][0] = 0.8;
     color[num_objects][1] = 0;
     color[num_objects][2] = 0.2;
@@ -382,6 +419,7 @@ int test01()
     num_objects++ ; // don't forget to do this        
     //////////////////////////////////////////////////////////////
 	object_types[num_objects] = OBJ_LINE;
+	object_refractive_index[num_objects] = 1.33;
     color[num_objects][0] = 0.8;
     color[num_objects][1] = 0;
     color[num_objects][2] = 0.2;
