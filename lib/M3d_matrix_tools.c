@@ -402,51 +402,115 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 
 
 /////////////////////
+double M3d_dot_product(double v[3], double w[3]) {
+	double sum = 0;
+	for (int i = 0; i < 3; i++) {
+		sum += v[i] * w[i];
+	}
+	return sum;
+}
 
-int M3d_view(double view[4][4], double view_inverse[4][4], double eye[3], double coi[3], double up[3]) {
-	double A[4][4];
-	double B[4][4];
-	double C[4][4];
-	double D[4][4];
-	double Ai[4][4];
-	double Bi[4][4];
-	double Ci[4][4];
-	double Di[4][4];
-	double Up[3];
-	double Uplen;
 
-	double a = coi[0] - eye[0];
-	double b = coi[1] - eye[1];
-	double c = coi[2] - eye[2];
-	double p = sqrt(a * a + c * c);
-	double r = sqrt(b * b + p * p);
+void M3d_normalize(double v[3]) {
+	double length = sqrt(M3d_dot_product(v, v));
+	if (length == 0) return;
+	for (int i = 0; i < 3; i++) {
+		v[i] /= length;
+	}
+}
 
-	M3d_make_translation(A, -eye[0], -eye[1], -eye[2]);
-	M3d_make_y_rotation_cs(B, c/p, -a/p);
-	M3d_make_x_rotation_cs(C, p/r, b/r);
 
-	M3d_make_identity(view);
-	M3d_mat_mult(view, A, view);
-	M3d_mat_mult(view, B, view);
-	M3d_mat_mult(view, C, view);
 
-	M3d_mat_mult_pt(Up, view, up);
-	Uplen = sqrt(Up[0] * Up[0] + Up[1] * Up[1]);
-	if (Uplen == 0) return 0;
-	M3d_make_z_rotation_cs(D, Up[1]/Uplen, Up[0]/Uplen);
-	M3d_mat_mult(view, D, view);
+int M3d_view_3d(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3], double lr) {
+// TRY 1
+//	lr *= -1; // Fix LH coordinate problem
+	// for RH coordinates, but we are in LH coordinates :( idk
+	double EC[3];
+	double EU[3];
+	for (int i = 0; i < 3; i++) {
+		EC[i] = coiA[i] - eyeA[i];
+		EU[i] = upA[i] - eyeA[i];
+	}
+	double ECxEU[3];
+	M3d_x_product(ECxEU, EC, EU);
+	M3d_normalize(ECxEU);
+//	for (int i = 0; i < 3; i++) {
+//		ECxEU[i] *= lr;
+//		eyeA[i] += ECxEU[i];
+//		upA[i] += ECxEU[i];
+//	}
 
-	// now make the inverse
+	// Initialize movement sequence
+	int mtype[100];
+	double mparam[100];
+	int n = 0;
 
-	M3d_make_translation(Ai, eye[0], eye[1], eye[2]);
-	M3d_make_y_rotation_cs(Bi, c/p, a/p);
-	M3d_make_x_rotation_cs(Ci, p/r, -b/r);
-	M3d_make_z_rotation_cs(Di, Up[1]/Uplen, -Up[0]/Uplen);
-	M3d_make_identity(view_inverse);
-	M3d_mat_mult(view_inverse, Di, view_inverse);
-	M3d_mat_mult(view_inverse, Ci, view_inverse);
-	M3d_mat_mult(view_inverse, Bi, view_inverse);
-	M3d_mat_mult(view_inverse, Ai, view_inverse);
+	// Copy inputs
+	double eye[3];
+	double coi[3];
+	double coi0[3];
+	double up[3];
+	double coi_3d[3];
+	double eye_3d[3];
+	for (int i = 0; i < 3; i++) {
+		eye[i] = eyeA[i];
+		coi[i] = coiA[i];
+		coi0[i] = coiA[i];
+		up[i] = upA[i];
+		coi_3d[i] = coiA[i];
+		eye_3d[i] = eyeA[i];
+	}
 
-	return 1;
+	// Create temporary movement sequence matrix
+	double t[4][4];
+	double t_i[4][4];
+
+	// Translate camera by negative of its location
+	mtype[n] = TX;	mparam[n] = -eye[0];	n++;
+	mtype[n] = TY;	mparam[n] = -eye[1];	n++;
+	mtype[n] = TZ;	mparam[n] = -eye[2];	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi, t, coi);
+
+	// Rotate about y-axis to bring CoI onto y-z plane
+	double theta = atan2(coi[0], coi[2]) / DEGREES;
+	mtype[n] = RY;	mparam[n] = -theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi0, t, coi0);
+
+	// Rotate about x-axis to bring CoI onto z-axis
+	theta = atan2(coi0[1], coi0[2]) / DEGREES;
+	mtype[n] = RX;	mparam[n] = theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(up, t, up);
+
+	// Rotate about z-axis to bring Up onto y-z plane
+	theta = atan2(up[0], up[1]) / DEGREES;
+	mtype[n] = RZ;	mparam[n] = theta;	n++;
+
+	// Shift eye
+//OLD:
+	//mtype[n] = TX;	mparam[n] = -lr;	n++;
+
+// new (v4) (3DDDD)
+	// Move CoI to origin
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi_3d, t, coi_3d);
+	//mtype[n] = TX;	mparam[n] = -coi_3d[0];	n++; // should be zero
+	//mtype[n] = TY;	mparam[n] = -coi_3d[1];	n++; // should be zero
+	mtype[n] = TZ;	mparam[n] = -coi_3d[2];	n++;
+	// Rotate to eye angle
+	double ElC = sqrt(pow(coi_3d[2], 2) + pow(lr, 2));
+	double eye_angle = asin(lr / ElC); //= -lr;
+	// OR eye_angle = atan2(lr / coi_3d[2]); // where coi_3d[2] IS |EC|
+	mtype[n] = RY;	mparam[n] = eye_angle / DEGREES;	n++;
+	// Put new eye back at origin
+	double new_eye_radius = ElC / coi_3d[2];
+	mtype[n] = TZ;	mparam[n] = coi_3d[2] * new_eye_radius;	n++;
+
+	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
+}
+
+int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3]) {
+	return M3d_view_3d(v, v_i, eyeA, coiA, upA, 0);
 }

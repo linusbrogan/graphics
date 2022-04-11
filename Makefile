@@ -7,6 +7,7 @@ SRC_FILES = \
 	functional \
 	get_image_from_file \
 	growing_sun \
+	lr \
 	M3d_test_sequence \
 	M3d_test_view \
 	mirror_testS \
@@ -46,7 +47,9 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 default: clean raytracer
 
-raytracer: build/raytracer_3d build/movie_player asset/earth.xwd
+raytracer: build/3d_Simple_RaytracerDS build/raytracer_3d build/movie_player asset/earth.xwd
+	./build/3d_Simple_RaytracerDS
+	display out/3d_Simple_RaytracerDS.xwd
 	./build/raytracer_3d
 	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
 
@@ -73,8 +76,6 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	./build/2d_Simple_RaytracerS
 	-timeout 10 ./build/3d_shapes
 	./build/movie_player 1080 720 out/Graph_3D/frame_ 0 $$(($$(ls out/Graph_3D | wc -l) - 1)) 1 40000
-	./build/3d_Simple_RaytracerDS
-	display out/3d_Simple_RaytracerDS.xwd
 	./build/checkerboard 10 100
 	./build/FPToolkitDemoB
 	./build/functional

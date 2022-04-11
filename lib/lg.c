@@ -8,6 +8,8 @@
 #include <xwd.h>
 #include <graphics.h>
 
+
+
 int LG_WINDOW_WIDTH = 0;
 int LG_WINDOW_HEIGHT = 0;
 #ifndef LG_USE_FPT
