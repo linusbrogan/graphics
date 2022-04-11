@@ -45,7 +45,7 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 	return 2;
 }
 
-void orient_normal(double intersection[3], double normal[3], double eye[3]) {
+int orient_normal(double intersection[3], double normal[3], double eye[3]) {
 	// Find vector from intersection point to eye
 	double e[3];
 	for (int i = 0; i < 3; i++) {
@@ -54,11 +54,14 @@ void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 
 	// Orient the normal on the same side as the eye
 	double dot = dot_product(normal, e);
+	double normal_sign = 1;
 	if (dot < 0) {
+		normal_sign = -1;
 		for (int i = 0; i < 3; i++) {
 			normal[i] *= -1;
 		}
 	}
 
 	normalize(normal);
+	return normal_sign;
 }
