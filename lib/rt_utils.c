@@ -104,7 +104,6 @@ int find_refraction_vector(double n1, double n2, double normal[3], double v1[3],
 	double V_i[4][4];
 	M3d_view(V, V_i, eye, coi, up);
 	double R[4][4];
-//phi*=-1;
 	M3d_make_y_rotation_cs(R, cos(phi), sin(phi));
 	double M[4][4];
 	M3d_mat_mult(M, V_i, R);

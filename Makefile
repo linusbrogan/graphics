@@ -40,8 +40,7 @@ SRC_TARGETS = $(addprefix build/,$(SRC_FILES))
 LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
 
 INCLUDES = -Iinclude
-OPTIMIZATION = -O2
-C_FLAGS = -lm -lX11 $(OPTIMIZATION) $(INCLUDES)
+C_FLAGS = -lm -lX11 $(INCLUDES)
 
 .PHONY: all clean default test
 

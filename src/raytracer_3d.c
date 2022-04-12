@@ -97,14 +97,15 @@ int main(int argc, char *argv[]) {
 		object_opacity[objects] = 0.1;
 		object_refractive_index[objects] = 1.5;
 		T_n = 0;
-		double rad = 0.1;
-		double mag_x = size * 1.5 * (1 - 2 * t);
+		double rad = 0.25;
+		double mag_x = -(-1.5 + 2.25 * t);
+		double mag_y = 0 - 1.5 * t;
 		double mag_z = 0;
 		T_type[T_n] = SX;	T_param[T_n] = rad;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = rad;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = rad;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = mag_z;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -0.5;	T_n++;
+		T_type[T_n] = TY;	T_param[T_n] = mag_y;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = mag_x;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
