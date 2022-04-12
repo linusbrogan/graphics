@@ -1,6 +1,14 @@
 #include <math.h>
 #include <m3d.h>
 
+#define EPSILON_ 1e-10
+
+int sgnn(double x) {
+	if (x > 0) return 1;
+	if (x < 0) return -1;
+	return 0;
+}
+
 double sq(double x) {
 	return x * x;
 }
@@ -69,9 +77,9 @@ int orient_normal(double intersection[3], double normal[3], double eye[3]) {
 
 int find_refraction_vector(double n1, double n2, double normal[3], double v1[3], double v2[3]) {
 	double c1 = -dot_product(v1, normal) / sqrt(dot_product(v1, v1) * dot_product(normal, normal));
-	double sign = sgn(c1); // +1 if normal is on same side as incident vector v1, otherwise -1
+	double sign = sgnn(c1); // +1 if normal is on same side as incident vector v1, otherwise -1
 	c1 = fabs(c1);
-	if (c1 >= 1 - EPSILON) {
+	if (c1 >= 1 - EPSILON_) {
 		for (int i = 0; i < 3; i++) {
 			v2[i] = v1[i];
 		}
@@ -79,7 +87,7 @@ int find_refraction_vector(double n1, double n2, double normal[3], double v1[3],
 	}
 	double theta1 = acos(c1);
 	double s2 = sin(theta1) * n1 / n2;
-	if (s2 >= 1 - EPSILON) return 0;
+	if (s2 >= 1 - EPSILON_) return 0;
 	double theta2 = asin(s2);
 
 	double X[3];
@@ -94,8 +102,9 @@ int find_refraction_vector(double n1, double n2, double normal[3], double v1[3],
 	double *up = X; // Cross product points up
 	double V[4][4];
 	double V_i[4][4];
-	M3d_view_(M, M_i, eye, coi, up);
-	double R[4][4;
+	M3d_view(V, V_i, eye, coi, up);
+	double R[4][4];
+//phi*=-1;
 	M3d_make_y_rotation_cs(R, cos(phi), sin(phi));
 	double M[4][4];
 	M3d_mat_mult(M, V_i, R);

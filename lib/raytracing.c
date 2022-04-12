@@ -112,7 +112,7 @@ int trace_ray(
 	if (closest_object >= 0) {
 		if (check_shadow) return t_min >= 0 && t_min <= 1;
 
-		orient_normal(intersection, normal, tail);
+		int normal_sign = orient_normal(intersection, normal, tail);
 
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
@@ -149,7 +149,7 @@ int trace_ray(
 		// Check ray direction: inward or outward?
 		double refraction_orientation = normal_sign * dot_product(L, normal);
 		if (refraction_orientation > 0) {
-			n1 = n_obj
+			n1 = n_obj;
 			n2 = 1;
 		}
 		int refraction = find_refraction_vector(n1, n2, normal, L, refracted_vector);
@@ -165,7 +165,7 @@ int trace_ray(
 			}
 
 			// Find refracted color
-			reflect_ray(refracted_tail, refracted_head, refracted_rgb, remaining_collisions - 1);
+			trace_ray(refracted_tail, refracted_head, refracted_rgb, remaining_collisions - 1, intensity, 0);
 		}
 
 
@@ -217,7 +217,7 @@ int trace_ray(
 		double eye[3] = {0, 0, 0};
 		Light_Model_rt(inherent_rgb, eye, intersection, normal, rgb, shadowed);
 		for (int i = 0; i < 3; i++) {
-			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
+			rgb[i] = rgb[i] * (1 - trans) + refracted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;
 		}
 		return 1;

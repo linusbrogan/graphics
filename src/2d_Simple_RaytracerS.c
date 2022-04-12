@@ -41,7 +41,7 @@ void (*gradient[4])(double, double, double[2]) = {
 enum object_type object_types[100];
 double object_refractive_index[100];
 
-int find_refraction_vector(double n1, double n2, double normal[3], double v1[3], double v2[3]) {
+int _find_refraction_vector(double n1, double n2, double normal[3], double v1[3], double v2[3]) {
 	double c1 = -dot_product(v1, normal) / sqrt(dot_product(v1, v1) * dot_product(normal, normal));
 	double sign = sgn(c1); // +1 if normal is on same side as incident vector v1, otherwise -1
 	c1 = fabs(c1);
