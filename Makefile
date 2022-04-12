@@ -16,6 +16,7 @@ SRC_FILES = \
 	space_station \
 	sprint \
 	stickfigureS \
+	uv_parameterization_of_triangle \
 	view_test04Mb \
 	view_test05MbS \
 	xwd_blend_example \
@@ -89,6 +90,7 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	./build/movie_player 800 800 out/Mirror_Test/frame_ 0 99 1 30000
 	./build/sprint
 	./build/stickfigureS 640 30000
+	./build/uv_parameterization_of_triangle
 	./build/view_test04Mb
 	display out/view_test04Mb0000.jpg
 	./build/view_test05MbS
