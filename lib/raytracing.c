@@ -22,6 +22,7 @@ double object_matrix_i[MAXIMUM_OBJECTS][4][4];
 double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
+double object_refractive_index[MAXIMUM_OBJECTS];
 enum texture_map object_texture[MAXIMUM_OBJECTS];
 int objects = MAXIMUM_OBJECTS;
 
@@ -31,6 +32,7 @@ void clear_objects() {
 		object_parameters[i] = NULL;
 		object_reflectivity[i] = 0;
 		object_opacity[i] = 1;
+		object_refractive_index[i] = 1;
 		object_texture[i] = TM_SOLID_COLOR;
 	}
 	objects = 0;
@@ -138,6 +140,35 @@ int trace_ray(
 			transmitted_tail[i] = intersection[i] + delta * EPSILON;
 			transmitted_head[i] = intersection[i] + delta;
 		}
+
+		// Find refracted ray
+		double refracted_vector[3] = {0, 0, 0};
+		double n_obj = object_refractive_index[closest_object];
+		double n1 = 1; // Assume vacuum outside of object
+		double n2 = n_obj;
+		// Check ray direction: inward or outward?
+		double refraction_orientation = normal_sign * dot_product(L, normal);
+		if (refraction_orientation > 0) {
+			n1 = n_obj
+			n2 = 1;
+		}
+		int refraction = find_refraction_vector(n1, n2, normal, L, refracted_vector);
+
+		double refracted_rgb[3] = {0, 0, 0};
+		if (refraction) {
+			normalize(refracted_vector);
+			double refracted_tail[3];
+			double refracted_head[3];
+			for (int i = 0; i < 3; i++) {
+				refracted_tail[i] = intersection[i] + refracted_vector[i] * EPSILON;
+				refracted_head[i] = intersection[i] + refracted_vector[i];
+			}
+
+			// Find refracted color
+			reflect_ray(refracted_tail, refracted_head, refracted_rgb, remaining_collisions - 1);
+		}
+
+
 
 		// Find object casting a shadow
 		double dummy_rgb[3];
