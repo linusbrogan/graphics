@@ -283,7 +283,7 @@ double solve_triangle_intersection_uvt(double E[3], double D[3], void *params, d
 		AM[i][0] = AB[i];
 		AM[i][1] = AC[i];
 		AM[i][2] = -D[i];
-		AM[i][3] E[i] - A[i];
+		AM[i][3] = E[i] - A[i];
 	}
 
 	int solutions = solve_3x3_system(AM, x);

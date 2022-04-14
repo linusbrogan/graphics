@@ -1,6 +1,6 @@
 #include <stdio.h>
-//#include <rt_shapes.h>
 #include <rt_utils.h>
+#include <rt_shapes.h>
 
 #define FOR3 for (int i = 0 ; i < 3; i++)
 
@@ -14,7 +14,11 @@ int main() {
 	};
 	double x[3];
 	int n = solve_3x3_system(AM, x);
-
 	printf("# Solutions: %d\n", n);
 	FOR3 printf("x[%d] = %lf\n", i, x[i]);
+
+	double xyz[3] = {0.25, 0.25, 0};
+	double uv[3] = {0, 0, 0};
+	reverse_parametrize_triangle(xyz, uv, NULL);
+	FOR3 printf("uv[%d] = %lf\n", i, uv[i]);
 }
