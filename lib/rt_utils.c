@@ -64,7 +64,8 @@ void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 	normalize(normal);
 }
 
-void ccc(int n, double AM[n][n + 1], double M[n][n], int column) {
+// Create a matrix for Cramer's rule
+void cramer_copy(int n, double AM[n][n + 1], double M[n][n], int column) {
 	for (int r = 0; r < n; r++) {
 		for (int c = 0; c < n; c++) {
 			M[r][c] = AM[r][c];
@@ -73,25 +74,14 @@ void ccc(int n, double AM[n][n + 1], double M[n][n], int column) {
 	}
 }
 
-// Creates a matrix for Cramer's rule
-void cramer_copy(double AM[3][4], double M[3][3], int column) {
-ccc(3, AM, M, column);return;
-	for (int r = 0; r < 3; r++) {
-		for (int c = 0; c < 3; c++) {
-			M[r][c] = AM[r][c];
-			if (c == column) M[r][c] = AM[r][3];
-		}
-	}
-}
-
 // Solve with Cramer's rule
 int solve_3x3_system(double AM[3][4], double x[3]) {
 	double M[3][3];
-	cramer_copy(AM, M, 3);
+	cramer_copy(3, AM, M, -1);
 	double det_M = M3d_det_3x3(M);
 	if (det_M == 0) return 0;
 	for (int i = 0; i < 3; i++) {
-		cramer_copy(AM, M, i);
+		cramer_copy(3, AM, M, i);
 		x[i] = M3d_det_3x3(M) / det_M;
 	}
 	return 3;
