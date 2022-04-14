@@ -9,6 +9,7 @@ enum object_type {
 	OBJ_HYPERBOLOID,
 	OBJ_CONE,
 	OBJ_ANNULUS,
+	OBJ_TRIANGLE,
 	OBJ_COUNT
 };
 
@@ -161,7 +162,7 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2], void *params) 
 	uv[_Y] = atanp(xyz[_Z], xyz[_X]) / TAU;
 }
 
-// Cone: = x^2 + y^2 - z^2 = 0
+// Cone: x^2 + y^2 - z^2 = 0
 void d_cone(double p[3], double d[3], void *params) {
 	d[_X] = 2 * p[_X];
 	d[_Y] = 2 * p[_Y];
@@ -237,13 +238,89 @@ void reverse_parametrize_annulus(double xyz[3], double uv[2], void *params) {
 	uv[_Y] = (sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / r;
 }
 
+// Triangle with corners A, B, C
+// Parameters: coordinates of A, B, C
+// P(u, v) = A + u * (B-A) + v * (C-A)
+// u in [0, 1]
+// v in [0, 1 - u]
+double default_triangle_parameters[3 * 3] = {
+	0, 0, 0,
+	1, 0, 0,
+	0, 1, 0
+};
+
+void d_triangle(double p[3], double d[3], void *params) {
+	if (params == NULL) params = default_triangle_parameters;
+	double *parameters = params;
+	double *A = parameters;
+	double *B = parameters + 3;
+	double *C = parameters + 6;
+	double AB[3];
+	double AC[3];
+	for (int i = 0; i < 3; i++) {
+		AB[i] = B[i] - A[i];
+		AC[i] = C[i] - A[i];
+	}
+
+	M3d_x_product(d, AB, AC);
+}
+
+double solve_triangle_intersection_uvt(double E[3], double D[3], void *params, double x[3]) {
+	if (params == NULL) params = default_triangle_parameters;
+	double *parameters = params;
+	double *A = parameters;
+	double *B = parameters + 3;
+	double *C = parameters + 6;
+	double AB[3];
+	double AC[3];
+	for (int i = 0; i < 3; i++) {
+		AB[i] = B[i] - A[i];
+		AC[i] = C[i] - A[i];
+	}
+
+	double AM[3][4];
+	for (int i = 0; i < 3; i++) {
+		AM[i][0] = AB[i];
+		AM[i][1] = AC[i];
+		AM[i][2] = -D[i];
+		AM[i][3] E[i] - A[i];
+	}
+
+	int solutions = solve_3x3_system(AM, x);
+	if (solutions <= 0) return -1;
+	double u = x[0];
+	double v = x[1];
+	double t = x[2];
+	if (u < 0 || u > 1 || v < 0 || v > 1 - u || t < 0) return -1;
+	return t;
+}
+
+double solve_triangle_intersection(double E[3], double D[3], void *params) {
+	double x[3];
+	return solve_triangle_intersection_uvt(E, D, params, x);
+}
+
+void reverse_parametrize_triangle(double xyz[3], double uv[2], void *params) {
+	double grad[3];
+	d_triangle(xyz, grad, params);
+	double P[3];
+	for (int i = 0; i < 3; i++) {
+		P[i] = xyz[i] - grad[i] / 2;
+	}
+	double uvt[3];
+	solve_triangle_intersection_uvt(xyz, grad, params, uvt);
+	uv[_X] = uvt[_X];
+	uv[_Y] = uvt[_Y];
+}
+
 void (*gradient[OBJ_COUNT])(double[3], double[3], void *) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
 	d_hyperboloid,
 	d_cone,
-	d_plane
+	d_plane,
+	d_triangle
 };
 
 double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3], void *) = {
@@ -252,7 +329,8 @@ double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3], void *) = {
 	solve_plane_intersection,
 	solve_hyperboloid_intersection,
 	solve_cone_intersection,
-	solve_annulus_intersection
+	solve_annulus_intersection,
+	solve_triangle_intersection
 };
 
 void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2], void *) = {
@@ -261,5 +339,6 @@ void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2], void *) = {
 	reverse_parametrize_plane,
 	reverse_parametrize_hyperboloid,
 	reverse_parametrize_cone,
-	reverse_parametrize_annulus
+	reverse_parametrize_annulus,
+	reverse_parametrize_triangle
 };

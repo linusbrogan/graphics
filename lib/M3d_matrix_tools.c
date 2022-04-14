@@ -451,7 +451,7 @@ int M3d_view(double view[4][4], double view_inverse[4][4], double eye[3], double
 	return 1;
 }
 
-double M3d_det_3x3(double M[3][3]) {
+double M3d_det_3x3(double **M) {
 	double sum = 0;
 	for (int i = 0; i < 3; i++) {
 		double product_p = 1;
@@ -459,10 +459,13 @@ double M3d_det_3x3(double M[3][3]) {
 		for (int j = 0; j < 3; j++) {
 			int r = j;
 			int c = (i + j) % 3;
-			product_p *= M[r][c];
+			double *row = M[r];
+			double n = ((double *) row)[c];
+			product_p *= n;
 			r = 3 - j - 1;
 			product_m *= M[r][c];
 		}
 		sum += product_p - product_m;
 	}
+	return sum;
 }

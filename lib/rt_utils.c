@@ -1,4 +1,5 @@
 #include <math.h>
+#include <m3d.h>
 
 double sq(double x) {
 	return x * x;
@@ -61,4 +62,28 @@ void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 	}
 
 	normalize(normal);
+}
+
+void swap(double *a, double *b) {
+	double temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+void swap_columns(int c1, int c2, double **M, int rows) {
+	for (int r = 0; r < rows; r++) {
+		swap(&(M[r][c1]), &(M[r][c2]));
+	}
+}
+
+// Solve with Cramer's rule
+int solve_3x3_system(double AM[3][4], double x[3]) {
+	double det_M = M3d_det_3x3((double **)AM);
+	if (det_M == 0) return 0;
+	for (int i = 0; i < 3; i++) {
+		swap_columns(i, 3, (double **) AM, 3);
+		x[i] = M3d_det_3x3((double **) AM) / det_M;
+		swap_columns(3, i, (double **) AM, 3);
+	}
+	return 3;
 }
