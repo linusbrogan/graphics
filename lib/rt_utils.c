@@ -1,14 +1,6 @@
 #include <math.h>
 #include <m3d.h>
 
-#define N "\n"
-#define T "\t"
-#define TT "\t\t"
-#define TTT "\t\t\t"
-#define TTTT "\t\t\t\t"
-
-
-
 double sq(double x) {
 	return x * x;
 }
@@ -72,39 +64,35 @@ void orient_normal(double intersection[3], double normal[3], double eye[3]) {
 	normalize(normal);
 }
 
-// Creates a matrix for Cramer's rule
-void cramer_copy(double **AM, int n, double **M, int column) {
-printf(TTTT"In cramer copy"N);
+void ccc(int n, double AM[n][n + 1], double M[n][n], int column) {
 	for (int r = 0; r < n; r++) {
 		for (int c = 0; c < n; c++) {
-printf(TTTT"r,c=%d,%d"N, r, c);
-printf(TTTT"AM@%p"N, AM);
-printf(TTTT"AM[0]@%p"N, AM[0]);
-printf(TTTT"AM[0][0]=%lf"N, AM[0][0]);
-double a = AM[r][c];
-printf(TTTT"AM[r][c]=%lf"N, a);
 			M[r][c] = AM[r][c];
 			if (c == column) M[r][c] = AM[r][n];
 		}
 	}
 }
 
+// Creates a matrix for Cramer's rule
+void cramer_copy(double AM[3][4], double M[3][3], int column) {
+ccc(3, AM, M, column);return;
+	for (int r = 0; r < 3; r++) {
+		for (int c = 0; c < 3; c++) {
+			M[r][c] = AM[r][c];
+			if (c == column) M[r][c] = AM[r][3];
+		}
+	}
+}
+
 // Solve with Cramer's rule
 int solve_3x3_system(double AM[3][4], double x[3]) {
-printf(TT"Solve_3x3: on AM@%p"N, AM);
 	double M[3][3];
-printf(TT"Gonna cramer copy"N);
-	cramer_copy((double **) AM, 3, (double **) M, 3);
-printf(TT"Cramer copied"N);
+	cramer_copy(AM, M, 3);
 	double det_M = M3d_det_3x3(M);
-printf(TT"det(M) = %lf"N, det_M);
 	if (det_M == 0) return 0;
 	for (int i = 0; i < 3; i++) {
-printf(TTT"Solver loop iteration %d"N, i);
-		cramer_copy((double **) AM, 3, (double **) M, i);
-printf(TTT"Copied matrix"N);
+		cramer_copy(AM, M, i);
 		x[i] = M3d_det_3x3(M) / det_M;
-printf(TTT"x[%d] = %lf"N, i, x[i]);
 	}
 	return 3;
 }

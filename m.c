@@ -7,7 +7,6 @@
 int main() {
 	setbuf(stdout, NULL);
 
-printf("main:"N);
 	double AM[3][4] = {
 		{3, 7, 2, 25},
 		{1, 3, 1, 11},
@@ -21,14 +20,8 @@ printf("main:"N);
 	double *BM[3] = {R1, R2, R3};
 
 	double x[3];
-printf(T"Gonna solve the system             AM@%p, AM[0]@%p, AM[0][0]@%p"N, AM, AM[0], &AM[0][0]);
-for (int r=0;r<3;r++)for(int c=0;c<4;c++)printf(T"Gonna solve the system (r,c)=(%d,%d) AM@%p, AM[r]=%p,@%p, AM[r][c]=%lf,\t@%p"N, r,c, AM, AM[r],&AM[r], AM[r][c],&AM[r][c]);
-for (int r=0;r<3;r++)for(int c=0;c<4;c++)printf(T"Gonna solve the system (r,c)=(%d,%d) BM@%p, BM[r]=%p,@%p, BM[r][c]=%lf,\t@%p"N, r,c, BM, BM[r],&BM[r], BM[r][c],&BM[r][c]);
-printf(T"Wack = %lf"N, (int *)(AM)[10]);
-	int n = solve_3x3_system(&AM[0], x);
-printf(T"Solved AM, %d solutions"N, n);
-	n = solve_3x3_system(BM, x);
-printf(T"Solved BM, %d solutions"N, n);
+	int n = solve_3x3_system(AM, x);
+	//n = solve_3x3_system(BM, x);
 
 
 	printf("# Solutions: %d\n", n);
