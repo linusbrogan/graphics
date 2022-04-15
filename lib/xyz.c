@@ -1,3 +1,14 @@
+class Object{
+	int points;
+	double pts[3 * points]
+	Poly *polys[];
+}
+class Poly {
+	int edges;
+	int points[];
+}
+
+
 #include <stdio.h>
 
 struct polygon {
