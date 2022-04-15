@@ -71,3 +71,77 @@ struct shape *load_shape(char *file_name) {
 	fclose(fp);
 	return shape;
 }
+
+void destroy_shape(struct shape *shape) {
+	if (shape == NULL) return;
+	if (shape->polygon_list != NULL) {
+		for (int poly = 0; poly < shape->polygons; poly++) {
+			free(shape->polygon_list[poly].point_list);
+		}
+	}
+	free(shape->polygon_list);
+	free(shape->point_list);
+	free(shape);
+}
+
+struct triangles {
+	int n;
+	double *points;
+};
+
+// WARNING: Assumes all polygons are convex
+struct triangles *convert_shape_to_triangles(struct shape *shape) {
+	struct triangles *t = malloc(sizeof(struct triangles));
+	check_pointer(t, "could not allocate triangles");
+	t->n = 0;
+
+	// Count triangles
+	for (int poly = 0; poly < shape->polygons; poly++) {
+		int points = shape->polygon_list[poly].points;
+		int ts = points - 2;
+		if (ts > 0) t->n += ts;
+	}
+
+	t->points = malloc(t->n * 3 * sizeof(double));
+	check_pointer(t->points, "could not allocate triangle points array");
+
+	// Split polygons into triangles;
+	int c = 0;
+	for (int poly = 0; poly < shape->polygons; poly++) {
+		int points = shape->polygon_list[poly].points;
+		int *point_list = shape->polygon_list[poly].point_list;
+		if (points < 3) continue;
+		for (int pt = 1; pt < points - 2; pt++) {
+			int pts[3] = {point_list[0], point_list[pt], point_list[pt + 1]};
+			for (int i = 0; i < 3; i++) {
+				for (int coord = 0; coord < 3; coord++) {
+					t->points[c] = shape->point_list[3 * pts[i] + coord];
+					c++;
+				}
+			}
+		}
+	}
+
+	return t;
+}
+
+enum xyz_shape {
+	XYZ_SPHERE,
+	XYZ_COUNT
+};
+
+#define XYZ_PATH "asset/xyz/"
+
+char *xyz_files[XYZ_COUNT] = {
+	XYZ_PATH "sphere.xyz"
+};
+
+struct triangles *xyz_triangles[XYZ_COUNT];
+
+void initialize_xyz_files() {
+	for (enum xyz_shape i = 0; i < XYZ_COUNT; i++) {
+		struct shape *shape = load_shape(xyz_files[i]);
+		xyz_triangles[i] = convert_shape_to_triangles(shape);
+		destroy_shape(shape);
+	}
+}

@@ -36,6 +36,30 @@ void clear_objects() {
 	objects = 0;
 }
 
+void matrix_copy(double from[4][4], double to[4][4]) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			to[i][j] = from[i][j];
+		}
+	}
+}
+
+void configure_xyz_shape(enum xyz_shape shape, double M[4][4], double M_i[4][4]) {
+	int model = objects;
+	while (1) {
+		object_type[objects] = OBJ_TRIANGLE;
+		matrix_copy(M, object_matrix[objects]);
+		matrix_copy(M_i, object_matrix_i[objects]);
+		for (int i = 0; i < 3; i++)
+			object_color[objects][i] = object_color[model][i];
+		object_reflectivity[objects] = object_reflectivity[model];
+		object_opacity[objects] = object_opacity[model];
+		object_texture[objects] = object_texture[model];
+		object_parameters[objects] = NULL;
+		objects++
+	}
+}
+
 void shape_texture_map(int object, double xyz[3], double rgb[3]) {
 	double uv[2];
 	reverse_parametrize[object_type[object]](xyz, uv, object_parameters[object]);
