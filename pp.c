@@ -22,4 +22,12 @@ int main() {
 	double xs[3];
 	n = solve_cubic(cs, xs);
 	printf("%d solutions: %lf, %lf, %lf\n", n, xs[0], xs[1], xs[2]);
+
+	cs[0] = 4;
+	cs[1] = -2;
+	cs[2] = -4;
+	cs[3] = 2;
+	n = solve_cubic(cs, xs);
+	printf("%d solutions: %lf, %lf, %lf\n", n, xs[0], xs[1], xs[2]);
+
 }

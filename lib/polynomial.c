@@ -61,12 +61,21 @@ int solve_depressed_cubic(double b, double c, double y[3]) {
 
 	double complex w[2] = {0, 0};
 	int n = csolve_quadratic(1, c, -cu(b) / 27, w);
-	if (n <= 0) return n;
-	double z = ccbrt(w[0]);
-	// What if z = 0? Can't divide then!
-	// If z = 0, then w = 0, so b = 0 (handled above).
-	y[0] = creal(z - b / (3 * z)); // This should always be real
-
+//
+	double A = 1;
+	double B = c;
+	double C = -cu(b) / 27;
+	double root = B * B - 4 * A * C;
+	if (root >= 0) {
+		double w = (-B - sqrt(root)) / (2 * A);
+		double z = cbrt(w);
+		y[0] = z - b / (3 * z);
+	} else {
+		double complex w = (-B - csqrt(root)) / (2 * A);
+		double complex z = ccbrt(w);
+		y[0] = creal(z - b / (3 * z)); // Should always be real
+	}
+//
 	// Reduce to quadratic and find remaining real roots
 	n = solve_quadratic(1, y[0], b + sq(y[0]), &(y[1]));
 	return n + 1;
@@ -98,3 +107,60 @@ int solve_cubic(double cs[4], double x[3]) {
 	return n;
 }
 
+int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
+	// Move terms over in equation
+	a *= -1;
+	b *= -1;
+	c *= -1;
+
+	// Find y to make perfect square
+	double cs[4] = {sq(b) + 4 * a * c, 8 * c, 4 * a, 8};
+	double ys[3];
+	int n = solve_cubic(cs, ys);
+	double y = ys[0];
+
+	// Create quadratic parameters
+	double A = a + 2 * y;
+	double B = b / (2 * A);
+
+	// Solve (+) quadratic
+	double complex bb = csqrt(A);
+	double complex cc = y + B * bb;
+	double complex ys[4];
+	n = csolve_quadratic(1, bb, cc, ys);
+
+	// Solve (-) quadratic
+	bb *= -1;
+	cc = y + B * bb;
+	n += csolve_quadratic(1, bb, cc, &(ys[n]));
+
+	// Save real roots
+	int m = 0;
+	for (int i = 0; i < n; i++) {
+		double epsilon = 1e-5;
+		double im = cimag(ys[i]);
+		if (fabs(im) < epsilon) {
+			xs[m] = creal(ys[i]);
+			m++;
+		}
+	}
+	return m;
+}
+
+int solve_quartic(double cs[5], double xs[4]) {
+	if (cs[4] == 0) return solve_cubic(cs, xs);
+	double b = cs[3] / cs[4];
+	double c = cs[2] / cs[4];
+	double d = cs[1] / cs[4];
+	double e = cs[0] / cs[4];
+
+	double aa = -3 * sq(b) / 8 + c;
+	double bb = -cu(b) / 8 - b * c / 2 + d;
+	double cc = -3 * qu(b) / 256 + sq(b) * c / 4 - b * d / 4 + e;
+
+	int n = solve_depressed_cubic(aa, bb, cc, xs);
+	for (int i = 0; i < n; i++) {
+		xs[i] -= b / 4;
+	}
+	return n;
+}
