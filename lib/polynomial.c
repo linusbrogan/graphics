@@ -1,4 +1,6 @@
+#include <complex.h>
 #include <math.h>
+#include "cpolynomial.c"
 
 double sq(double x) {
 	return x * x;
@@ -57,16 +59,17 @@ int solve_depressed_cubic(double b, double c, double y[3]) {
 		return 1;
 	}
 
-	double w[2] = {0, 0};
-	int n = solve_quadratic(1, c, -cu(b) / 27, w);
-	if (n == 0) return 0; // What about complex roots?
-	double z0 = cbrt(w[0]);
-	double z1 = cbrt(w[1]);
+	double complex w[2] = {0, 0};
+	int n = csolve_quadratic(1, c, -cu(b) / 27, w);
+	if (n <= 0) return n;
+	double z = ccbrt(w[0]);
 	// What if z = 0? Can't divide then!
 	// If z = 0, then w = 0, so b = 0 (handled above).
-	y[0] = z0 - b / (3 * z0);
-	y[1] = z1 - b / (3 * z1);
-	return 2;
+	y[0] = creal(z - b / (3 * z)); // This should always be real
+
+	// Reduce to quadratic and find remaining real roots
+	n = solve_quadratic(1, y[0], b + sq(y[0]), &(y[1]));
+	return n + 1;
 }
 
 int solve_cubic(double cs[4], double x[3]) {

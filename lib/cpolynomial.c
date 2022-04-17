@@ -21,11 +21,6 @@ double complex ccbrt(double complex z) {
 	return cbrt(r) * cexp(I * theta / 3);
 }
 
-double isZero(double x) {
-	double epsilon = 1e-10;
-	return fabs(x) < epsilon;
-}
-
 double complex cevaluate_polynomial(double complex *c, int degree, double complex x) {
 	if (degree < 0) return 0;
 	double complex sum = 0;
