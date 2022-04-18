@@ -111,6 +111,7 @@ int solve_cubic(double cs[4], double x[3]) {
 	return n;
 }
 
+// Ferrari's method
 int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Move terms over in equation
 	a *= -1;
@@ -118,7 +119,12 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	c *= -1;
 
 	// Find y to make perfect square
-	double cs[4] = {-sq(b) + 4 * a * c, 8 * c, 4 * a, 8};
+	double cs[4] = {
+		-sq(b) + 4 * a * c,
+		8 * c,
+		4 * a,
+		8
+	};
 	double ys[3];
 	int n = solve_cubic(cs, ys);
 	double y = ys[0];
@@ -126,16 +132,17 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Create quadratic parameters
 	double A = a + 2 * y; // What if this is zero?
 	double B = b / (2 * A);
-	double complex zs[4];
+	double complex buffer[4 + 1];
+	double complex *zs = buffer + 1;
 
 	// Solve (+) quadratic
 	double complex bb = csqrt(A);
-	double complex cc = y + B * bb;
+	double complex cc = y + B * csqrt(A);
 	n = csolve_quadratic(1, bb, cc, zs);
 
 	// Solve (-) quadratic
-	bb *= -1;
-	cc = y + B * bb;
+	bb = -csqrt(A);
+	cc = y - B * csqrt(A);
 	n += csolve_quadratic(1, bb, cc, zs + n);
 
 	// Save real roots
