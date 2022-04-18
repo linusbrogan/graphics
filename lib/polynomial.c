@@ -124,25 +124,25 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	double y = ys[0];
 
 	// Create quadratic parameters
-	double A = a + 2 * y;
+	double A = a + 2 * y; // What if this is zero?
 	double B = b / (2 * A);
+	double complex zs[4];
 
 	// Solve (+) quadratic
 	double complex bb = csqrt(A);
 	double complex cc = y + B * bb;
-	double complex zs[4];
 	n = csolve_quadratic(1, bb, cc, zs);
 
 	// Solve (-) quadratic
 	bb *= -1;
 	cc = y + B * bb;
-	n += csolve_quadratic(1, bb, cc, &(zs[n]));
+	n += csolve_quadratic(1, bb, cc, zs + n);
 
 	// Save real roots
 	int m = 0;
 	for (int i = 0; i < n; i++) {
 		double epsilon = 1e-5;
-		double im = cimag(ys[i]);
+		double im = cimag(zs[i]);
 		if (fabs(im) < epsilon) {
 			xs[m] = creal(zs[i]);
 			m++;
