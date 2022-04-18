@@ -9,14 +9,9 @@ double complex ccu(double complex x) {
 	return cpow(x, 3);
 }
 
-double cmag(double complex z) {
-	double x = creal(z);
-	double y = creal(z);
-	return sqrt(x * x + y * y);
-}
 
 double complex ccbrt(double complex z) {
-	double r = cmag(z);
+	double r = cabs(z);
 	double theta = carg(z);
 	return cbrt(r) * cexp(I * theta / 3);
 }
