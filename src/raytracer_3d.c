@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 		// Configure frame
 		t = 0.1 * frame;
 		double eye[3] = {5, 1, 8};
-		double coi[3] = {0, 0, 5};
+		double coi[3] = {0, 0, 0};
 		for (int i = 0; i < 3; i++) {
 			eye[i] += (4 + sin((i + 1) * t)) * (eye[i] - coi[i]);
 		}
@@ -77,146 +77,13 @@ int main(int argc, char *argv[]) {
 		double light[3] = {half_width - 1 + sin(1.2 * t), cos(t), 1.5 * (half_height + sin(t))};
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
-		// Build lower platform
-		object_type[objects] = OBJ_PLANE;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 1;
-		object_color[objects][_B] = 0.5;
-		object_reflectivity[objects] = 0.7;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = half_width;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = half_width;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-		// Build column 1
-		object_type[objects] = OBJ_CYLINDER;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 4;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 4;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-		// Build column 2
-		object_type[objects] = OBJ_CYLINDER;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 4;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -4;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-		// Build column 3
-		object_type[objects] = OBJ_CYLINDER;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -4;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -4;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-		// Build column 4
-		object_type[objects] = OBJ_CYLINDER;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = half_height;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -4;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 4;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-
-		// Build stand base
-		object_type[objects] = OBJ_CYLINDER;
-		object_color[objects][_R] = 0;
-		object_color[objects][_G] = 1;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 0.5;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
-		// Build stand
-		object_type[objects] = OBJ_HYPERBOLOID;
-		object_color[objects][_R] = 0;
-		object_color[objects][_G] = 1;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_SOLID_COLOR;
-		T_n = 0;
-		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
-		double scale = 1 / cosh(asinh(1));
-		T_type[T_n] = SX;	T_param[T_n] = scale;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = scale;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 2 + 1;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
 		// Build globe
-		object_type[objects] = OBJ_SPHERE;
+		object_type[objects] = OBJ_TORUS;
 		object_color[objects][_R] = 0;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0.2;
-		object_opacity[objects] = 1;
-		object_texture[objects] = TM_EARTH;
+		object_color[objects][_G] = 1;
+		object_color[objects][_B] = 1;
+		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
-		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RZ;	T_param[T_n] = -40 * t;	T_n++;
-		T_type[T_n] = SX;	T_param[T_n] = 3;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 3;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 3;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1 + 2 * 2 + sqrt(pow(3, 2) - 1);	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);

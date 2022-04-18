@@ -10,6 +10,10 @@ double cu(double x) {
 	return pow(x, 3);
 }
 
+double qu(double x) {
+	return pow(x, 4);
+}
+
 double isZero(double x) {
 	double epsilon = 1e-10;
 	return fabs(x) < epsilon;
@@ -126,13 +130,13 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Solve (+) quadratic
 	double complex bb = csqrt(A);
 	double complex cc = y + B * bb;
-	double complex ys[4];
-	n = csolve_quadratic(1, bb, cc, ys);
+	double complex zs[4];
+	n = csolve_quadratic(1, bb, cc, zs);
 
 	// Solve (-) quadratic
 	bb *= -1;
 	cc = y + B * bb;
-	n += csolve_quadratic(1, bb, cc, &(ys[n]));
+	n += csolve_quadratic(1, bb, cc, &(zs[n]));
 
 	// Save real roots
 	int m = 0;
@@ -140,7 +144,7 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 		double epsilon = 1e-5;
 		double im = cimag(ys[i]);
 		if (fabs(im) < epsilon) {
-			xs[m] = creal(ys[i]);
+			xs[m] = creal(zs[i]);
 			m++;
 		}
 	}
@@ -149,6 +153,7 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 
 int solve_quartic(double cs[5], double xs[4]) {
 	if (cs[4] == 0) return solve_cubic(cs, xs);
+
 	double b = cs[3] / cs[4];
 	double c = cs[2] / cs[4];
 	double d = cs[1] / cs[4];
@@ -158,7 +163,7 @@ int solve_quartic(double cs[5], double xs[4]) {
 	double bb = -cu(b) / 8 - b * c / 2 + d;
 	double cc = -3 * qu(b) / 256 + sq(b) * c / 4 - b * d / 4 + e;
 
-	int n = solve_depressed_cubic(aa, bb, cc, xs);
+	int n = solve_depressed_quartic(aa, bb, cc, xs);
 	for (int i = 0; i < n; i++) {
 		xs[i] -= b / 4;
 	}

@@ -44,11 +44,11 @@ C_FLAGS = -lm -lX11 $(INCLUDES)
 
 .PHONY: all clean default test
 
+default: clean raytracer
+
 polynomials:
 	cc -o pt src/pt.c -lm
 	./pt
-
-default: clean raytracer
 
 raytracer: build/raytracer_3d build/movie_player asset/earth.xwd
 	./build/raytracer_3d

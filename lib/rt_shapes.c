@@ -18,15 +18,6 @@ double atanp(double y, double x) {
 	return theta;
 }
 
-// Handy power functions
-double cu(double x) {
-	return pow(x, 3);
-}
-
-double qu(double x) {
-	return pow(x, 4);
-}
-
 // Sphere: x^2 + y^2 + z^2 = 1
 void d_sphere(double p[3], double d[3]) {
 	d[_X] = 2 * p[_X];
@@ -192,8 +183,14 @@ double solve_torus_intersection(double E[3], double D[3]) {
 
 	double t[4] = {-1, -1, -1, -1};
 	int n = solve_quartic(c, t);
+	double t_min = -1;
+	for (int i = 0; i < n; i++) {
+		if (t[i] > 1e-10 && (t_min <= 0 || t[i] < t_min)) {
+			t_min = t[i];
+		}
+	}
 
-	return -1;
+	return t_min;
 }
 
 // x(u, v) = cosh(u) * cos(v)
