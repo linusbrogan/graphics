@@ -9,7 +9,7 @@
 #define FRAMES 100
 
 void initialize() {
-	LG_init_graphics(1080, 720);
+	LG_init_graphics(600, 400);
 	initialize_texture_maps();
 	HALF_ANGLE = M_PI / 4;
 
@@ -58,9 +58,10 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		t = 0.1 * frame;
-		double eye[3] = {0, 0, 0};
-		double coi[3] = {1, 0, 0};
-		double up[3] = {0, 1, 0};
+		double rrr = 10 * (-1 + 2 * frame / 100.0);
+		double eye[3] = {0, sin(t) * rrr, rrr * cos(t)};
+		double coi[3] = {0, 0, 0};
+		double up[3] = {eye[_X], eye[_Y] + 1, eye[_Z]};
 
 		// Make view matrix
 		double view[4][4];
@@ -71,29 +72,39 @@ int main(int argc, char *argv[]) {
 		double half_height = 8;
 
 		// Set light
-		double light[3] = {half_width - 1 + sin(1.2 * t), cos(t), 1.5 * (half_height + sin(t))};
+		double *light = eye;
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
-		// Build globe
-		object_type[objects] = OBJ_TORUS;
-		object_color[objects][_R] = 0;
-		object_color[objects][_G] = 1;
-		object_color[objects][_B] = 1;
+		// Build lower platform
+		object_type[objects] = OBJ_SPHERE;
+		object_color[objects][_R] = 1;
+		object_color[objects][_G] = 0;
+		object_color[objects][_B] = 0;
+		object_opacity[objects] = 1;
+		object_reflectivity[objects] = 0;
 		object_texture[objects] = TM_SOLID_COLOR;
 		T_n = 0;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		//objects++;
+		objects++;
 
-		// Build globe
-		object_type[objects] = OBJ_SPHERE;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_texture[objects] = TM_SOLID_COLOR;
+		// Build lower platform
+		object_type[objects] = OBJ_TORUS;
+		object_color[objects][_R] = 0;
+		object_color[objects][_G] = 1;
+		object_color[objects][_B] = 1;
+		object_opacity[objects] = 1;
+		object_reflectivity[objects] = 0;
+		object_texture[objects] = TM_CHECKERBOARD;//SOLID_COLOR;
 		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 0;	T_n++;
+//		T_type[T_n] = TZ;	T_param[T_n] = 0;	T_n++;
+		double tss = 1.75;
+		T_type[T_n] = SX;	T_param[T_n] = tss;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = tss;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = tss;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = frame / 25.0 * TAU;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = 3;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);

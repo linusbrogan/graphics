@@ -118,7 +118,7 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	c *= -1;
 
 	// Find y to make perfect square
-	double cs[4] = {sq(b) + 4 * a * c, 8 * c, 4 * a, 8};
+	double cs[4] = {-sq(b) + 4 * a * c, 8 * c, 4 * a, 8};
 	double ys[3];
 	int n = solve_cubic(cs, ys);
 	double y = ys[0];
@@ -141,7 +141,7 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Save real roots
 	int m = 0;
 	for (int i = 0; i < n; i++) {
-		double epsilon = 1e-5;
+		double epsilon = 1e-4;
 		double im = cimag(zs[i]);
 		if (fabs(im) < epsilon) {
 			xs[m] = creal(zs[i]);

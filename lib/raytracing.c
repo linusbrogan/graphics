@@ -62,7 +62,6 @@ int trace_ray(
 		// Object-space front of ray, where it intersects the screen
 		double F[3];
 		M3d_mat_mult_pt(F, object_matrix_i[object], head);
-
 		// Compute vector along ray
 		double D[3];
 		for (int i = 0; i < 3; i++) {
@@ -91,7 +90,7 @@ int trace_ray(
 		normal[1] = object_matrix_i[object][0][1] * d[0] + object_matrix_i[object][1][1] * d[1] + object_matrix_i[object][2][1] * d[2];
 		normal[2] = object_matrix_i[object][0][2] * d[0] + object_matrix_i[object][1][2] * d[1] + object_matrix_i[object][2][2] * d[2];
 
-		// Map intersection point back to world space
+		// Map intersection point back to eye space
 		M3d_mat_mult_pt(intersection, object_matrix[object], object_space_intersection);
 	}
 

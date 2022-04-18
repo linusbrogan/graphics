@@ -162,7 +162,7 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
 
 // Torus: (sqrt(x^2 + y^2) - R)^2 + z^2 - r^2 = 0
 const double torus_R = 1;
-const double torus_r = 0.1;
+const double torus_r = 0.5;
 void d_torus(double p[3], double d[3]) {
 	double R = torus_R;
 	double dxy = 2 * (1 - R / sqrt(sq(p[_X]) + sq(p[_Y])));
@@ -175,7 +175,7 @@ double solve_torus_intersection(double E[3], double D[3]) {
 	double R = torus_R;
 	double r = torus_r;
 	double c[5];
-	c[0] = sq(sq(R) - sq(r)) + qu(E[_X]) + qu(E[_Y]) + qu(E[_Z]) + 2 * sq((E[_X] * E[_Y]) + sq(E[_Y] * E[_Z]) + sq(E[_Z] * E[_X])) + 2 * (sq(R) - sq(r)) * (sq(E[_X]) + sq(E[_Y]) + sq(E[_Z])) - 4 * sq(R) * (sq(E[_X]) + sq(E[_Y]));
+	c[0] = sq(sq(R) - sq(r)) + qu(E[_X]) + qu(E[_Y]) + qu(E[_Z]) + 2 * (sq(E[_X] * E[_Y]) + sq(E[_Y] * E[_Z]) + sq(E[_Z] * E[_X])) + 2 * (sq(R) - sq(r)) * (sq(E[_X]) + sq(E[_Y]) + sq(E[_Z])) - 4 * sq(R) * (sq(E[_X]) + sq(E[_Y]));
 	c[1] = 4 * (cu(E[_X]) * D[_X] + cu(E[_Y]) * D[_Y] + cu(E[_Z]) * D[_Z] + sq(E[_X]) * E[_Y] * D[_Y] + sq(E[_Y]) * E[_X] * D[_X] + sq(E[_Y]) * E[_Z] * D[_Z] + sq(E[_Z]) * E[_Y] * D[_Y] + sq(E[_Z]) * E[_X] * D[_X] + sq(E[_X]) * E[_Z] * D[_Z] + (sq(R) - sq(r)) * (E[_X] * D[_X] + E[_Y] * D[_Y] + E[_Z] * D[_Z]) - 2 * sq(R) * (E[_X] * D[_X] + E[_Y] * D[_Y]));
 	c[2] = (6 * (sq(E[_X] * D[_X]) + sq(E[_Y] * D[_Y]) + sq(E[_Z] * D[_Z])) + 2 * (sq(E[_X] * D[_Y]) + 4 * E[_X] * E[_Y] * D[_X] * D[_Y] + sq(E[_Y] * D[_X]) + sq(E[_Y] * D[_Z]) + 4 * E[_Y] * E[_Z] * D[_Y] * D[_Z] + sq(E[_Z] * D[_Y]) + sq(E[_Z] * D[_X]) + 4 * E[_Z] * E[_X] * D[_Z] * D[_X] + sq(E[_X] * D[_Z])) + 2 * (sq(R) - sq(r)) * (sq(D[_X]) + sq(D[_Y]) + sq(D[_Z])) - 4 * sq(R) * (sq(D[_X]) + sq(D[_Y])));
 	c[3] = 4 * (E[_X] * cu(D[_X]) + E[_Y] * cu(D[_Y]) + E[_Z] * cu(D[_Z]) + E[_X] * D[_X] * sq(D[_Y]) + E[_Y] * D[_Y] * sq(D[_X]) + E[_Y] * D[_Y] * sq(D[_Z]) + E[_Z] * D[_Z] * sq(D[_Y]) + E[_Z] * D[_Z] * sq(D[_X]) + E[_X] * D[_X] * sq(D[_Z]));
@@ -193,11 +193,10 @@ double solve_torus_intersection(double E[3], double D[3]) {
 	return t_min;
 }
 
-// x(u, v) = cosh(u) * cos(v)
-// y(u, v) = sinh(v)
-// z(u, v) = cosh(u) * sin(v)
-// u in [-arcsinh(1), arcsinh(1)]
-// v in [0, tau)
+// x(u, v) = (R + r * cos(v)) * cos(u);
+// y(u, v) = (R + r * cos(v)) * sin(u);
+// z(u, v) = r * sin(v);
+// u, v in [0, tau)
 void reverse_parametrize_torus(double xyz[3], double uv[2]) {
 	double R = torus_R;
 	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
