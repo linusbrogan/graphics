@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 		// Configure frame
 		t = 0.1 * frame;
 		double rrr = 10 * (-1 + 2 * frame / 100.0);
-		double eye[3] = {0, sin(t) * rrr, rrr * cos(t)};
+		double eye[3] = {5,6,2};//{0, sin(t) * rrr, rrr * cos(t)};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y] + 1, eye[_Z]};
 
@@ -96,14 +96,16 @@ int main(int argc, char *argv[]) {
 		object_color[objects][_B] = 1;
 		object_opacity[objects] = 1;
 		object_reflectivity[objects] = 0;
-		object_texture[objects] = TM_CHECKERBOARD;//SOLID_COLOR;
+		object_texture[objects] = TM_CHECKERBOARD;
 		T_n = 0;
 //		T_type[T_n] = TZ;	T_param[T_n] = 0;	T_n++;
 		double tss = 1.75;
 		T_type[T_n] = SX;	T_param[T_n] = tss;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = tss;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = tss;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = frame / 25.0 * TAU;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = TAU * frame / 10.0;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 2 * TAU * frame / 10.0;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = 3 * TAU * frame / 10.0;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = 3;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);

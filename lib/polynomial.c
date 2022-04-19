@@ -58,6 +58,14 @@ int solve_quadratic(double a, double b, double c, double x[2]) {
 // del Ferro's method
 // Solve y^3 + by + c = 0
 int solve_depressed_cubic(double b, double c, double y[3]) {
+//
+	// COMPLEX ANALYSIS METHOD
+	double S = csqrt(sq(c / 2) + cu(b / 3));
+	y[0] = creal(ccbrt(-c / 2 + S) + ccbrt(-c / 2 - S));
+	//goto end_solver;
+//
+
+
 	if (b == 0) {
 		y[0] = cbrt(-c);
 		return 1;
@@ -70,17 +78,19 @@ int solve_depressed_cubic(double b, double c, double y[3]) {
 	double B = c;
 	double C = -cu(b) / 27;
 	double root = B * B - 4 * A * C;
-	if (root >= 0) {
-		double w = (-B - sqrt(root)) / (2 * A);
-		double z = cbrt(w);
-		y[0] = z - b / (3 * z);
-	} else {
+//	if (root >= 0) {
+//		double w = (-B - sqrt(root)) / (2 * A);
+//		double z = cbrt(w);
+//		y[0] = z - b / (3 * z);
+//	} else {
+{
 		double complex w = (-B - csqrt(root)) / (2 * A);
 		double complex z = ccbrt(w);
 		y[0] = creal(z - b / (3 * z)); // Should always be real
 	}
 //
 	// Reduce to quadratic and find remaining real roots
+end_solver:
 	n = solve_quadratic(1, y[0], b + sq(y[0]), &(y[1]));
 	return n + 1;
 }
@@ -112,6 +122,7 @@ int solve_cubic(double cs[4], double x[3]) {
 }
 
 // Ferrari's method
+// Solve x^4 + ax^2 + bx + c = 0.
 int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Move terms over in equation
 	a *= -1;
@@ -167,8 +178,8 @@ int solve_quartic(double cs[5], double xs[4]) {
 	double e = cs[0] / cs[4];
 
 	double aa = -3 * sq(b) / 8 + c;
-	double bb = -cu(b) / 8 - b * c / 2 + d;
-	double cc = -3 * qu(b) / 256 + sq(b) * c / 4 - b * d / 4 + e;
+	double bb = cu(b) / 8 - b * c / 2 + d;
+	double cc = -3 * qu(b) / 256 + sq(b) * c / 16 - b * d / 4 + e;
 
 	int n = solve_depressed_quartic(aa, bb, cc, xs);
 	for (int i = 0; i < n; i++) {
