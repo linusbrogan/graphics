@@ -124,6 +124,41 @@ int solve_cubic(double cs[4], double x[3]) {
 // Ferrari's method
 // Solve x^4 + ax^2 + bx + c = 0.
 int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
+// JEFF's METHOD
+{
+	double m = -a;
+	double n = -b;
+	double p = -c;
+	double cs[4] = {
+		-sq(n),
+		sq(m) + 4 * p,
+		-2 * m,
+		1
+	};
+	double Fs[3];
+	solve_cubic(cs, Fs);
+	double complex f = sqrt(Fs[0]); //pm?!!
+	double complex i = (csq(f) - m - n / f) / 2;
+	double complex g = (csq(f) - m + n / f) / 2;
+
+	double complex buffer[4 + 1];
+	double complex *zs = buffer + 1;
+
+	int N = csolve_quadratic(1, f, g, zs);
+	N += csolve_quadratic(1, -f, i, zs + N);
+
+	int M = 0;
+	for (int i = 0; i < N; i++) {
+		double epsilon = 1e-4;
+		double im = cimag(zs[i]);
+		if (fabs(im) < epsilon) {
+			xs[M] = creal(zs[i]);
+			M++;
+		}
+	}
+	return m;
+}
+
 	// Move terms over in equation
 	a *= -1;
 	b *= -1;
