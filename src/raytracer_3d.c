@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 		double half_height = 8;
 
 		// Set light
-		double light[3] = {half_width - 1 + sin(1.2 * t), cos(t), 1.5 * (half_height + sin(t))};
+		double light[3] = {half_width - 1 + sin(1.2 * t), 10 * cos(t), 1.5 * (half_height + sin(t))};
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
 		object_type[objects] = OBJ_PLANE;
@@ -83,6 +83,7 @@ int main(int argc, char *argv[]) {
 		double size = 1.5;
 		T_type[T_n] = SX;	T_param[T_n] = size;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = size;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = -10;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
@@ -97,13 +98,13 @@ int main(int argc, char *argv[]) {
 		object_opacity[objects] = 0.1;
 		object_refractive_index[objects] = 1.5;
 		T_n = 0;
-		double rad = 0.25;
+		double rad = 0.5;
 		double mag_x = -(-1.5 + 2.25 * t);
-		double mag_y = 0 - 1.5 * t;
-		double mag_z = 0;
+		double mag_y = 0;//0 - 1.5 * t;
+		double mag_z = 2;
 		T_type[T_n] = SX;	T_param[T_n] = rad;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = rad;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = rad;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = rad / 3;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = mag_z;	T_n++;
 		T_type[T_n] = TY;	T_param[T_n] = mag_y;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = mag_x;	T_n++;

@@ -93,7 +93,7 @@ int find_refraction_vector(double n1, double n2, double normal[3], double v1[3],
 	double X[3];
 	M3d_x_product(X, v1, normal);
 	for (int i = 0; i < 3; i++) {
-		X[2] *= -sign;
+		X[i] *= -sign;
 	}
 	double phi = theta1 - theta2;
 

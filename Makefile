@@ -40,7 +40,7 @@ SRC_TARGETS = $(addprefix build/,$(SRC_FILES))
 LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
 
 INCLUDES = -Iinclude
-C_FLAGS = -lm -lX11 $(INCLUDES)
+C_FLAGS = -lm -lX11 $(INCLUDES) -O3
 
 .PHONY: all clean default test
 
