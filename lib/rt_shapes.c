@@ -162,7 +162,7 @@ void reverse_parametrize_hyperboloid(double xyz[3], double uv[2]) {
 
 // Torus: (sqrt(x^2 + y^2) - R)^2 + z^2 - r^2 = 0
 const double torus_R = 1;
-const double torus_r = 0.2;
+const double torus_r = 0.3;
 void d_torus(double p[3], double d[3]) {
 	double R = torus_R;
 	double dxy = 2 * (1 - R / sqrt(sq(p[_X]) + sq(p[_Y])));

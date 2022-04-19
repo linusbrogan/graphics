@@ -11,18 +11,24 @@ void cpn(double complex x) {
 }
 
 int main() {
+	printf("Solve x^2 + 1 = 0 complex: should get pm i\n");
 	double complex a = 1;
 	double complex b = 0;
 	double complex c = 1;
 	double complex x[2];
 	int n = csolve_quadratic(a, b, c, x);
-	printf("%d solutions: %lf+%lfi and %lf+%lfi\n", n, creal(x[0]), cimag(x[0]), creal(x[1]), cimag(x[1]));
+	printf("%d solutions: ", n);
+	cpf(x[0]);
+	printf(" and ");
+	cpn(x[1]);
 
+	printf("Solve 2x^3 - 2x^2 + 2x - 2 = 0, expecting just 1 (and i, -i)\n");
 	double cs[4] = {-2, 2, -2, 2};
 	double xs[3];
 	n = solve_cubic(cs, xs);
 	printf("%d solutions: %lf, %lf, %lf\n", n, xs[0], xs[1], xs[2]);
 
+	printf("Solve 2x^3 - 4x^2 - 2x + 4 = 0, expecting: 1, -1, 2\n");
 	cs[0] = 4;
 	cs[1] = -2;
 	cs[2] = -4;

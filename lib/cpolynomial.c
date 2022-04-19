@@ -9,7 +9,6 @@ double complex ccu(double complex x) {
 	return cpow(x, 3);
 }
 
-
 double complex ccbrt(double complex z) {
 	double r = cabs(z);
 	double theta = carg(z);

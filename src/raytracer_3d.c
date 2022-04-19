@@ -9,7 +9,7 @@
 #define FRAMES 100
 
 void initialize() {
-	LG_init_graphics(600, 400);
+	LG_init_graphics(1080, 720);
 	initialize_texture_maps();
 	HALF_ANGLE = M_PI / 4;
 

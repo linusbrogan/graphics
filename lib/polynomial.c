@@ -2,6 +2,8 @@
 #include <math.h>
 #include "cpolynomial.c"
 
+
+#include <stdio.h>
 double sq(double x) {
 	return x * x;
 }
@@ -65,7 +67,6 @@ int solve_depressed_cubic(double b, double c, double y[3]) {
 	//goto end_solver;
 //
 
-
 	if (b == 0) {
 		y[0] = cbrt(-c);
 		return 1;
@@ -73,22 +74,21 @@ int solve_depressed_cubic(double b, double c, double y[3]) {
 
 	double complex w[2] = {0, 0};
 	int n = csolve_quadratic(1, c, -cu(b) / 27, w);
-//
 	double A = 1;
 	double B = c;
 	double C = -cu(b) / 27;
 	double root = B * B - 4 * A * C;
-//	if (root >= 0) {
-//		double w = (-B - sqrt(root)) / (2 * A);
-//		double z = cbrt(w);
-//		y[0] = z - b / (3 * z);
-//	} else {
-{
+	// Find a real root
+	if (root >= 0) {
+		double w = (-B - sqrt(root)) / (2 * A);
+		double z = cbrt(w);
+		y[0] = z - b / (3 * z);
+	} else {
 		double complex w = (-B - csqrt(root)) / (2 * A);
 		double complex z = ccbrt(w);
-		y[0] = creal(z - b / (3 * z)); // Should always be real
+		y[0] = creal(z - b / (3 * z)); // Should always be real, but perhaps is not, hence the if-else
 	}
-//
+
 	// Reduce to quadratic and find remaining real roots
 end_solver:
 	n = solve_quadratic(1, y[0], b + sq(y[0]), &(y[1]));
@@ -113,6 +113,7 @@ int solve_cubic(double cs[4], double x[3]) {
 	double d = cs[0] / cs[3];
 	double bb = -sq(b) / 3 + c;
 	double cc = 2 * cu(b) / 27 - b * c / 3 + d;
+//printf("b=%lf, c=%lf,d=%lf,bb=%lf,cc=%lf\n", b, c, d, bb, cc);
 	double y[3];
 	int n = solve_depressed_cubic(bb, cc, y);
 	for (int i = 0; i < n; i++) {
@@ -143,13 +144,14 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Create quadratic parameters
 	double A = a + 2 * y; // What if this is zero?
 	double B = b / (2 * A);
-	double complex buffer[4 + 1];
-	double complex *zs = buffer + 1;
+	if (isZero(A)) B = 0;
+	double complex zs[4];
 
 	// Solve (+) quadratic
 	double complex bb = csqrt(A);
 	double complex cc = y + B * csqrt(A);
 	n = csolve_quadratic(1, bb, cc, zs);
+	if (n < 0) n = 0;
 
 	// Solve (-) quadratic
 	bb = -csqrt(A);
@@ -159,7 +161,7 @@ int solve_depressed_quartic(double a, double b, double c, double xs[4]) {
 	// Save real roots
 	int m = 0;
 	for (int i = 0; i < n; i++) {
-		double epsilon = 1e-4;
+		double epsilon = 1e-10;
 		double im = cimag(zs[i]);
 		if (fabs(im) < epsilon) {
 			xs[m] = creal(zs[i]);

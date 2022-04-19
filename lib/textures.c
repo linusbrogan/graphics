@@ -13,7 +13,8 @@ enum texture_map {
 };
 
 char *TEXTURE_MAP_FILES[TM_COUNT] = {
-	"asset/checkerboard.xwd",
+	"donut.xwd",
+//	"asset/checkerboard.xwd",
 	"asset/clock.xwd",
 	"asset/mandelbrot_set.xwd",
 	"asset/earth.xwd"
