@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 		// Configure frame
 		t = 0.1 * frame;
 		double rrr = 10 * (-1 + 2 * frame / 100.0);
-		double eye[3] = {5,3,8};//{0, sin(t) * rrr, rrr * cos(t)};
+		double eye[3] = {5,6,2};//{0, sin(t) * rrr, rrr * cos(t)};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y] + 1, eye[_Z]};
 
