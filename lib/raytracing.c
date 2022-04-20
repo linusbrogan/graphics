@@ -21,6 +21,7 @@ double object_matrix_i[MAXIMUM_OBJECTS][4][4];
 double object_color[MAXIMUM_OBJECTS][3];
 double object_reflectivity[MAXIMUM_OBJECTS];
 double object_opacity[MAXIMUM_OBJECTS];
+double object_refractive_index[MAXIMUM_OBJECTS];
 enum texture_map object_texture[MAXIMUM_OBJECTS];
 int objects = MAXIMUM_OBJECTS;
 
@@ -30,6 +31,7 @@ void clear_objects() {
 		object_parameters[i] = NULL;
 		object_reflectivity[i] = 0;
 		object_opacity[i] = 1;
+		object_refractive_index[i] = 1;
 		object_texture[i] = TM_SOLID_COLOR;
 	}
 	objects = 0;
@@ -109,7 +111,7 @@ int trace_ray(
 	if (closest_object >= 0) {
 		if (check_shadow) return t_min >= 0 && t_min <= 1;
 
-		orient_normal(intersection, normal, tail);
+		int normal_sign = orient_normal(intersection, normal, tail);
 
 		// Find reflected ray
 		double r[3] = {0, 0, 0};
@@ -123,8 +125,6 @@ int trace_ray(
 		double light_head[3];
 		double reflected_tail[3];
 		double reflected_head[3];
-		double transmitted_tail[3];
-		double transmitted_head[3];
 		for (int i = 0; i < 3; i++) {
 			double l = light_in_eye_space[i] - intersection[i];
 			light_tail[i] = intersection[i] + l * EPSILON;
@@ -132,10 +132,6 @@ int trace_ray(
 
 			reflected_tail[i] = intersection[i] + r[i] * EPSILON;
 			reflected_head[i] = intersection[i] + r[i];
-
-			double delta = head[i] - tail[i];
-			transmitted_tail[i] = intersection[i] + delta * EPSILON;
-			transmitted_head[i] = intersection[i] + delta;
 		}
 
 		// Find object casting a shadow
@@ -161,17 +157,39 @@ int trace_ray(
 			0
 		);
 
-		// Find transmitted color from behind object
+		// Find refracted ray
+		double refracted_vector[3] = {0, 0, 0};
+		double n_obj = object_refractive_index[closest_object];
+		double n1 = 1; // Vacuum
+		double n2 = n_obj;
+		// Check if incident ray is entering (+) or exiting (-) object
+		double refraction_orientation = -normal_sign * dot_product(L, normal);
+		if (refraction_orientation < 0) {
+			n1 = n_obj;
+			n2 = 1;
+		}
+		int refraction = find_refraction_vector(n1, n2, normal, L, refracted_vector);
+		normalize(refracted_vector);
+		double refracted_tail[3];
+		double refracted_head[3];
+		for (int i = 0; i < 3; i++) {
+			refracted_tail[i] = intersection[i] + refracted_vector[i] * EPSILON;
+			refracted_head[i] = intersection[i] + refracted_vector[i];
+		}
+
+		// Find refracted color
 		double trans = 1 - object_opacity[closest_object];
-		double transmitted_rgb[3];
-		trace_ray(
-			transmitted_tail,
-			transmitted_head,
-			transmitted_rgb,
-			remaining_collisions - 1,
-			intensity * trans,
-			0
-		);
+		double refracted_rgb[3] = {0, 0, 0};
+		if (refraction) {
+			trace_ray(
+				refracted_tail,
+				refracted_head,
+				refracted_rgb,
+				remaining_collisions - 1,
+				intensity * trans,
+				0
+			);
+		}
 
 		// Find object color, including reflection and transparent transmission
 		double inherent_rgb[3];
@@ -185,7 +203,7 @@ int trace_ray(
 		double eye[3] = {0, 0, 0};
 		Light_Model_rt(inherent_rgb, eye, intersection, normal, rgb, shadowed);
 		for (int i = 0; i < 3; i++) {
-			rgb[i] = rgb[i] * (1 - trans) + transmitted_rgb[i] * trans;
+			rgb[i] = rgb[i] * (1 - trans) + refracted_rgb[i] * trans;
 			rgb[i] = rgb[i] * (1 - ref) + reflected_rgb[i] * ref;
 		}
 		return 1;
