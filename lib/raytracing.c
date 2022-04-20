@@ -13,7 +13,6 @@
 #define WINDOW_SIZE (WS_MAX(LG_WINDOW_WIDTH, LG_WINDOW_HEIGHT))
 double HALF_ANGLE = (M_PI / 6);
 #define H (tan(HALF_ANGLE))
-#define EPSILON (1e-10)
 
 enum object_type object_type[MAXIMUM_OBJECTS];
 void *object_parameters[MAXIMUM_OBJECTS];

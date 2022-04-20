@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#define EPSILON (1e-10)
 #define TAU (2 * M_PI)
 
 enum color {
