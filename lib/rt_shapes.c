@@ -9,6 +9,7 @@ enum object_type {
 	OBJ_HYPERBOLOID,
 	OBJ_CONE,
 	OBJ_ANNULUS,
+	OBJ_TORUS,
 	OBJ_COUNT
 };
 
@@ -237,13 +238,68 @@ void reverse_parametrize_annulus(double xyz[3], double uv[2], void *params) {
 	uv[_Y] = (sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / r;
 }
 
+// Torus: (sqrt(x^2 + y^2) - R)^2 + z^2 - r^2 = 0
+// Parameters: primary radius R, secondary radius r
+// Constraints: R > r > 0
+double default_torus_parameters[2] = {1, 0.2};
+void d_torus(double p[3], double d[3], void *params) {
+	if (params == NULL) params = default_torus_parameters;
+	double *parameters = params;
+	double R = parameters[0];
+
+	double dxy = 2 * (1 - R / sqrt(sq(p[_X]) + sq(p[_Y])));
+	d[_X] = dxy * p[_X];
+	d[_Y] = dxy * p[_Y];
+	d[_Z] = 2 * p[_Z];
+}
+
+double solve_torus_intersection(double E[3], double D[3], void *params) {
+	if (params == NULL) params = default_torus_parameters;
+	double *parameters = params;
+	double R = parameters[0];
+	double r = parameters[1];
+
+	double c[5] = {
+		sq(sq(R) - sq(r)) + qu(E[_X]) + qu(E[_Y]) + qu(E[_Z]) + 2 * (sq(E[_X] * E[_Y]) + sq(E[_Y] * E[_Z]) + sq(E[_Z] * E[_X])) + 2 * (sq(R) - sq(r)) * (sq(E[_X]) + sq(E[_Y]) + sq(E[_Z])) - 4 * sq(R) * (sq(E[_X]) + sq(E[_Y])),
+		4 * (cu(E[_X]) * D[_X] + cu(E[_Y]) * D[_Y] + cu(E[_Z]) * D[_Z] + sq(E[_X]) * E[_Y] * D[_Y] + sq(E[_Y]) * E[_X] * D[_X] + sq(E[_Y]) * E[_Z] * D[_Z] + sq(E[_Z]) * E[_Y] * D[_Y] + sq(E[_Z]) * E[_X] * D[_X] + sq(E[_X]) * E[_Z] * D[_Z] + (sq(R) - sq(r)) * (E[_X] * D[_X] + E[_Y] * D[_Y] + E[_Z] * D[_Z]) - 2 * sq(R) * (E[_X] * D[_X] + E[_Y] * D[_Y])),
+		(6 * (sq(E[_X] * D[_X]) + sq(E[_Y] * D[_Y]) + sq(E[_Z] * D[_Z])) + 2 * (sq(E[_X] * D[_Y]) + 4 * E[_X] * E[_Y] * D[_X] * D[_Y] + sq(E[_Y] * D[_X]) + sq(E[_Y] * D[_Z]) + 4 * E[_Y] * E[_Z] * D[_Y] * D[_Z] + sq(E[_Z] * D[_Y]) + sq(E[_Z] * D[_X]) + 4 * E[_Z] * E[_X] * D[_Z] * D[_X] + sq(E[_X] * D[_Z])) + 2 * (sq(R) - sq(r)) * (sq(D[_X]) + sq(D[_Y]) + sq(D[_Z])) - 4 * sq(R) * (sq(D[_X]) + sq(D[_Y]))),
+		4 * (E[_X] * cu(D[_X]) + E[_Y] * cu(D[_Y]) + E[_Z] * cu(D[_Z]) + E[_X] * D[_X] * sq(D[_Y]) + E[_Y] * D[_Y] * sq(D[_X]) + E[_Y] * D[_Y] * sq(D[_Z]) + E[_Z] * D[_Z] * sq(D[_Y]) + E[_Z] * D[_Z] * sq(D[_X]) + E[_X] * D[_X] * sq(D[_Z])),
+		(qu(D[_X]) + qu(D[_Y]) + qu(D[_Z]) + 2 * (sq(D[_X] * D[_Y]) + sq(D[_Y] * D[_Z]) + sq(D[_Z] * D[_X])))
+	};
+
+	double t[4] = {-1, -1, -1, -1};
+	int n = solve_quartic(c, t);
+	double t_min = -1;
+	for (int i = 0; i < n; i++) {
+		if (t[i] > EPSILON && (t_min <= 0 || t[i] < t_min)) {
+			t_min = t[i];
+		}
+	}
+
+	return t_min;
+}
+
+// x(u, v) = (R + r * cos(v)) * cos(u);
+// y(u, v) = (R + r * cos(v)) * sin(u);
+// z(u, v) = r * sin(v);
+// u, v in [0, tau)
+void reverse_parametrize_torus(double xyz[3], double uv[2], void *params) {
+	if (params == NULL) params = default_torus_parameters;
+	double *parameters = params;
+	double R = parameters[0];
+
+	uv[_X] = atanp(xyz[_Y], xyz[_X]) / TAU;
+	uv[_Y] = atanp(xyz[_Z], sqrt(sq(xyz[_X]) + sq(xyz[_Y])) - R) / TAU;
+}
+
 void (*gradient[OBJ_COUNT])(double[3], double[3], void *) = {
 	d_sphere,
 	d_cylinder,
 	d_plane,
 	d_hyperboloid,
 	d_cone,
-	d_plane
+	d_plane,
+	d_torus
 };
 
 double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3], void *) = {
@@ -252,7 +308,8 @@ double (*solve_ray_intersection[OBJ_COUNT])(double[3], double[3], void *) = {
 	solve_plane_intersection,
 	solve_hyperboloid_intersection,
 	solve_cone_intersection,
-	solve_annulus_intersection
+	solve_annulus_intersection,
+	solve_torus_intersection
 };
 
 void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2], void *) = {
@@ -261,5 +318,6 @@ void (*reverse_parametrize[OBJ_COUNT])(double[3], double[2], void *) = {
 	reverse_parametrize_plane,
 	reverse_parametrize_hyperboloid,
 	reverse_parametrize_cone,
-	reverse_parametrize_annulus
+	reverse_parametrize_annulus,
+	reverse_parametrize_torus
 };
