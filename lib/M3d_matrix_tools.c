@@ -403,7 +403,14 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 
 /////////////////////
 
-int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], double upA[3]) {
+int M3d_view_3d(
+	double v[4][4],
+	double v_i[4][4],
+	double eyeA[3],
+	double coiA[3],
+	double upA[3],
+	double delta
+) {
 	// Initialize movement sequence
 	int mtype[100];
 	double mparam[100];
@@ -447,5 +454,19 @@ int M3d_view(double v[4][4], double v_i[4][4], double eyeA[3], double coiA[3], d
 	// Rotate about z-axis to bring Up onto y-z plane
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
+
+	// Translate eye
+	mtype[n] = TX;	mparam[n] = delta;	n++;
+
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
+}
+
+int M3d_view(
+	double v[4][4],
+	double v_i[4][4],
+	double eye[3],
+	double coi[3],
+	double up[3]
+) {
+	return M3d_view_3d(v, v_i, eye, coi, up, 0);
 }

@@ -17,9 +17,9 @@ void initialize() {
 	mkdir(OUTPUT_PATH, 0777);
 }
 
-void save_image(int frame) {
+void save_image(int frame, char *prefix) {
 	char file_name[100];
-	sprintf(file_name, "%s/frame_%04d.xwd", OUTPUT_PATH, frame);
+	sprintf(file_name, "%s/%s_%04d.xwd", OUTPUT_PATH, prefix, frame);
 	LG_display_image();
 	LG_save_image_to_file(file_name);
 }
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 	double M_i[4][4];
 
 	int frame = frame_start;
-	double t = 0;
+	int side = -1;
 	while (1) {
 		if (LG_no_wait_key() == 'q' || frame >= frame_stop)
 			return 0;
@@ -60,11 +60,12 @@ int main(int argc, char *argv[]) {
 		double eye[3] = {0, 0, 4};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y] + 1, eye[_Z]};
+		double eye_spacing = 0.02;
 
 		// Make view matrix
 		double view[4][4];
 		double view_i[4][4];
-		M3d_view(view, view_i, eye, coi, up);
+		M3d_view_3d(view, view_i, eye, coi, up, eye_spacing * side);
 
 		// Set light
 		double light[3] = {-10, 10, 10};
@@ -147,8 +148,15 @@ int main(int argc, char *argv[]) {
 		objects++;
 
 		render();
-		save_image(frame);
-		frame++;
+
+		if (side < 0) {
+			save_image(frame, "left");
+			side = 1;
+		} else {
+			save_image(frame, "right");
+			side = -1;
+			frame++;
+		}
 	}
 
 	return 0;
