@@ -56,11 +56,28 @@ int find_refraction_vector(double n1, double n2, double normal[3], double v1[3],
 
 	double X[3];
 	M3d_x_product(X, v1, normal);
-	X[2] *= -normal_sign;
-	double phi = sign(X[2]) * (theta1 - theta2);
+	for (int i = 0; i < 3; i++) {
+		X[i] *= -normal_sign;
+	}
+	double phi = theta1 - theta2;
 
+	// Construct view matrix to put vectors in simple reference frame
+	double eye[3] = {0, 0, 0}; // Rotate vectors, so center at origin
+	double *coi = v1; // Can be any vector in the plane span(v1, normal)
+	double *up = X; // Rotate about this (+) axis
+	double V[4][4];
+	double V_i[4][4];
+	M3d_view(V, V_i, eye, coi, up);
+
+	// Construct rotation
+	double R[4][4];
+	M3d_make_y_rotation_cs(R, cos(phi), sin(phi));
+
+	// Rotate in the simple reference frame using the view matrix
 	double M[4][4];
-	M3d_make_z_rotation_cs(M, cos(phi), sin(phi));
+	M3d_mat_mult(M, R, V);
+	M3d_mat_mult(M, V_i, M);
+
 	M3d_mat_mult_pt(v2, M, v1);
 	return 1;
 }
