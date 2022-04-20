@@ -9,6 +9,7 @@ SRC_FILES = \
 	growing_sun \
 	M3d_test_sequence \
 	M3d_test_view \
+	merge_3d \
 	mirror_testS \
 	movie_player \
 	raytracer_3d \
