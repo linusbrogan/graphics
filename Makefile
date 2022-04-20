@@ -29,6 +29,7 @@ LIB_FILES = \
 	lg \
 	light_model \
 	M3d_matrix_tools \
+	polynomial \
 	raytracing \
 	rt_shapes \
 	rt_utils \

@@ -1,8 +1,5 @@
 #include <math.h>
-
-double sq(double x) {
-	return x * x;
-}
+#include <polynomial.h>
 
 double dot_product(double v[3], double w[3]) {
 	double sum = 0;
@@ -33,16 +30,6 @@ void find_reflection_vector(double incident[3], double normal[3], double reflect
 	for (int i = 0; i < 3; i++) {
 		reflected[i] = scale * n[i] - l[i];
 	}
-}
-
-int solve_quadratic(double a, double b, double c, double x[2]) {
-	double root = b * b - 4 * a * c;
-	if (root < 0) return 0;
-	root = sqrt(root);
-	x[0] = (-b - root) / (2 * a);
-	x[1] = (-b + root) / (2 * a);
-	if (root == 0) return 1;
-	return 2;
 }
 
 void orient_normal(double intersection[3], double normal[3], double eye[3]) {
