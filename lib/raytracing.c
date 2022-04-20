@@ -67,7 +67,7 @@ int trace_ray(
 	double normal[3] = {0, 0, 0};
 
 	for (int object = 0; object < objects; object++) {
-		// Map input ray from world space to object space
+		// Map input ray from eye space to object space
 		// Oject-space eye
 		double E[3];
 		M3d_mat_mult_pt(E, object_matrix_i[object], tail);
@@ -96,14 +96,14 @@ int trace_ray(
 			object_space_intersection[i] = E[i] + t * D[i];
 		}
 
-		// Find world-space normal vector
+		// Find eye-space normal vector
 		double d[3];
 		gradient[object_type[object]](object_space_intersection, d, object_parameters[object]);
 		normal[0] = object_matrix_i[object][0][0] * d[0] + object_matrix_i[object][1][0] * d[1] + object_matrix_i[object][2][0] * d[2];
 		normal[1] = object_matrix_i[object][0][1] * d[0] + object_matrix_i[object][1][1] * d[1] + object_matrix_i[object][2][1] * d[2];
 		normal[2] = object_matrix_i[object][0][2] * d[0] + object_matrix_i[object][1][2] * d[1] + object_matrix_i[object][2][2] * d[2];
 
-		// Map intersection point back to world space
+		// Map intersection point back to eye space
 		M3d_mat_mult_pt(intersection, object_matrix[object], object_space_intersection);
 	}
 
@@ -198,7 +198,7 @@ void ray(double tail[3], double head[3], double rgb[3]) {
 	trace_ray(tail, head, rgb, MAXIMUM_REFLECTIONS, 1, 0);
 }
 
-void map_pixel_onto_world_space_screen(double p[3]) {
+void map_pixel_onto_eye_space_screen(double p[3]) {
 	p[_X] = (p[_X] * 2 - LG_WINDOW_WIDTH) * H / WINDOW_SIZE;
 	p[_Y] = (p[_Y] * 2 - LG_WINDOW_HEIGHT) * H / WINDOW_SIZE;
 	p[_Z] = 1;
@@ -209,7 +209,7 @@ void render() {
 	for (int x = 0; x < LG_WINDOW_WIDTH; x++) {
 		for (int y = 0; y < LG_WINDOW_HEIGHT; y++) {
 			double p[3] = {x, y, 0};
-			map_pixel_onto_world_space_screen(p);
+			map_pixel_onto_eye_space_screen(p);
 			double rgb[3];
 			ray(eye, p, rgb);
 			LG_rgb(rgb[_R], rgb[_G], rgb[_B]);
