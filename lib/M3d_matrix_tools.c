@@ -433,20 +433,16 @@ int M3d_view_3d(
 
 	// Copy inputs
 	double eye[3];
-	double eye_shift[3];
 	double coi[3];
 	double coi0[3];
-	double coi_shift[3];
+	double coi_ses[3];
 	double up[3];
-	double up_shift[3];
 	for (int i = 0; i < 3; i++) {
 		eye[i] = eyeA[i];
-		eye_shift[i] = eyeA[i];
 		coi[i] = coiA[i];
 		coi0[i] = coiA[i];
-		coi_shift[i] = coiA[i];
+		coi_ses[i] = coiA[i];
 		up[i] = upA[i];
-		up_shift[i] = upA[i];
 	}
 	// Create temporary movement sequence matrix
 	double t[4][4];
@@ -475,23 +471,15 @@ int M3d_view_3d(
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
 	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
-	M3d_mat_mult_pt(coi_shift, t, coi_shift);
+	M3d_mat_mult_pt(coi_ses, t, coi_ses);
 
-	// Adjust eye and Up and recompute
-	if (delta != 0) {
-		// Shear eye and Up and then map back from standard eye space to world space
-		double dz = coi_shift[2];
-		mtype[n] = TZ;	mparam[n] = -dz;	n++;
-		mtype[n] = HXZ;	mparam[n] = delta / dz;	n++;
-		mtype[n] = TZ;	mparam[n] = dz;	n++;
-		double _i[4][4];
-		M3d_make_movement_sequence_matrix(t, _i, n, mtype, mparam);
-		M3d_mat_mult(t, t_i, t);
-		M3d_mat_mult_pt(eye_shift, t, eye_shift);
-		M3d_mat_mult_pt(up_shift, t, up_shift);
-
-		return M3d_view_3d(v, v_i, eye_shift, coiA, up_shift, 0);
-	}
+	// Rotate about eye-space CoI
+	double EC = coi_ses[2];
+	mtype[n] = TZ;	mparam[n] = -EC;	n++;
+	theta = atan2(delta, EC);
+	mtype[n] = RY;	mparam[n] = -theta;	n++;
+	double EC2 = sqrt(EC * EC + delta * delta);
+	mtype[n] = TZ;	mparam[n] = EC2;	n++;
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
