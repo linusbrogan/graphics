@@ -420,11 +420,13 @@ int M3d_view_3d(
 	double eye[3];
 	double coi[3];
 	double coi0[3];
+	double coi_z[3];
 	double up[3];
 	for (int i = 0; i < 3; i++) {
 		eye[i] = eyeA[i];
 		coi[i] = coiA[i];
 		coi0[i] = coiA[i];
+		coi_z[i] = coiA[i];
 		up[i] = upA[i];
 	}
 
@@ -454,9 +456,13 @@ int M3d_view_3d(
 	// Rotate about z-axis to bring Up onto y-z plane
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
+	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
+	M3d_mat_mult_pt(coi_z, t, coi_z);
 
-	// Translate eye
-	mtype[n] = TX;	mparam[n] = delta;	n++;
+	// Rotate around CoI
+	mtype[n] = TZ;	mparam[n] = -coi[2];	n++;
+	mtype[n] = RY;	mparam[n] = delta;	n++;
+	mtype[n] = TZ;	mparam[n] = coi[2];	n++;
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
