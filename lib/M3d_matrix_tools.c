@@ -400,6 +400,21 @@ int M3d_make_movement_sequence_matrix(double v[4][4], double vi[4][4], int n, in
 	return 1;
 }
 
+double dot_product(double v[3], double w[3]) {
+	double sum = 0;
+	for (int i = 0; i < 3; i++) {
+		sum += v[i] * w[i];
+	}
+	return sum;
+}
+
+void normalize(double v[3]) {
+	double length = sqrt(dot_product(v, v));
+	if (length == 0) return;
+	for (int i = 0; i < 3; i++) {
+		v[i] /= length;
+	}
+}
 
 /////////////////////
 

@@ -8,22 +8,6 @@ int sign(double x) {
 	return 0;
 }
 
-double dot_product(double v[3], double w[3]) {
-	double sum = 0;
-	for (int i = 0; i < 3; i++) {
-		sum += v[i] * w[i];
-	}
-	return sum;
-}
-
-void normalize(double v[3]) {
-	double length = sqrt(dot_product(v, v));
-	if (length == 0) return;
-	for (int i = 0; i < 3; i++) {
-		v[i] /= length;
-	}
-}
-
 void find_reflection_vector(double incident[3], double normal[3], double reflected[3]) {
 	double l[3];
 	double n[3];
