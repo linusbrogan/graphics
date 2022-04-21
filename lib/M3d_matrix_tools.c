@@ -421,7 +421,7 @@ void normalize(double v[3]) {
 int M3d_view_3d(
 	double v[4][4],
 	double v_i[4][4],
-	double eyeA[3],
+	double eye_center[3],
 	double coiA[3],
 	double upA[3],
 	double delta
@@ -431,20 +431,32 @@ int M3d_view_3d(
 	double mparam[100];
 	int n = 0;
 
+	// Translate eye
+	double EC[3];
+	double EU[3];
+	for (int i = 0; i < 3; i++) {
+		EC[i] = coiA[i] - eye_center[i];
+		EU[i] = upA[i] - eye_center[i];
+	}
+	double ECxEU[3];
+	M3d_x_product(ECxEU, EC, EU);
+	normalize(ECxEU);
+	double eyeA[3];
+	for (int i = 0; i < 3; i++) {
+		eyeA[i] = eye_center[i] - ECxEU[i] * delta;
+	}
+
 	// Copy inputs
 	double eye[3];
 	double coi[3];
 	double coi0[3];
-	double coi_z[3];
 	double up[3];
 	for (int i = 0; i < 3; i++) {
 		eye[i] = eyeA[i];
 		coi[i] = coiA[i];
 		coi0[i] = coiA[i];
-		coi_z[i] = coiA[i];
 		up[i] = upA[i];
 	}
-
 	// Create temporary movement sequence matrix
 	double t[4][4];
 	double t_i[4][4];
@@ -471,13 +483,6 @@ int M3d_view_3d(
 	// Rotate about z-axis to bring Up onto y-z plane
 	theta = atan2(up[0], up[1]) / DEGREES;
 	mtype[n] = RZ;	mparam[n] = theta;	n++;
-	M3d_make_movement_sequence_matrix(t, t_i, n, mtype, mparam);
-	M3d_mat_mult_pt(coi_z, t, coi_z);
-
-	// Rotate around CoI
-	mtype[n] = TZ;	mparam[n] = -coi[2];	n++;
-	mtype[n] = RY;	mparam[n] = delta;	n++;
-	mtype[n] = TZ;	mparam[n] = coi[2];	n++;
 
 	return M3d_make_movement_sequence_matrix(v, v_i, n, mtype, mparam);
 }
