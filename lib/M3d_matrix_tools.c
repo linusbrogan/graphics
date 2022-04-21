@@ -423,7 +423,7 @@ int M3d_view_3d(
 	double v_i[4][4],
 	double eye_center[3],
 	double coiA[3],
-	double upA[3],
+	double up_center[3],
 	double delta
 ) {
 	// Initialize movement sequence
@@ -431,19 +431,21 @@ int M3d_view_3d(
 	double mparam[100];
 	int n = 0;
 
-	// Translate eye
+	// Translate eye and up point
 	double EC[3];
 	double EU[3];
 	for (int i = 0; i < 3; i++) {
 		EC[i] = coiA[i] - eye_center[i];
-		EU[i] = upA[i] - eye_center[i];
+		EU[i] = up_center[i] - eye_center[i];
 	}
 	double ECxEU[3];
 	M3d_x_product(ECxEU, EC, EU);
 	normalize(ECxEU);
 	double eyeA[3];
+	double upA[3];
 	for (int i = 0; i < 3; i++) {
 		eyeA[i] = eye_center[i] - ECxEU[i] * delta;
+		upA[i] = up_center[i] - ECxEU[i] * delta;
 	}
 
 	// Copy inputs
