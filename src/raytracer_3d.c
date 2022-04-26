@@ -64,7 +64,8 @@ int main(int argc, char *argv[]) {
 		clear_objects();
 
 		// Configure frame
-		double eye[3] = {10, 4, 1};
+		double t = frame;
+		double eye[3] = {4 * cos(t * TAU / 5), 5 * sin(t * TAU / 4), 10 * cos(t * TAU / 10) };
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
 		double eye_spacing = 1;
@@ -229,9 +230,9 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_SPHERE;
 		object_texture[objects] = TM_CHECKERBOARD;
 		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = 1000;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 1000;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 1000;	T_n++;
+		T_type[T_n] = SX;	T_param[T_n] = 10000;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 10000;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 10000;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
@@ -239,14 +240,14 @@ int main(int argc, char *argv[]) {
 
 		render();
 
-		if (side < 0) {
+//		if (side < 0) {
 			save_image(frame, "left");
-			side = 1;
-		} else {
-			save_image(frame, "right");
-			side = -1;
+//			side = 1;
+//		} else {
+//			save_image(frame, "right");
+//			side = -1;
 			frame++;
-		}
+//		}
 	}
 
 	return 0;
