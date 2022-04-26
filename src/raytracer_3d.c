@@ -24,6 +24,13 @@ void save_image(int frame, char *prefix) {
 	LG_save_image_to_file(file_name);
 }
 
+void apply_transformation(int object_start, int object_end, double T[4][4], double T_i[4][4]) {
+	for (int i = object_start; i < object_end; i++) {
+		M3d_mat_mult(object_matrix[i], T, object_matrix[i]);
+		M3d_mat_mult(object_matrix_i[i], object_matrix_i[i], T_i);
+	}
+}
+
 int main(int argc, char *argv[]) {
 	int frame_start = 0;
 	int frame_stop = FRAMES;
@@ -57,7 +64,7 @@ int main(int argc, char *argv[]) {
 		clear_objects();
 
 		// Configure frame
-		double eye[3] = {0.5, 4, 1};
+		double eye[3] = {10, 4, 1};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
 		double eye_spacing = 1;
@@ -71,43 +78,104 @@ int main(int argc, char *argv[]) {
 		double light[3] = {-10, 10, 10};
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
+		// Parameters
+		double glass_inner_radius = 1;
+		double glass_thickness = 0.05;
+		double glass_height = 3;
+		double water_height = glass_height * 0.6;
+		double water_radius = glass_inner_radius * 0.99;
+		double n_glass = 1.5;
+		double n_water = 1.33;
+
 		// Build glass
+		double glass_object_start = objects;
+		// Inner wall
 		object_type[objects] = OBJ_CYLINDER;
 		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0;
+		object_color[objects][_R] = 0.5;
 		object_color[objects][_G] = 1;
 		object_color[objects][_B] = 0.8;
 		object_reflectivity[objects] = 0.2;
 		object_opacity[objects] = 0.1;
-		object_refractive_index[objects] = 1.5;
+		object_refractive_index[objects] = n_glass;
 		T_n = 0;
+		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SX;	T_param[T_n] = 0.5;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 0.5;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 0.5;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		T_type[T_n] = SX;	T_param[T_n] = glass_inner_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = glass_inner_radius;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = (glass_height - glass_thickness) / 2;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = glass_thickness;	T_n++;
+		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+//		M3d_mat_mult(object_matrix[objects], view, M);
+//		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
 		objects++;
 
-		// Build water
+		// Outer wall
+		object_type[objects] = OBJ_CYLINDER;
+		object_texture[objects] = TM_SOLID_COLOR;
+		for (int i = 0; i < 3; i++)
+			object_color[objects][i] = object_color[objects - 1][i];
+		object_reflectivity[objects] = object_reflectivity[objects - 1];
+		object_opacity[objects] = object_opacity[objects - 1];
+		object_refractive_index[objects] = object_refractive_index[objects - 1];
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
+		T_type[T_n] = SX;	T_param[T_n] = glass_inner_radius + glass_thickness;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = glass_inner_radius + glass_thickness;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = glass_height / 2;	T_n++;
+		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+		objects++;
+
+		// Bottom wall
+		double bottom_wall_params[2] = {0, glass_inner_radius + glass_thickness};
+		object_type[objects] = OBJ_ANNULUS;
+		object_parameters[objects] = bottom_wall_params;
+		object_texture[objects] = TM_SOLID_COLOR;
+		for (int i = 0; i < 3; i++)
+			object_color[objects][i] = object_color[objects - 1][i];
+		object_reflectivity[objects] = object_reflectivity[objects - 1];
+		object_opacity[objects] = object_opacity[objects - 1];
+		object_refractive_index[objects] = object_refractive_index[objects - 1];
+		T_n = 0;
+		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+		objects++;
+
+		// Inner bottom wall
+		double inner_bottom_wall_params[2] = {0, glass_inner_radius};
+		object_type[objects] = OBJ_ANNULUS;
+		object_parameters[objects] = inner_bottom_wall_params;
+		object_texture[objects] = TM_SOLID_COLOR;
+		for (int i = 0; i < 3; i++)
+			object_color[objects][i] = object_color[objects - 1][i];
+		object_reflectivity[objects] = object_reflectivity[objects - 1];
+		object_opacity[objects] = object_opacity[objects - 1];
+		object_refractive_index[objects] = object_refractive_index[objects - 1];
+		T_n = 0;
+		T_type[T_n] = NZ;	T_param[T_n] = -1;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = glass_thickness;	T_n++;
+		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+		objects++;
+
+		// Water
 		object_type[objects] = OBJ_CYLINDER;
 		object_texture[objects] = TM_SOLID_COLOR;
 		object_color[objects][_R] = 0.3;
-		object_color[objects][_G] = 0.6;
+		object_color[objects][_G] = 0.8;
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
-		object_opacity[objects] = 0.25;
-		object_refractive_index[objects] = 1.5;
+		object_opacity[objects] = 0.2;
+		object_refractive_index[objects] = n_water;
 		T_n = 0;
+		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = SX;	T_param[T_n] = 0.45;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 0.45;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 0.3;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		T_type[T_n] = SX;	T_param[T_n] = water_radius;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = water_radius;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = water_height / 2;	T_n++;
+		T_type[T_n] = TZ;	T_param[T_n] = glass_thickness;	T_n++;
+		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
 		objects++;
+		double glass_object_end = objects;
+		apply_transformation(glass_object_start, glass_object_end, view, view_i);
 
 		// Build bubbles
 		double bubble_radius = 0.01;
@@ -132,27 +200,6 @@ int main(int argc, char *argv[]) {
 			objects++;
 		}
 
-		// Build straw
-		object_type[objects] = OBJ_CYLINDER;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 0;
-		object_color[objects][_B] = 0;
-		object_reflectivity[objects] = 0.1;
-		object_opacity[objects] = 0.9;
-		object_refractive_index[objects] = 1.4;
-		T_n = 0;
-		T_type[T_n] = TZ;	T_param[T_n] = 1.3;	T_n++;
-		T_type[T_n] = SX;	T_param[T_n] = 0.05;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 0.05;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 0.5;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = 30;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -0.25;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		M3d_mat_mult(object_matrix[objects], view, M);
-		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
-		objects++;
-
 		// Build donut
 		object_type[objects] = OBJ_TORUS;
 		object_texture[objects] = TM_CHECKERBOARD;
@@ -173,6 +220,18 @@ int main(int argc, char *argv[]) {
 		object_type[objects] = OBJ_PLANE;
 		object_texture[objects] = TM_CHECKERBOARD;
 		T_n = 0;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+
+		// Build BG
+		object_type[objects] = OBJ_SPHERE;
+		object_texture[objects] = TM_CHECKERBOARD;
+		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 1000;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 1000;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 1000;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
