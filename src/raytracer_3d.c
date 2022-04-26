@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 		double eye[3] = {0.5, 4, 1};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
-		double eye_spacing = 0.2;
+		double eye_spacing = 1;
 
 		// Make view matrix
 		double view[4][4];
@@ -93,11 +93,11 @@ int main(int argc, char *argv[]) {
 		// Build water
 		object_type[objects] = OBJ_CYLINDER;
 		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0;
-		object_color[objects][_G] = 0.3;
+		object_color[objects][_R] = 0.3;
+		object_color[objects][_G] = 0.6;
 		object_color[objects][_B] = 1;
 		object_reflectivity[objects] = 0.2;
-		object_opacity[objects] = 0.4;
+		object_opacity[objects] = 0.25;
 		object_refractive_index[objects] = 1.5;
 		T_n = 0;
 		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
@@ -108,6 +108,29 @@ int main(int argc, char *argv[]) {
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
 		objects++;
+
+		// Build bubbles
+		double bubble_radius = 0.01;
+		for (int i = 0; i < 10; i++) {
+			object_type[objects] = OBJ_SPHERE;
+			object_texture[objects] = TM_SOLID_COLOR;
+			object_color[objects][_R] = 1;
+			object_color[objects][_G] = 1;
+			object_color[objects][_B] = 1;
+			object_reflectivity[objects] = 0.2;
+			object_opacity[objects] = 0.3;
+			T_n = 0;
+			T_type[T_n] = SX;	T_param[T_n] = bubble_radius;	T_n++;
+			T_type[T_n] = SY;	T_param[T_n] = bubble_radius;	T_n++;
+			T_type[T_n] = SZ;	T_param[T_n] = bubble_radius;	T_n++;
+			T_type[T_n] = TX;	T_param[T_n] = 0.2 * cos(i / 2.0);	T_n++;
+			T_type[T_n] = TY;	T_param[T_n] = 0.25 * sin(i / 3.0);	T_n++;
+			T_type[T_n] = TZ;	T_param[T_n] = 4 * frame / 100.0 + fabs(cos(i) / 3.0);	T_n++;
+			M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+			M3d_mat_mult(object_matrix[objects], view, M);
+			M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+			objects++;
+		}
 
 		// Build straw
 		object_type[objects] = OBJ_CYLINDER;
@@ -125,6 +148,31 @@ int main(int argc, char *argv[]) {
 		T_type[T_n] = SZ;	T_param[T_n] = 0.5;	T_n++;
 		T_type[T_n] = RY;	T_param[T_n] = 30;	T_n++;
 		T_type[T_n] = TX;	T_param[T_n] = -0.25;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+
+		// Build donut
+		object_type[objects] = OBJ_TORUS;
+		object_texture[objects] = TM_CHECKERBOARD;
+		object_reflectivity[objects] = 0.1;
+		T_n = 0;
+		T_type[T_n] = TZ;	T_param[T_n] = 0.2;	T_n++;
+		T_type[T_n] = SX;	T_param[T_n] = 0.3;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 0.3;	T_n++;
+		T_type[T_n] = SZ;	T_param[T_n] = 0.3;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = -32;	T_n++;
+		T_type[T_n] = TX;	T_param[T_n] = 1;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		M3d_mat_mult(object_matrix[objects], view, M);
+		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
+		objects++;
+
+		// Build table
+		object_type[objects] = OBJ_PLANE;
+		object_texture[objects] = TM_CHECKERBOARD;
+		T_n = 0;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		M3d_mat_mult(object_matrix[objects], view, M);
 		M3d_mat_mult(object_matrix_i[objects], M_i, view_i);
