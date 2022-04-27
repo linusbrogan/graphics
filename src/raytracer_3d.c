@@ -1,5 +1,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdlib.h>
 #include <lg.h>
 #include <light_model.h>
 #include <m3d.h>
@@ -9,6 +10,7 @@
 #define FRAMES 100
 
 void initialize() {
+	srand48(&initialize);
 	LG_init_graphics(1080, 720);
 	initialize_texture_maps();
 	HALF_ANGLE = M_PI / 4;
@@ -189,11 +191,13 @@ int main(int argc, char *argv[]) {
 			object_reflectivity[objects] = 0.2;
 			object_opacity[objects] = 0.3;
 			T_n = 0;
+			double bx = drand48() * glass_inner_radius * cos(TAU * drand48());
+			double by = drand48() * glass_inner_radius * sin(TAU * drand48());
 			T_type[T_n] = SX;	T_param[T_n] = bubble_radius;	T_n++;
 			T_type[T_n] = SY;	T_param[T_n] = bubble_radius;	T_n++;
 			T_type[T_n] = SZ;	T_param[T_n] = bubble_radius;	T_n++;
-			T_type[T_n] = TX;	T_param[T_n] = 0.2 * cos(i / 2.0);	T_n++;
-			T_type[T_n] = TY;	T_param[T_n] = 0.25 * sin(i / 3.0);	T_n++;
+			T_type[T_n] = TX;	T_param[T_n] = bx;	T_n++;
+			T_type[T_n] = TY;	T_param[T_n] = by;	T_n++;
 			T_type[T_n] = TZ;	T_param[T_n] = 4 * frame / 100.0 + fabs(cos(i) / 3.0);	T_n++;
 			M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 			M3d_mat_mult(object_matrix[objects], view, M);
