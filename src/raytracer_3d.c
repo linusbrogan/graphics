@@ -7,10 +7,9 @@
 #include <raytracing.h>
 
 #define OUTPUT_PATH "out/Raytracer_3D"
-#define FRAMES 100
+#define FRAMES 200
 
 void initialize() {
-	srand48(&initialize);
 	LG_init_graphics(1080, 720);
 	initialize_texture_maps();
 	HALF_ANGLE = M_PI / 4;
@@ -67,10 +66,10 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		double t = frame * TAU / FRAMES;
-		double eye[3] = {7 * cos(t * 2), 5 * sin(t * 2), cos(t * 3)};
+		double eye[3] = {5 * cos(t * 2), 5.2 * sin(t * 2), cos(t)};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
-		double eye_spacing = 1;
+		double eye_spacing = 0.05;
 
 		// Make view matrix
 		double view[4][4];
