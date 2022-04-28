@@ -42,7 +42,7 @@ SRC_TARGETS = $(addprefix build/,$(SRC_FILES))
 LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
 
 INCLUDES = -Iinclude
-C_FLAGS = -lm -lX11 $(INCLUDES)
+C_FLAGS = -lm -lX11 $(INCLUDES) -O3
 
 .PHONY: all clean default test
 
@@ -50,7 +50,8 @@ default: clean raytracer
 
 raytracer: build/raytracer_3d build/movie_player asset/earth.xwd
 	./build/raytracer_3d
-	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
+	./build/movie_player 720 480 out/Raytracer_3D/left_ 0 400 0 40000
+	echo ./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
 
 asset/earth.xwd:
 	convert asset/earth.jpg asset/earth.convert.xwd
