@@ -109,8 +109,9 @@ int main(int argc, char *argv[]) {
 					object_color[objects][_R] = ((double) (i + N) / (2 * N) + 1) / 2;
 					object_color[objects][_G] = ((double) (j + N) / (2 * N) + 1) / 2;
 					object_color[objects][_B] = ((double) (k + N) / (2 * N) + 1) / 2;
-					object_reflectivity[objects] = 0;
-					object_opacity[objects] = 1;
+					object_reflectivity[objects] = 0.2;
+					object_refractive_index[objects] = 1;
+					object_opacity[objects] = 0.4;
 					T_n = 0;
 					T_type[T_n] = SX;	T_param[T_n] = bubble_radius;	T_n++;
 					T_type[T_n] = SY;	T_param[T_n] = bubble_radius;	T_n++;
