@@ -5,7 +5,7 @@
 #include <rt_utils.h>
 #include <textures.h>
 
-#define MAXIMUM_OBJECTS 100
+#define MAXIMUM_OBJECTS 20000
 #define MAXIMUM_REFLECTIONS 4
 #define MINIMUM_INTENSITY 0.05
 #define INTENSITY_DECAY 0.99
