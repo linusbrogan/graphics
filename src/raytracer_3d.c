@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		double t = frame * TAU / FRAMES;
-		double eye[3] = {0, 0, 0.5};
-		double coi[3] = {cos(t), sin(t), cos(2 * t)};
+		double eye[3] = {0, 0, 5};
+		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
 		double eye_spacing = 0.02;
 
@@ -89,43 +89,80 @@ int main(int argc, char *argv[]) {
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
 		// Parameters
-		double glass_inner_radius = 1;
-		double glass_thickness = 0.05;
-		double glass_height = 3;
-		double water_height = glass_height * 0.6;
-		double water_radius = glass_inner_radius * 0.99;
-		double n_glass = 1.5;
-		double n_water = 1.33;
+		double vertex_radius = 0.1;
 
-		// Build bubbles
-		double bubble_radius = 0.1;
-		int N = 5;
-		for (int i = -N; i < N; i++) {
-			for (int j = -N; j < N; j++) {
-				for (int k = -N; k < N; k++) {
-					if ((i + j + k + 3 * N) % 2 == 0) continue;
+		for (int x = -1; x <= 1; x += 2) {
+			for (int y = -1; y <= 1; y += 2) {
+				for (int z = -1; z <= 1; z += 2) {
 					object_type[objects] = OBJ_SPHERE;
 					object_texture[objects] = TM_SOLID_COLOR;
-					object_color[objects][_R] = ((double) (i + N) / (2 * N) + 1) / 2;
-					object_color[objects][_G] = ((double) (j + N) / (2 * N) + 1) / 2;
-					object_color[objects][_B] = ((double) (k + N) / (2 * N) + 1) / 2;
-					object_reflectivity[objects] = 0.2;
-					object_refractive_index[objects] = 1;
-					object_opacity[objects] = 0.4;
+					object_color[objects][_R] = (x + 1) / 2.0;
+					object_color[objects][_G] = (y + 1) / 2.0;
+					object_color[objects][_B] = (z + 1) / 2.0;
 					T_n = 0;
-					T_type[T_n] = SX;	T_param[T_n] = bubble_radius;	T_n++;
-					T_type[T_n] = SY;	T_param[T_n] = bubble_radius;	T_n++;
-					T_type[T_n] = SZ;	T_param[T_n] = bubble_radius;	T_n++;
-					T_type[T_n] = TX;	T_param[T_n] = i;	T_n++;
-					T_type[T_n] = TY;	T_param[T_n] = j;	T_n++;
-					T_type[T_n] = TZ;	T_param[T_n] = k;	T_n++;
+					T_type[T_n] = SX;	T_param[T_n] = vertex_radius * 2;	T_n++;
+					T_type[T_n] = SY;	T_param[T_n] = vertex_radius * 2;	T_n++;
+					T_type[T_n] = SZ;	T_param[T_n] = vertex_radius * 2;	T_n++;
+					T_type[T_n] = TX;	T_param[T_n] = x;	T_n++;
+					T_type[T_n] = TY;	T_param[T_n] = y;	T_n++;
+					T_type[T_n] = TZ;	T_param[T_n] = z;	T_n++;
 					M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
 					objects++;
 				}
+
+				object_type[objects] = OBJ_CYLINDER;
+				object_texture[objects] = TM_SOLID_COLOR;
+				object_color[objects][_R] = 1;
+				object_color[objects][_G] = 1;
+				object_color[objects][_B] = 1;
+				T_n = 0;
+				T_type[T_n] = SX;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = SY;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = TX;	T_param[T_n] = x;	T_n++;
+				T_type[T_n] = TY;	T_param[T_n] = y;	T_n++;
+				M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+				objects++;
+
+				object_type[objects] = OBJ_CYLINDER;
+				object_texture[objects] = TM_SOLID_COLOR;
+				object_color[objects][_R] = 1;
+				object_color[objects][_G] = 1;
+				object_color[objects][_B] = 1;
+				T_n = 0;
+				T_type[T_n] = SX;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = SY;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = TX;	T_param[T_n] = x;	T_n++;
+				T_type[T_n] = TY;	T_param[T_n] = y;	T_n++;
+				T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
+				M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+				objects++;
+
+				object_type[objects] = OBJ_CYLINDER;
+				object_texture[objects] = TM_SOLID_COLOR;
+				object_color[objects][_R] = 1;
+				object_color[objects][_G] = 1;
+				object_color[objects][_B] = 1;
+				T_n = 0;
+				T_type[T_n] = SX;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = SY;	T_param[T_n] = vertex_radius;	T_n++;
+				T_type[T_n] = TX;	T_param[T_n] = x;	T_n++;
+				T_type[T_n] = TY;	T_param[T_n] = y;	T_n++;
+				T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
+				M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
+				objects++;
 			}
 		}
 
+		T_n = 0;
+		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = t / DEGREES;	T_n++;
+		//T_type[T_n] = RY;	T_param[T_n] = 2 * t;	T_n++;
+		//T_type[T_n] = RX;	T_param[T_n] = 1 * t;	T_n++;
+		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
+		apply_transformation(0, objects, M, M_i);
+
 		apply_transformation(0, objects, view, view_i);
+
 		render();
 
 		if (side < 0) {
