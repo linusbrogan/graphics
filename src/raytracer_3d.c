@@ -7,7 +7,7 @@
 #include <raytracing.h>
 
 #define OUTPUT_PATH "out/Raytracer_3D"
-#define FRAMES 100
+#define FRAMES 50
 
 void initialize() {
 	srand48(&initialize);
@@ -85,259 +85,26 @@ int main(int argc, char *argv[]) {
 		M3d_view_3d(view, view_i, eye, coi, up, eye_spacing * side);
 
 		// Set light
-		double light[3] = {50, 125, 56};
+		double light[3] = {50 * cos(t), 125 * sin(t), 56};
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
 		// Parameters
 		double vertex_radius = 0.3;
 		double cone_radius = 0.25;
 
-		for (int x = -1; x <= 1; x += 2) {
-			for (int y = -1; y <= 1; y += 2) {
-				for (int z = -1; z <= 1; z += 2) {
-					object_type[objects] = OBJ_SPHERE;
-					object_texture[objects] = TM_SOLID_COLOR;
-					object_color[objects][_R] = (x + 1) / 2.0;
-					object_color[objects][_G] = (y + 1) / 2.0;
-					object_color[objects][_B] = (z + 1) / 2.0;
-					T_n = 0;
-					T_type[T_n] = SX;	T_param[T_n] = vertex_radius;	T_n++;
-					T_type[T_n] = SY;	T_param[T_n] = vertex_radius;	T_n++;
-					T_type[T_n] = SZ;	T_param[T_n] = vertex_radius;	T_n++;
-					T_type[T_n] = TX;	T_param[T_n] = x;	T_n++;
-					T_type[T_n] = TY;	T_param[T_n] = y;	T_n++;
-					T_type[T_n] = TZ;	T_param[T_n] = z;	T_n++;
-					M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-					objects++;
-				}
-			}
-		}
-
-		// K -> R
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// K -> G
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = -90;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// K -> B
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// Y -> R
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// Y -> G
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -90;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// Y -> W
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// C -> G
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = 180;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// C -> B
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// C -> W
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = 90;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// M -> B
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = -90;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// M -> R
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RY;	T_param[T_n] = 180;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// M -> W
-		object_type[objects] = OBJ_CONE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 0.75;
-		object_color[objects][_G] = 0.75;
-		object_color[objects][_B] = 0.75;
-		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = cone_radius;	T_n++;
-		T_type[T_n] = SZ;	T_param[T_n] = 2;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = -1;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = -90;	T_n++;
-		T_type[T_n] = TZ;	T_param[T_n] = 1;	T_n++;
-		T_type[T_n] = TX;	T_param[T_n] = 1;	T_n++;
-		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		objects++;
-
-		// Reposition all objects
-		T_n = 0;
-		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = 45;	T_n++;
-		T_type[T_n] = RZ;	T_param[T_n] = t / DEGREES;	T_n++;
-		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
-		apply_transformation(0, objects, M, M_i);
-
 		// Planes
-		object_type[objects] = OBJ_PLANE;
-		object_texture[objects] = TM_SOLID_COLOR;
-		object_color[objects][_R] = 1;
-		object_color[objects][_G] = 1;
-		object_color[objects][_B] = 1;
-		object_reflectivity[objects] = 0.5;
+		object_type[objects] = OBJ_SPHERE;
+		object_texture[objects] = TM_EARTH;
+		object_color[objects][_R] = 0.6;
+		object_color[objects][_G] = 0.6;
+		object_color[objects][_B] = 0.6;
+		//object_refractive_index[objects] = 1 / 1.5;
+		//object_opacity[objects] = 0.5;
 		T_n = 0;
-		T_type[T_n] = SX;	T_param[T_n] = 100;	T_n++;
-		T_type[T_n] = SY;	T_param[T_n] = 100;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
-		T_type[T_n] = TY;	T_param[T_n] = -15;	T_n++;
+		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = t / DEGREES;	T_n++;
 		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
 		objects++;
-
 
 		apply_transformation(0, objects, view, view_i);
 
