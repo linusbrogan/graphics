@@ -74,10 +74,10 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		double t = frame * TAU / FRAMES;
-		double eye[3] = {0, 0, 5};
+		double eye[3] = {0, 5, 0};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
-		double eye_spacing = 0.02;
+		double eye_spacing = 0.2;
 
 		// Make view matrix
 		double view[4][4];
@@ -155,9 +155,8 @@ int main(int argc, char *argv[]) {
 
 		T_n = 0;
 		T_type[T_n] = RZ;	T_param[T_n] = 45;	T_n++;
-		T_type[T_n] = RX;	T_param[T_n] = t / DEGREES;	T_n++;
-		//T_type[T_n] = RY;	T_param[T_n] = 2 * t;	T_n++;
-		//T_type[T_n] = RX;	T_param[T_n] = 1 * t;	T_n++;
+		T_type[T_n] = RX;	T_param[T_n] = 45;	T_n++;
+		T_type[T_n] = RZ;	T_param[T_n] = t / DEGREES;	T_n++;
 		M3d_make_movement_sequence_matrix(M, M_i, T_n, T_type, T_param);
 		apply_transformation(0, objects, M, M_i);
 
