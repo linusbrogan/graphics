@@ -54,8 +54,8 @@ raytracer: build/raytracer_3d build/merge_3d build/movie_player asset/earth.xwd
 	./build/movie_player 1080 720 out/Raytracer_3D/3d_ 0 99 0 80000
 
 asset/earth.xwd:
-	convert asset/earth.jpg asset/earth.convert.xwd
-	./tool/change_CONVERTxwd_to_JEFFxwd.exec asset/earth.convert.xwd asset/earth.xwd
+	echo convert asset/earth.jpg asset/earth.convert.xwd
+	echo ./tool/change_CONVERTxwd_to_JEFFxwd.exec asset/earth.convert.xwd asset/earth.xwd
 
 space_station: build/space_station build/movie_player asset/earth.xwd
 	time ./build/space_station 0 100

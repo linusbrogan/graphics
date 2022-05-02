@@ -7,13 +7,13 @@
 #include <raytracing.h>
 
 #define OUTPUT_PATH "out/Raytracer_3D"
-#define FRAMES 50
+#define FRAMES 100
 
 void initialize() {
 	srand48(&initialize);
-	LG_init_graphics(1080, 720);
+	LG_init_graphics(720, 720);
 	initialize_texture_maps();
-	HALF_ANGLE = M_PI / 4;
+	//HALF_ANGLE = M_PI / 4;
 
 	// Create frame directory
 	mkdir(OUTPUT_PATH, 0777);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		double t = frame * TAU / FRAMES;
-		double eye[3] = {0, 5, 0};
+		double eye[3] = {0, 5, 3};
 		double coi[3] = {0, 0, 0};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
 		double eye_spacing = 0.2;
@@ -93,18 +93,24 @@ int main(int argc, char *argv[]) {
 		double cone_radius = 0.25;
 
 		// Planes
-		object_type[objects] = OBJ_SPHERE;
-		object_texture[objects] = TM_EARTH;
-		object_color[objects][_R] = 0.6;
-		object_color[objects][_G] = 0.6;
-		object_color[objects][_B] = 0.6;
+	double torus_params[2] = {1, 0.1};
+for (int i = 0; i < 3; i++){
+		object_type[objects] = OBJ_TORUS;
+		object_texture[objects] = TM_SOLID_COLOR;//EARTH;
+		object_parameters[objects] = torus_params;
+		object_color[objects][_R] = fmod((1 + i) / 4.0, 1) / 2 + 0.5;
+		object_color[objects][_G] = fmod((2 + i) / 4.0, 1) / 2 + 0.5;
+		object_color[objects][_B] = fmod((3 + i) / 4.0, 1) / 2 + 0.5;
 		//object_refractive_index[objects] = 1 / 1.5;
 		//object_opacity[objects] = 0.5;
 		T_n = 0;
-		T_type[T_n] = NX;	T_param[T_n] = -1;	T_n++;
+		int ops[3] = {RX, RZ, NX};
+		T_type[T_n] = RX;	T_param[T_n] = 90;	T_n++;
+		T_type[T_n] = ops[i];	T_param[T_n] = 90 /*i * 120*/;	T_n++;
 		T_type[T_n] = RZ;	T_param[T_n] = t / DEGREES;	T_n++;
 		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
 		objects++;
+}
 
 		apply_transformation(0, objects, view, view_i);
 
