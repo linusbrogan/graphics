@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 		// Configure frame
 		double t = frame * TAU / FRAMES;
-		double eye[3] = {2 + 4 * cos(2 * t), 2 + 5 * sin(2 * t), 2 + 0.5 * sin(5 * t)};
+		double eye[3] = {6 * cos(2 * t), 7 * sin(2 * t), 2 + 0.5 * sin(5 * t)};
 		double coi[3] = {0, 0, 2};
 		double up[3] = {eye[_X], eye[_Y], eye[_Z] + 1};
 		double eye_spacing = 1;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 		M3d_mat_mult_pt(light_in_eye_space, view, light);
 
 		// Parameters
-		double glass_inner_radius = 1;
+		double glass_inner_radius = 0.8;
 		double glass_thickness = 0.05;
 		double glass_height = 3;
 		double water_height = glass_height * 0.6;
@@ -218,15 +218,15 @@ int main(int argc, char *argv[]) {
 		objects++;
 
 		// Build bubbles
-		double bubble_radius = 0.01;
+		double bubble_radius = 0.015;
 		for (int i = 0; i < num_bubbles; i++) {
 			object_type[objects] = OBJ_SPHERE;
 			object_texture[objects] = TM_SOLID_COLOR;
 			object_color[objects][_R] = 1;
 			object_color[objects][_G] = 1;
 			object_color[objects][_B] = 1;
-			object_reflectivity[objects] = 0.2;
-			object_opacity[objects] = 0.7;
+			object_reflectivity[objects] = 0.1;
+			object_opacity[objects] = 0.8;
 			T_n = 0;
 			double bx = bubbles[i * 3] * glass_inner_radius * cos(TAU * bubbles[i * 3 + 1]);
 			double by = bubbles[i * 3] * glass_inner_radius * sin(TAU * bubbles[i * 3 + 1]);
@@ -286,20 +286,25 @@ int main(int argc, char *argv[]) {
 
 		// Build table
 		object_type[objects] = OBJ_PLANE;
-		object_texture[objects] = TM_CHECKERBOARD;
+		object_texture[objects] = TM_WOOD;
 		T_n = 0;
+		T_type[T_n] = SX;	T_param[T_n] = 10;	T_n++;
+		T_type[T_n] = SY;	T_param[T_n] = 10;	T_n++;
 		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
 		objects++;
 
 		// Build BG
 		object_type[objects] = OBJ_SPHERE;
-		object_texture[objects] = TM_CHECKERBOARD;
+		object_texture[objects] = TM_SOLID_COLOR;
+		object_color[objects][_R] = 0.75;
+		object_color[objects][_G] = 0.75;
+		object_color[objects][_B] = 0.75;
 		T_n = 0;
 		T_type[T_n] = SX;	T_param[T_n] = 10000;	T_n++;
 		T_type[T_n] = SY;	T_param[T_n] = 10000;	T_n++;
 		T_type[T_n] = SZ;	T_param[T_n] = 10000;	T_n++;
 		M3d_make_movement_sequence_matrix(object_matrix[objects], object_matrix_i[objects], T_n, T_type, T_param);
-		//objects++;
+		objects++;
 
 		apply_transformation(0, objects, view, view_i);
 		render();

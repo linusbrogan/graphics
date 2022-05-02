@@ -9,6 +9,7 @@ enum texture_map {
 	TM_CLOCK,
 	TM_MANDELBROT_SET,
 	TM_EARTH,
+	TM_WOOD,
 	TM_COUNT
 };
 
@@ -16,7 +17,8 @@ char *TEXTURE_MAP_FILES[TM_COUNT] = {
 	"asset/checkerboard.xwd",
 	"asset/clock.xwd",
 	"asset/mandelbrot_set.xwd",
-	"asset/earth.xwd"
+	"asset/earth.xwd",
+	"asset/wood.xwd"
 };
 
 int TEXTURE_IDS[TM_COUNT];
