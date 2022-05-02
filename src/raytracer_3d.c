@@ -9,8 +9,8 @@
 #define FRAMES 400
 
 void initialize() {
-	//LG_init_graphics(1080, 720);
-	LG_init_graphics(720, 480);
+	LG_init_graphics(1080, 720);
+	//LG_init_graphics(720, 480);
 	initialize_texture_maps();
 	HALF_ANGLE = M_PI / 4;
 
@@ -252,12 +252,11 @@ int main(int argc, char *argv[]) {
 		if (side < 0) {
 			save_image(frame, "left");
 			side = 1;
-//		} else {
-}
+		} else {
 			save_image(frame, "right");
-//			side = -1;
+			side = -1;
 			frame++;
-//		}
+		}
 	}
 
 	return 0;
