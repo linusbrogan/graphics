@@ -241,7 +241,7 @@ void reverse_parametrize_annulus(double xyz[3], double uv[2], void *params) {
 // Torus: (sqrt(x^2 + y^2) - R)^2 + z^2 - r^2 = 0
 // Parameters: primary radius R, secondary radius r
 // Constraints: R > r > 0
-double default_torus_parameters[2] = {1, 0.2};
+double default_torus_parameters[2] = {1, 0.3};
 void d_torus(double p[3], double d[3], void *params) {
 	if (params == NULL) params = default_torus_parameters;
 	double *parameters = params;
