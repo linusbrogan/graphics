@@ -25,9 +25,11 @@ int main(int argc, char *argv[]) {
 	int direction = 1;
 	while (1) {
 		sprintf(file_name, "%s%04d.xwd", prefix_name, i);
-		G_get_image_from_file(file_name, 0, 0) ;
-		G_display_image();
-		usleep(microseconds);
+		int loaded_image = G_get_image_from_file(file_name, 0, 0);
+		if (loaded_image) {
+			G_display_image();
+			usleep(microseconds);
+		}
 		char keypress = G_no_wait_key();
 		if (keypress == 'q') exit(0);
 		if (back_and_forth) {
