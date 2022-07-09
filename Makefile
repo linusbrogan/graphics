@@ -48,9 +48,10 @@ C_FLAGS = -O3 -lm -lX11 $(INCLUDES)
 
 default: clean raytracer
 
-raytracer: build/raytracer_3d build/movie_player asset/earth.xwd
+raytracer: build/raytracer_3d build/merge_3d build/movie_player asset/earth.xwd
 	./build/raytracer_3d
-	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
+	./build/merge_3d out/Raytracer_3D/ 0 399
+	./build/movie_player 1080 720 out/Raytracer_3D/3d_ 0 399 0 40000
 
 asset/earth.xwd:
 	convert asset/earth.jpg asset/earth.convert.xwd
