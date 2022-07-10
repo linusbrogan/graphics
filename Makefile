@@ -42,6 +42,8 @@ LIB_TARGETS = $(addprefix build/,$(addsuffix .o,$(LIB_FILES)))
 
 INCLUDES = -Iinclude
 C_FLAGS = -lm -lX11 $(INCLUDES)
+FFMPEG_FLAGS_1 = -y -start_number 0 -i
+FFMPEG_FLAGS_2 = -c:v libx264 -r 24.97
 
 .PHONY: all clean default test
 
@@ -49,7 +51,7 @@ default: clean raytracer
 
 raytracer: build/raytracer_3d build/movie_player asset/earth.xwd
 	./build/raytracer_3d
-	./build/movie_player 1080 720 out/Raytracer_3D/frame_ 0 99 1 40000
+	ffmpeg $(FFMPEG_FLAGS_1) out/Raytracer_3D/frame_%04d.xwd $(FFMPEG_FLAGS_2) out/Raytracer_3D/2D.mp4
 
 asset/earth.xwd:
 	convert asset/earth.jpg asset/earth.convert.xwd
