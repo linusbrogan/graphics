@@ -100,7 +100,6 @@ test: asset/earth.xwd $(SRC_TARGETS)
 	./build/view_test05MbS
 	./build/shapes
 	display out/2dshapes02.xwd
-	./tool/play_xwd_movieC.exec ./out/ViewMatrixMovie/pimage 0 90
 	echo asset/clock.xwd asset/mandelbrot_set.xwd | ./build/xwd_blend_example
 	./build/xwd_no_graphics_window_example
 	display out/taller.xwd
