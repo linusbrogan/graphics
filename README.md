@@ -1,6 +1,7 @@
 # Graphics
 
 This is a raytracer and some other graphics-related code.
+Earlier revisions render by z-buffer method.
 
 Download these renders in the [Releases](https://github.com/linusbrogan/graphics/releases).
 <video src="https://user-images.githubusercontent.com/6074681/196287214-ab932456-7729-45cc-801d-a8a14d199ef3.mp4" autoplay controls></video>
@@ -9,6 +10,18 @@ Download these renders in the [Releases](https://github.com/linusbrogan/graphics
 
 `make` will render the scene configured in `src/raytracer_3d.c` as `2D.mp4` and `3D.mp4` under `out/Raytracer_3D`.
 The 3D video is intended to be viewed with red-cyan 3D glasses.
+
+## Raytracer Features
+- Supported shapes include:
+  - Sphere
+  - Cylinder
+  - Cone
+  - Torus
+- Texture maps
+- Shadows
+- Reflection
+- Refraction
+- Red-cyan 3D
 
 ## Dependencies
 - [ImageMagick](https://imagemagick.org/) (`convert` produces XWD texture maps)
